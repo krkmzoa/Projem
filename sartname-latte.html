@@ -147,7 +147,7 @@ canvas{display:block;width:100%;height:100%}
     <div class="overlay" id="pick">
       <div class="pickhead">SİPARİŞ · KAHVENİ SEÇ</div>
       <div class="drinks" id="drinks"></div>
-      <div class="giftnote"><em>Mühendis</em> seviyesinde dört değerin hepsini <em>±1</em> sapmayla tuttur, seçtiğin kahve <em>bizden</em>.<br>Bu, en az <em>65 puan</em> demek.</div>
+      <div class="giftnote"><em>Mühendis</em> seviyesinde dört değerin hepsini <em>±1</em> sapmayla tuttur, seçtiğin kahve <em>bizden</em>.<br>Kazanan en az <em>65 puan</em> alır, ama yüksek puan tek başına yetmez.</div>
     </div>
 
     <div class="overlay" id="result" aria-live="polite">
@@ -197,7 +197,7 @@ canvas{display:block;width:100%;height:100%}
     muhendis: {label:'BARİSTA',     wob:.22, hide:true,  bands:true,  lag:0,   tol:[1.5,2.5,2,2], spd:1.1, gift:false,
                desc:'Dijital ekran kapalı · akış dalgalı'},
     bas:      {label:'MÜHENDİS',    wob:.38, hide:true,  bands:false, lag:.22, tol:[1,1,1,1],     spd:1.2, gift:true,
-               desc:'Hediye: 4 değer ±1 · en az 65 puan'},
+               desc:'Hediye: dört değerin hepsi ±1 içinde'},
   };
 
   const GIFT_MIN = Math.round(4*25*.65); // ±1'in tam kenarında bile alınan en düşük toplam
@@ -351,7 +351,7 @@ canvas{display:block;width:100%;height:100%}
       $('redeem').disabled = false; $('redeem').textContent = 'Barista onayı · Teslim edildi';
     }
     $('teaser').textContent = (!M.gift && allOne) ? 'Dört değer de ±1 içinde! Bunu Mühendis seviyesinde yaparsan kahve bizden.'
-      : (M.gift && !won) ? `Hediye şartı: 4 değer ±1 · en az ${GIFT_MIN} puan` : '';
+      : (M.gift && !won) ? `Hediye kazanılmadı: ${[0,1,2,3].filter(n => !withinOne(n)).map(n => `${STEPS[n].name} ${fmtV(n,S.val[n])}${STEPS[n].suf} (hedef ${targetOf(n)}${STEPS[n].suf})`).join(', ')} ±1 dışında. Puan ne olursa olsun dört değerin hepsi ±1 içinde olmalı.` : '';
     const isBest = total>bests[mode]; if (isBest){ bests[mode]=total; try{localStorage.setItem('koiBest3_'+mode, String(total));}catch(e){} }
     $('best').textContent = isBest && total>0 ? `YENİ REKOR · ${total}/100` : `REKORUN · ${bests[mode]}/100`;
     $('ctrl').textContent = won ? 'HEDİYE' : vtxt; $('ctrl').style.color = won ? 'var(--ok)' : vcol;
