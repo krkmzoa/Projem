@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Şartnameye Uygun Latte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#17345c;
+  --paper-deep:#112848;
+  --line:#e8eef7;
+  --line-dim:rgba(232,238,247,.42);
+  --koi:#f2792e;
+  --ok:#3ccf7d;
+  --warn:#ffb020;
+  --bad:#ff5a4f;
+  --espresso:#4a2614;
+  --milk:#c99a6b;
+  --foam:#f4e6cf;
+  --display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --body:'Barlow','Helvetica Neue',Arial,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--paper);
+  background-image:
+    linear-gradient(rgba(232,238,247,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,238,247,.07) 1px,transparent 1px),
+    linear-gradient(rgba(232,238,247,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,238,247,.035) 1px,transparent 1px);
+  background-size:80px 80px,80px 80px,16px 16px,16px 16px;
+  color:var(--line);font-family:var(--body);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  display:flex;justify-content:center;
+}
+.sheet{width:100%;max-width:460px;min-height:100%;padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;
+  border-left:1px solid var(--line-dim);border-right:1px solid var(--line-dim)}
+.top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--line-dim)}
+.top b{color:var(--koi);font-weight:700}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(36px,11vw,52px);line-height:.86;margin:0;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
+h1 span{color:var(--koi)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mode{appearance:none;border:1.5px solid var(--line-dim);background:transparent;color:var(--line-dim);border-radius:8px;padding:7px 2px;
+  font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.mode[aria-checked="true"]{border-color:var(--koi);background:var(--koi);color:#1b0f08}
+.mode:focus-visible{outline:3px solid var(--line);outline-offset:2px}
+.modesub{font-family:var(--mono);font-size:10px;color:var(--line-dim);display:flex;justify-content:space-between;gap:8px;margin-top:-4px}
+.modesub b{color:var(--koi);font-weight:700;white-space:nowrap}
+.specs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.spec{border:1.5px solid var(--line-dim);border-radius:6px;padding:5px 5px;font-family:var(--mono);font-size:10px;line-height:1.35;color:var(--line-dim);transition:border-color .2s,color .2s,background .2s;min-width:0}
+.spec b{display:block;font-size:11px;letter-spacing:-.03em;color:var(--line);font-weight:700;white-space:nowrap;overflow:hidden}
+.spec.active{border-color:var(--koi);color:var(--line);background:rgba(242,121,46,.12)}
+.spec.done{border-style:dashed}
+.spec .pts{float:right;color:var(--koi);font-weight:700}
+.stage{position:relative;flex:1;min-height:290px;border:1.5px solid var(--line);border-radius:4px;overflow:hidden;background:rgba(17,40,72,.35)}
+canvas{display:block;width:100%;height:100%}
+.stage-label{position:absolute;left:10px;top:8px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--line-dim)}
+.readout{position:absolute;right:10px;top:6px;text-align:right;font-family:var(--mono)}
+.readout .v{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.readout .u{font-size:11px;color:var(--line-dim);letter-spacing:.08em}
+.msg{min-height:44px;font-size:16px;line-height:1.3;font-weight:600;text-align:center;text-wrap:balance}
+.msg em{font-style:normal;color:var(--koi)}
+.hold{appearance:none;border:0;width:100%;height:74px;border-radius:14px;background:var(--koi);color:#1b0f08;
+  font-family:var(--display);font-weight:900;font-size:34px;letter-spacing:.04em;text-transform:uppercase;
+  box-shadow:0 6px 0 #a94d17;touch-action:none;cursor:pointer;transition:transform .05s,box-shadow .05s}
+.hold.down{transform:translateY(5px);box-shadow:0 1px 0 #a94d17}
+.hold:focus-visible{outline:3px solid var(--line);outline-offset:3px}
+.hold[disabled]{opacity:.45}
+.antet{display:grid;grid-template-columns:1.4fr 1fr 1fr;border:1.5px solid var(--line);font-family:var(--mono);font-size:9.5px;letter-spacing:.04em}
+.antet div{padding:4px 6px;border-right:1px solid var(--line-dim)}
+.antet div:last-child{border-right:0}
+.antet small{display:block;color:var(--line-dim);font-size:8.5px}
+.result{position:absolute;inset:0;background:rgba(14,32,58,.96);display:none;flex-direction:column;justify-content:center;align-items:center;gap:8px;padding:14px;overflow:auto;text-align:center}
+.result.show{display:flex}
+.score{font-family:var(--display);font-weight:900;font-size:76px;line-height:.85;font-variant-numeric:tabular-nums}
+.score small{font-size:32px;color:var(--line-dim)}
+.stamp{font-family:var(--display);font-weight:900;font-size:38px;letter-spacing:.06em;padding:4px 18px;border:5px solid currentColor;border-radius:8px;transform:rotate(-7deg)}
+.stamp.pop{animation:slam .32s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes slam{from{transform:rotate(-7deg) scale(2.6);opacity:0}to{transform:rotate(-7deg) scale(1);opacity:1}}
+.lines{width:100%;max-width:340px;font-family:var(--mono);font-size:11.5px;text-align:left;display:grid;gap:4px}
+.lines div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line-dim);padding-bottom:3px}
+.lines span:last-child{color:var(--koi);white-space:nowrap}
+.best{font-family:var(--mono);font-size:11px;color:var(--line-dim)}
+.row{display:flex;gap:8px;width:100%;max-width:340px}
+.btn{flex:1;appearance:none;border:1.5px solid var(--line);background:transparent;color:var(--line);border-radius:10px;padding:12px 8px;font-family:var(--body);font-weight:700;font-size:15px;cursor:pointer}
+.btn.primary{background:var(--line);color:var(--paper)}
+.btn:focus-visible{outline:3px solid var(--koi);outline-offset:2px}
+.kasa{font-size:13px;color:var(--line-dim);max-width:300px}
+@media (prefers-reduced-motion:reduce){.stamp.pop{animation:none}.hold{transition:none}}
+</style>
+</head>
+<body>
+<main class="sheet">
+  <div class="top"><span><b>ATELIER KOI</b> · PROJE KONTROL</span><span id="roundNo">PAFTA 1/4</span></div>
+  <h1>Şartnameye<br><span>uygun latte</span></h1>
+  <div class="modes" role="radiogroup" aria-label="Zorluk">
+    <button class="mode" role="radio" data-m="stajyer">STAJYER</button>
+    <button class="mode" role="radio" data-m="muhendis">MÜHENDİS</button>
+    <button class="mode" role="radio" data-m="bas">BAŞMÜHENDİS</button>
+  </div>
+  <div class="modesub"><span id="modeDesc"></span><b id="modeBest"></b></div>
+  <div class="specs">
+    <div class="spec active" id="sp0"></div>
+    <div class="spec" id="sp1"></div>
+    <div class="spec" id="sp2"></div>
+    <div class="spec" id="sp3"></div>
+  </div>
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+    <div class="stage-label">KESİT A-A · ÖLÇEK 1:1</div>
+    <div class="readout"><div class="v" id="rv">0,0</div><div class="u" id="ru">KG · TAMP BASKISI</div></div>
+    <div class="result" id="result" aria-live="polite">
+      <div class="best" id="resHead">PROJE KONTROL RAPORU</div>
+      <div class="score" id="score">0<small>/100</small></div>
+      <div class="stamp" id="stamp">UYGUNDUR</div>
+      <div class="lines" id="lines"></div>
+      <div class="best" id="best"></div>
+      <div class="row"><button class="btn primary" id="again">Tekrar dene</button><button class="btn" id="copy">Skoru kopyala</button></div>
+      <div class="kasa">Rekorunu kasada göster.</div>
+    </div>
+  </div>
+  <div class="msg" id="msg"></div>
+  <button class="hold" id="hold" aria-label="Bas">Bas</button>
+  <div class="antet">
+    <div><small>PROJE</small>Latte · Şartname Rev.02</div>
+    <div><small>ÇİZEN</small>Mühendis Kafeci</div>
+    <div><small>KONTROL</small><span id="ctrl">—</span></div>
+  </div>
+</main>
+<script>
+(() => {
+  const num = (v, d) => (+v.toFixed(d)).toString().replace('.', ',');
+
+  // Zorluk seviyeleri
+  const MODES = {
+    stajyer:  {label:'STAJYER',     random:false, wob:0,   hide:false, bands:true,  lag:0,   tol:[1.5,3,3,.15],  spd:1,
+               desc:'Sabit şartname · göstergeler açık'},
+    muhendis: {label:'MÜHENDİS',    random:true,  wob:.22, hide:true,  bands:true,  lag:0,   tol:[1,2,2,.1],     spd:1.15,
+               desc:'Her tur yeni şartname · dijital ekran kapalı'},
+    bas:      {label:'BAŞMÜHENDİS', random:true,  wob:.38, hide:true,  bands:false, lag:.22, tol:[.6,1.5,1.5,.07], spd:1.3,
+               desc:'Hedef bandı yok · sensör gecikmeli'},
+  };
+  const BASE = [15, 27, 62, 1.5];
+  const POOL = [[13,14,15,16,17],[24,25,26,27,28,29,30],[56,58,60,62,64,66],[1.0,1.2,1.4,1.5,1.6]];
+
+  const STEPS = [
+    {key:'tamp', name:'Tamp', unit:'KG · TAMP BASKISI', suf:' kg', fall:4, d:1, cd:0, btn:'Bas',
+     ready:t=>`İğne salınıyor. Baskı <em>${t}</em> iken <em>bas</em>.`, low:'Gevşek tamp', high:'Sıkı tamp'},
+    {key:'shot', name:'Espresso', unit:'SN · EKSTRAKSİYON', suf:' sn', fall:5, d:1, cd:0, btn:'Basılı tut',
+     ready:t=>`Basılı tut, shot aksın. <em>${t}</em> olunca bırak.`, low:'Az ekstrakte, ekşi', high:'Fazla ekstrakte, acı'},
+    {key:'milk', name:'Süt', unit:'°C · SÜT SICAKLIĞI', suf:' °C', fall:7, d:0, cd:0, btn:'Basılı tut',
+     ready:t=>`Sütü ısıt. Hedef <em>${t}</em>. Bırakınca da bir süre ısınır.`, low:'Ilık kaldı', high:'Fazla ısındı', burn:'Süt yandı'},
+    {key:'foam', name:'Köpük', unit:'CM · KÖPÜK KALINLIĞI', suf:' cm', fall:.45, d:2, cd:1, btn:'Basılı tut',
+     ready:t=>`Sütü dök. Köpük <em>${t}</em> olunca bırak. Taşırma.`, low:'Köpük ince', high:'Köpük kalın'},
+  ];
+  const fmtV = (i, v) => i===2 ? String(Math.round(v)) : v.toFixed(STEPS[i].d).replace('.', ',');
+  const fmtT = (i) => { const t=S.tgt[i], st=STEPS[i]; return `${t.c.toFixed(st.cd).replace('.',',')}${st.suf} ±${num(t.half,2)}`; };
+
+  const $ = id => document.getElementById(id);
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  const holdBtn = $('hold'), msg = $('msg');
+  const rnd = (a,b) => a+Math.random()*(b-a);
+  const pick = a => a[Math.floor(Math.random()*a.length)];
+
+  let mode = 'muhendis';
+  try { const m = localStorage.getItem('koiLatteMode'); if (MODES[m]) mode = m; } catch(e) {}
+  const bests = {};
+  for (const k in MODES){ try { bests[k] = +localStorage.getItem('koiLatte2_'+k) || 0; } catch(e){ bests[k]=0; } }
+
+  let S;
+  function fresh(){
+    const M = MODES[mode];
+    return {step:0, phase:'ready', t:0, holdT:0,
+      tgt: STEPS.map((st,i)=>({c: M.random ? pick(POOL[i]) : BASE[i], half: M.tol[i]})),
+      tamp:0, tampPh:Math.random()*2, shot:0, temp:6, foam:0, disp:[0,0,6,0], val:[0,0,0,0],
+      rate:[0,1,2,3].map(()=>rnd(.85,1.2)), ph:[0,1,2,3,4,5,6,7].map(()=>rnd(0,6.28)),
+      inertia:rnd(2,4.5)*(mode==='bas'?1.25:1), drip:rnd(.03,.09), tf:1,
+      pts:[null,null,null,null], notes:['','','',''], post:0, overflow:false};
+  }
+  // Akış hızındaki dalgalanma (basınç, buhar, el titremesi)
+  function wob(i, t){ const a=MODES[mode].wob; return 1 + a*(.6*Math.sin(t*2.3+S.ph[i]) + .4*Math.sin(t*5.7+S.ph[i+4])); }
+
+  // ---------- puanlama: her adım 25 puan ----------
+  function score(i, v){
+    const st = STEPS[i], t = S.tgt[i];
+    if (st.key==='milk' && v>=72) return [0, st.burn];
+    if (st.key==='foam' && S.overflow) return [0, 'Taştı'];
+    const d = Math.abs(v - t.c);
+    if (d <= t.half) return [25*(1 - .35*(d/t.half)**2), d <= t.half*.25 ? 'Tam şartname' : 'Şartnameye uygun'];
+    return [25*Math.max(0, .45*(1-(d-t.half)/st.fall)), v<t.c ? st.low : st.high];
+  }
+
+  // ---------- fizik ----------
+  let last = performance.now(), holding = false;
+  function update(dt){
+    const M = MODES[mode], i = S.step, st = STEPS[i];
+    S.t += dt;
+    if (i===0 && S.phase==='ready'){
+      const kgps = 18*M.spd*S.rate[0]*wob(0, S.t)*Math.min(1.6, 1+.06*S.t);
+      S.tampPh = (S.tampPh + dt*kgps/30) % 2;
+      S.tamp = 30*(S.tampPh<1 ? S.tampPh : 2-S.tampPh);
+    }
+    if (S.phase==='holding'){
+      S.holdT += dt; const h=S.holdT;
+      if (i===1) S.shot += dt*8*S.rate[1]*S.tf*wob(1,h);
+      if (i===2) S.temp += dt*(12+9*h)*S.rate[2]*wob(2,h);
+      if (i===3){ S.foam += dt*(.4+.35*h)*S.rate[3]*wob(3,h); if (liquidTop()>8.9){ S.overflow=true; release(); } }
+    } else if (S.phase==='settle'){
+      S.post += dt;
+      if (i===2){ const k=Math.min(1,S.post/0.9); S.temp = S.tempAtRelease + S.inertia*(1-Math.pow(1-k,2)); }
+      if (i===3){ const k=Math.min(1,S.post/0.5); S.foam = S.foamAtRelease + S.drip*k; }
+      if (S.post>0.95) finishStep();
+    }
+    const real = [S.tamp, S.shot, S.temp, S.foam];
+    for (let k=0;k<4;k++){
+      if (k===0 || !M.lag) S.disp[k] = real[k];
+      else S.disp[k] += (real[k]-S.disp[k])*Math.min(1, dt/M.lag);
+    }
+    const v = S.disp[i], t = S.tgt[i];
+    const live = (i===0 && S.phase==='ready') || S.phase==='holding' || S.phase==='settle';
+    const rv = $('rv');
+    if (M.hide && live){ rv.textContent = '– –'; rv.style.color = 'var(--line-dim)'; return; }
+    rv.textContent = fmtV(i, v);
+    const inBand = Math.abs(v-t.c) <= t.half;
+    rv.style.color = (S.phase==='ready' && i>0) ? 'var(--line)' : (inBand ? 'var(--ok)' : (v>t.c ? 'var(--bad)' : 'var(--line)'));
+  }
+  function espH(){ return Math.min(2.6, S.shot*0.06); }
+  function liquidTop(){ return espH() + (S.foam>0 ? 4.4*Math.pow(S.foam/1.5,.8) + S.foam : 0); }
+
+  // ---------- akış ----------
+  function press(){
+    if (S.phase!=='ready') return;
+    holdBtn.classList.add('down');
+    if (S.step===0){ S.phase='settle'; S.post=0.6; holdBtn.disabled=true; return; }
+    holding = true; S.holdT = 0; S.phase='holding';
+  }
+  function release(){
+    holdBtn.classList.remove('down');
+    if (!holding) return; holding=false;
+    if (S.phase!=='holding') return;
+    S.phase='settle'; S.post=0; S.tempAtRelease=S.temp; S.foamAtRelease=S.foam;
+    if (S.step===1) S.post=0.6;
+    holdBtn.disabled = true;
+  }
+  function finishStep(){
+    const i = S.step, st = STEPS[i], v = [S.tamp,S.shot,S.temp,S.foam][i];
+    S.disp[i] = v;
+    const [p, note] = score(i, v); S.pts[i]=p; S.notes[i]=note; S.val[i]=v;
+    $('pt'+i).textContent = Math.round(p);
+    $('sp'+i).classList.remove('active'); $('sp'+i).classList.add('done');
+    $('rv').textContent = fmtV(i, v);
+    let extra = '';
+    if (i===0){
+      S.tf = Math.max(.6, Math.min(1.6, 1 + (S.tgt[0].c - v)*.07));
+      extra = S.tf>1.08 ? ' Shot <em>hızlı</em> akacak.' : S.tf<.92 ? ' Shot <em>yavaş</em> akacak.' : '';
+    }
+    msg.innerHTML = `${st.name}: <em>${fmtV(i,v)}${st.suf}</em>. ${note}.${extra}`;
+    S.phase='wait';
+    setTimeout(()=>{
+      if (S.step<3){ S.step++; S.phase='ready'; holdBtn.disabled=false; setBtn();
+        $('sp'+S.step).classList.add('active'); $('ru').textContent=STEPS[S.step].unit; $('roundNo').textContent=`PAFTA ${S.step+1}/4`;
+        msg.innerHTML = STEPS[S.step].ready(fmtT(S.step)); }
+      else showResult();
+    }, i===0 && extra ? 1700 : 1300);
+  }
+  function setBtn(){ const b = STEPS[S.step].btn; holdBtn.textContent = b; holdBtn.setAttribute('aria-label', b); }
+  function verdict(total){ return total>=90?['UYGUNDUR','var(--ok)']: total>=70?['REVİZE','var(--warn)']:['UYGUNSUZ','var(--bad)']; }
+  function showResult(){
+    const total = Math.round(S.pts.reduce((a,b)=>a+b,0));
+    const [vtxt, vcol] = verdict(total);
+    $('resHead').textContent = `PROJE KONTROL RAPORU · ${MODES[mode].label}`;
+    $('score').innerHTML = `${total}<small>/100</small>`;
+    const stp=$('stamp'); stp.textContent=vtxt; stp.style.color=vcol; stp.classList.remove('pop'); void stp.offsetWidth; stp.classList.add('pop');
+    $('lines').innerHTML = STEPS.map((st,i)=>`<div><span>${st.name} · ${fmtV(i,S.val[i])}${st.suf} / ${fmtT(i)} · ${S.notes[i]}</span><span>${Math.round(S.pts[i])}</span></div>`).join('');
+    const isBest = total>bests[mode]; if (isBest){ bests[mode]=total; try{localStorage.setItem('koiLatte2_'+mode, String(total));}catch(e){} }
+    $('best').textContent = isBest && total>0 ? `YENİ REKOR · ${total}/100` : `REKORUN · ${bests[mode]}/100`;
+    $('ctrl').textContent = vtxt; $('ctrl').style.color = vcol;
+    $('result').classList.add('show');
+    msg.innerHTML = total>=90 ? 'Proje onaylandı. <em>Afiyet olsun.</em>' : total>=70 ? 'Revizyon gerekli. <em>Bir daha dene.</em>' : 'Şartname dışı. <em>Yeniden hesapla.</em>';
+    holdBtn.disabled = true;
+    S.total=total; S.verdict=vtxt;
+    renderModes();
+  }
+  function renderSpecs(){
+    STEPS.forEach((st,i)=>{
+      $('sp'+i).innerHTML = `<b>${st.name}</b><span class="pts" id="pt${i}"></span>${S.tgt[i].c.toFixed(st.cd).replace('.',',')}${st.suf}<br>±${num(S.tgt[i].half,2)}`;
+    });
+  }
+  function renderModes(){
+    document.querySelectorAll('.mode').forEach(b => b.setAttribute('aria-checked', String(b.dataset.m===mode)));
+    $('modeDesc').textContent = MODES[mode].desc;
+    $('modeBest').textContent = `REKOR ${bests[mode]}`;
+  }
+  function restart(){
+    S = fresh(); holding=false; $('result').classList.remove('show'); holdBtn.disabled=false; holdBtn.classList.remove('down');
+    renderSpecs(); renderModes();
+    for (let i=0;i<4;i++) $('sp'+i).classList.remove('done','active');
+    $('sp0').classList.add('active'); $('ru').textContent=STEPS[0].unit; $('roundNo').textContent='PAFTA 1/4';
+    $('ctrl').textContent='—'; $('ctrl').style.color='';
+    setBtn();
+    msg.innerHTML = STEPS[0].ready(fmtT(0));
+  }
+  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => {
+    mode = b.dataset.m; try{localStorage.setItem('koiLatteMode', mode);}catch(e){}
+    restart();
+  }));
+  $('again').addEventListener('click', restart);
+  $('copy').addEventListener('click', async () => {
+    const t = `Atelier Koi · Şartnameye Uygun Latte · ${MODES[mode].label}: ${S.total}/100 · ${S.verdict}`;
+    try { await navigator.clipboard.writeText(t); $('copy').textContent='Kopyalandı'; }
+    catch(e){ $('copy').textContent='Kopyalanamadı'; }
+    setTimeout(()=>$('copy').textContent='Skoru kopyala', 1600);
+  });
+  holdBtn.addEventListener('pointerdown', e => { e.preventDefault(); try{holdBtn.setPointerCapture(e.pointerId);}catch(_){} press(); });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev => holdBtn.addEventListener(ev, release));
+  holdBtn.addEventListener('contextmenu', e => e.preventDefault());
+  window.addEventListener('keydown', e => { if ((e.code==='Space'||e.code==='Enter') && !e.repeat && document.activeElement===holdBtn){ e.preventDefault(); press(); } });
+  window.addEventListener('keyup', e => { if (e.code==='Space'||e.code==='Enter') release(); });
+
+  // ---------- çizim ----------
+  let W=0,H=0,dpr=1;
+  function resize(){ const r=cv.getBoundingClientRect(); dpr=Math.min(2,window.devicePixelRatio||1); W=r.width; H=r.height; cv.width=W*dpr; cv.height=H*dpr; }
+  new ResizeObserver(resize).observe(cv); resize();
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const C = {}; ['--line','--line-dim','--koi','--ok','--bad','--espresso','--milk','--foam','--warn'].forEach(k=>C[k]=css(k));
+  const MONO = css('--mono');
+
+  function draw(now){
+    const M = MODES[mode];
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+    const cupH = 9, top = H*0.17, bot = H*0.9, pxcm = (bot-top)/cupH;
+    const cx = W*0.4, topW = Math.min(W*0.27, pxcm*3.6), botW = topW*0.68;
+    const xAt = h => topW - (topW-botW)*(1-h/cupH);
+    const yAt = h => bot - h*pxcm;
+    function layer(h0,h1,fill,hatch){
+      if (h1<=h0) return;
+      ctx.beginPath(); ctx.moveTo(cx-xAt(h0),yAt(h0)); ctx.lineTo(cx+xAt(h0),yAt(h0)); ctx.lineTo(cx+xAt(h1),yAt(h1)); ctx.lineTo(cx-xAt(h1),yAt(h1)); ctx.closePath();
+      ctx.fillStyle=fill; ctx.fill();
+      if (hatch){ ctx.save(); ctx.clip(); ctx.strokeStyle='rgba(0,0,0,.12)'; ctx.lineWidth=1;
+        for (let x=-H; x<W; x+=9){ ctx.beginPath(); ctx.moveTo(x,yAt(h0)); ctx.lineTo(x+(yAt(h0)-yAt(h1)),yAt(h1)); ctx.stroke(); } ctx.restore(); }
+    }
+    const e = espH(), foamTop = liquidTop(), foamBot = S.foam>0 ? foamTop - S.foam : e;
+    layer(0, e, C['--espresso']);
+    layer(e, foamBot, C['--milk']);
+    layer(foamBot, foamTop, C['--foam'], true);
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2.2; ctx.lineJoin='round';
+    ctx.beginPath(); ctx.moveTo(cx-topW-6,top); ctx.lineTo(cx-botW-6,bot+6); ctx.lineTo(cx+botW+6,bot+6); ctx.lineTo(cx+topW+6,top); ctx.stroke();
+    ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(cx-topW,top); ctx.lineTo(cx-botW,bot); ctx.lineTo(cx+botW,bot); ctx.lineTo(cx+topW,top); ctx.stroke();
+    ctx.save(); ctx.beginPath(); ctx.moveTo(cx-topW-6,top); ctx.lineTo(cx-botW-6,bot+6); ctx.lineTo(cx+botW+6,bot+6); ctx.lineTo(cx+topW+6,top);
+    ctx.lineTo(cx+topW,top); ctx.lineTo(cx+botW,bot); ctx.lineTo(cx-botW,bot); ctx.lineTo(cx-topW,top); ctx.closePath(); ctx.clip();
+    ctx.strokeStyle=C['--line-dim']; ctx.lineWidth=1; for (let x=-H;x<W;x+=6){ ctx.beginPath(); ctx.moveTo(x,bot+8); ctx.lineTo(x+H,bot+8-H); ctx.stroke(); } ctx.restore();
+    ctx.lineWidth=2.2; ctx.strokeStyle=C['--line']; ctx.beginPath(); ctx.ellipse(cx-topW-4-pxcm*.9, yAt(5.2), pxcm*1.0, pxcm*1.5, 0, Math.PI*.42, Math.PI*1.58); ctx.stroke();
+    ctx.setLineDash([14,4,3,4]); ctx.lineWidth=1; ctx.strokeStyle=C['--line-dim']; ctx.beginPath(); ctx.moveTo(cx,top-14); ctx.lineTo(cx,bot+18); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = `500 10px ${MONO}`; ctx.fillStyle=C['--line-dim'];
+
+    const gx = cx + topW + 26;
+    const t = S.tgt[S.step];
+    if (S.step===0) drawGauge(gx+(W-gx)/2-8, H*0.55, Math.max(26, Math.min((W-gx)/2-26, 56)), t, M.bands);
+    if (S.step===1) drawClock(gx+(W-gx)/2, H*0.45, Math.max(26, Math.min((W-gx)/2-10, 52)), t, M.bands);
+    if (S.step===2) drawThermo(gx + 22, top, bot, t, M.bands);
+    if (S.step===3) drawRuler(cx+topW+14, foamBot, foamTop, yAt, t, M.bands);
+    if (S.phase==='holding'){
+      ctx.strokeStyle = S.step===1 ? C['--espresso'] : C['--foam']; ctx.lineWidth = S.step===1?4:7; ctx.lineCap='round';
+      if (S.step!==2){ const sx = cx + (S.step===3?10:0); ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, yAt(S.step===1?e:foamTop)); ctx.stroke(); }
+    }
+    if (S.step===2){
+      const k = Math.max(0,(S.temp-30)/40);
+      ctx.strokeStyle=`rgba(232,238,247,${0.25*k})`; ctx.lineWidth=3;
+      for (let i=0;i<3;i++){ const ph=(now/900+i/3)%1; const x=cx-20+i*20, y=top-10-ph*50; ctx.beginPath(); ctx.moveTo(x,y+30); ctx.quadraticCurveTo(x+10*Math.sin(now/300+i),y+15,x,y); ctx.stroke(); }
+    }
+    ctx.strokeStyle=C['--line-dim']; ctx.lineWidth=1; const dx = cx-topW-pxcm*2.6;
+    ctx.beginPath(); ctx.moveTo(dx, top); ctx.lineTo(dx, bot); ctx.stroke();
+    [top,bot].forEach(y=>{ctx.beginPath(); ctx.moveTo(dx-5,y); ctx.lineTo(dx+5,y); ctx.stroke();});
+    ctx.save(); ctx.translate(dx-6,(top+bot)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillStyle=C['--line-dim']; ctx.fillText('h = 9,0 cm',0,0); ctx.restore();
+  }
+  function drawGauge(x,y,r,t,bands){
+    const A = v => Math.PI + (v/30)*Math.PI;
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,r,Math.PI,0); ctx.lineTo(x-r,y); ctx.stroke();
+    if (bands){ ctx.strokeStyle=C['--ok']; ctx.lineWidth=7; ctx.beginPath(); ctx.arc(x,y,r-6,A(t.c-t.half),A(t.c+t.half)); ctx.stroke(); }
+    ctx.strokeStyle=C['--line-dim']; ctx.fillStyle=C['--line-dim']; ctx.lineWidth=1; ctx.textAlign='center';
+    for (let v=0; v<=30; v+=1){ const a=A(v), l = v%5===0 ? 10 : 4;
+      ctx.beginPath(); ctx.moveTo(x+Math.cos(a)*(r-2),y+Math.sin(a)*(r-2)); ctx.lineTo(x+Math.cos(a)*(r-2-l),y+Math.sin(a)*(r-2-l)); ctx.stroke();
+      if (v%10===0) ctx.fillText(String(v), x+Math.cos(a)*(r+10), y+Math.sin(a)*(r+10)+3); }
+    const a=A(S.disp[0]); ctx.strokeStyle=C['--koi']; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+Math.cos(a)*(r-10),y+Math.sin(a)*(r-10)); ctx.stroke();
+    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fill();
+    ctx.fillStyle=C['--line-dim']; ctx.fillText('kg', x, y+16);
+  }
+  function drawClock(x,y,r,t,bands){
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.stroke();
+    const a0=-Math.PI/2, per=40;
+    if (bands){ ctx.strokeStyle=C['--ok']; ctx.lineWidth=7; ctx.beginPath(); ctx.arc(x,y,r-6,a0+(t.c-t.half)/per*Math.PI*2,a0+(t.c+t.half)/per*Math.PI*2); ctx.stroke(); }
+    ctx.strokeStyle=C['--line-dim']; ctx.fillStyle=C['--line-dim']; ctx.lineWidth=1; ctx.textAlign='center';
+    for (let i=0;i<40;i++){ const a=a0+i/per*Math.PI*2, l = i%5===0 ? 8 : 3;
+      ctx.beginPath(); ctx.moveTo(x+Math.cos(a)*(r-2),y+Math.sin(a)*(r-2)); ctx.lineTo(x+Math.cos(a)*(r-2-l),y+Math.sin(a)*(r-2-l)); ctx.stroke();
+      if (i%10===0) ctx.fillText(String(i), x+Math.cos(a)*(r-18), y+Math.sin(a)*(r-18)+3); }
+    const a=a0+(S.disp[1]%per)/per*Math.PI*2; ctx.strokeStyle=C['--koi']; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+Math.cos(a)*(r-10),y+Math.sin(a)*(r-10)); ctx.stroke();
+    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fill();
+    ctx.fillStyle=C['--line-dim']; ctx.fillText('sn', x, y+r+16);
+  }
+  function drawThermo(x,top,bot,t,bands){
+    const lo=0, hi=80, y=v=>bot-(v-lo)/(hi-lo)*(bot-top-20);
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.roundRect(x-9, top, 18, bot-top-6, 9); ctx.stroke();
+    if (bands){ ctx.fillStyle='rgba(60,207,125,.25)'; ctx.fillRect(x-30, y(t.c+t.half), 60, y(t.c-t.half)-y(t.c+t.half)); }
+    ctx.fillStyle='rgba(255,90,79,.18)'; ctx.fillRect(x-30, y(80), 60, y(72)-y(80));
+    const v=Math.min(80,S.disp[2]); ctx.fillStyle = S.disp[2]>t.c+t.half ? C['--bad'] : C['--koi'];
+    ctx.beginPath(); ctx.roundRect(x-4.5, y(v), 9, bot-6-y(v)-2, 4); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, bot-4, 12, 0, 7); ctx.fill();
+    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left';
+    for (let k=0;k<=80;k+=2){ ctx.fillRect(x+12, y(k), k%10===0?7:3, 1); if (k%10===0) ctx.fillText(String(k), x+21, y(k)+3); }
+    if (bands){ ctx.fillStyle=C['--ok']; ctx.fillText(`${num(t.c-t.half,1)}–${num(t.c+t.half,1)}`, x+21, y(t.c)+3); }
+    ctx.fillStyle=C['--bad']; ctx.fillText('YANIK', x-28, y(76)+3);
+  }
+  function drawRuler(x, fb, ft, yAt, t, bands){
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=1.5; ctx.fillStyle='rgba(232,238,247,.08)';
+    const y0=yAt(fb), y3=yAt(fb+3);
+    ctx.fillRect(x, y3, 26, y0-y3); ctx.strokeRect(x, y3, 26, y0-y3);
+    if (bands){ ctx.fillStyle='rgba(60,207,125,.3)'; ctx.fillRect(x, yAt(fb+t.c+t.half), 26, yAt(fb+t.c-t.half)-yAt(fb+t.c+t.half)); }
+    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left';
+    for (let mm=0; mm<=30; mm++){ const yy=yAt(fb+mm/10); ctx.fillRect(x, yy, mm%10===0?14:(mm%5===0?10:5), 1); if (mm%5===0) ctx.fillText((mm/10).toFixed(1).replace('.',','), x+30, yy+3); }
+    // sensör göstergesi (başmühendiste gecikmeli)
+    const yt=yAt(fb + S.disp[3]);
+    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.moveTo(x-2,yt); ctx.lineTo(x-12,yt-6); ctx.lineTo(x-12,yt+6); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=C['--koi']; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(x-12,yt); ctx.lineTo(x-60,yt); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  function loop(now){
+    const dt = Math.min(0.05,(now-last)/1000); last=now;
+    if (S.phase!=='wait') update(dt);
+    draw(now);
+    requestAnimationFrame(loop);
+  }
+  restart();
+  window.claude?.hot?.snapshot?.(() => ({bests, mode}));
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
