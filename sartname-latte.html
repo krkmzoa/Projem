@@ -219,7 +219,7 @@ canvas{display:block;width:100%;height:100%}
                desc:'Göstergeler açık · geniş tolerans'},
     muhendis: {label:'BARİSTA',     wob:.22, hide:true,  bands:true,  lag:0,   tol:[1.5,2.5,2,2], spd:1.1, gift:false,
                desc:'Dijital ekran kapalı · akış dalgalı'},
-    bas:      {label:'MÜHENDİS',    wob:.38, hide:true,  bands:false, lag:.22, tol:[1,1,1,1],     spd:1.2, gift:true,
+    bas:      {label:'MÜHENDİS',    wob:.38, hide:true,  bands:false, lag:0,   tol:[1,1,1,1],     spd:1.2, gift:true,
                desc:'Hediye: 80+ puan · sapma ±2 içinde'},
   };
 
@@ -235,7 +235,7 @@ canvas{display:block;width:100%;height:100%}
     {key:'milk', name:'Süt', unit:'°C · SÜT SICAKLIĞI', suf:' °C', fall:7, d:0,
      ready:t=>`Sütü ısıt. Hedef <em>${t}</em>. Bırakınca da bir süre ısınır.`, low:'Ilık kaldı', high:'Fazla ısındı', burn:'Süt yandı'},
     {key:'foam', name:'Köpük', unit:'MM · KÖPÜK KALINLIĞI', suf:' mm', fall:6, d:1,
-     ready:t=>`Sütü dök. Köpük <em>${t}</em> olunca bırak. Taşırma.`},
+     ready:t=>`Sütü dök. Köpük <em>${t}</em> olunca bırak. Bırakınca biraz kabarır, taşırma.`},
   ];
   const targetOf = i => [18, 36, 65, DRINKS[drink].foam][i];
   const rnd1 = (i, v) => STEPS[i].d ? Math.round(v*10)/10 : Math.round(v);
@@ -630,7 +630,7 @@ canvas{display:block;width:100%;height:100%}
       if (mm%every===0) ctx.fillText(String(mm), xr+13, yy+4);
     }
     if (bands){ ctx.fillStyle=C['--ok']; ctx.font=`700 10px ${MONO}`; ctx.fillText(`${c}`, x0-2-ctx.measureText(String(c)).width, y(c)+4); }
-    // sensör işareti (Mühendis seviyesinde gecikmeli)
+    // köpük göstergesi
     const yd = y(Math.max(0, Math.min(max, S.disp[3])));
     ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.moveTo(xr+1, yd); ctx.lineTo(xr+9, yd-5); ctx.lineTo(xr+9, yd+5); ctx.closePath(); ctx.fill();
     ctx.strokeStyle=C['--koi']; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x0, yd); ctx.lineTo(xr, yd); ctx.stroke();
