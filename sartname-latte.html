@@ -447,7 +447,14 @@ canvas{display:block;width:100%;height:100%}
       if (i===0) drawGauge(gx+(W-gx)/2-8, H*0.55, Math.max(26, Math.min((W-gx)/2-26, 56)), c, half, M.bands);
       if (i===1) drawScale(gx + 14, top, bot, c, half, M.bands);
       if (i===2) drawThermo(gx + 22, top, bot, c, half, M.bands);
-      if (i===3) drawRuler(cx+topW+14, foamBot, yAt, c, half, M.bands);
+      if (i===3){
+        // köpük yüzeyindeki B dairesi → sağdaki büyütülmüş detay
+        const by = yAt((foamBot+foamTop)/2), bx = cx + xAt(foamTop) - 6;
+        ctx.strokeStyle=C['--koi']; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(bx, by, 11, 0, 7); ctx.stroke();
+        ctx.fillStyle=C['--koi']; ctx.font=`700 10px ${MONO}`; ctx.textAlign='center'; ctx.fillText('B', bx, by-15);
+        ctx.font=`500 10px ${MONO}`;
+        drawDetail(cx+topW+18, W-8, top+14, bot, c, half, M.bands, bx+11, by);
+      }
       if (S.phase==='holding'){
         ctx.lineCap='round';
         if (i===0){ // değirmenden düşen kahve
@@ -508,19 +515,41 @@ canvas{display:block;width:100%;height:100%}
     if (bands){ ctx.fillStyle=C['--ok']; ctx.fillText(`${num(c-half,1)}–${num(c+half,1)}`, x+21, y(c)+3); }
     ctx.fillStyle=C['--bad']; ctx.fillText('YANIK', x-28, y(76)+3);
   }
-  // köpük cetveli (mm), sıfır noktası köpük tabanında
-  function drawRuler(x, fb, yAt, c, half, bands){
-    const max = 25, cm = mm => fb + mm/10;
-    ctx.strokeStyle=C['--line']; ctx.lineWidth=1.5; ctx.fillStyle='rgba(232,238,247,.08)';
-    const y0=yAt(cm(0)), y1=yAt(cm(max));
-    ctx.fillRect(x, y1, 26, y0-y1); ctx.strokeRect(x, y1, 26, y0-y1);
-    if (bands){ ctx.fillStyle='rgba(60,207,125,.3)'; ctx.fillRect(x, yAt(cm(c+half)), 26, yAt(cm(c-half))-yAt(cm(c+half))); }
-    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left';
-    for (let mm=0; mm<=max; mm++){ const yy=yAt(cm(mm)); ctx.fillRect(x, yy, mm%10===0?14:(mm%5===0?10:5), 1); if (mm%5===0) ctx.fillText(String(mm), x+30, yy+3); }
-    ctx.fillText('mm', x+2, y1-6);
-    const yt=yAt(cm(S.disp[3]));
-    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.moveTo(x-2,yt); ctx.lineTo(x-12,yt-6); ctx.lineTo(x-12,yt+6); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle=C['--koi']; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(x-12,yt); ctx.lineTo(x-60,yt); ctx.stroke(); ctx.setLineDash([]);
+  // DETAY B: köpük katmanının büyütülmüş kesiti, her mm okunur
+  function drawDetail(x0, x1, top, bot, c, half, bands, px, py){
+    const max = Math.max(15, c + 10), win = Math.min(42, Math.max(26, (x1-x0)*.42));
+    const head = 16, yb = bot - 14, yt0 = top + head + 6, ppm = (yb - yt0)/max;
+    const y = mm => yb - mm*ppm, xr = x0 + win;
+    // pencere
+    ctx.save(); ctx.beginPath(); ctx.rect(x0, yt0, win, yb-yt0+14); ctx.clip();
+    ctx.fillStyle=C['--milk']; ctx.fillRect(x0, yb, win, 14);
+    const f = Math.max(0, Math.min(max, S.foam));
+    ctx.fillStyle=C['--foam']; ctx.fillRect(x0, y(f), win, yb - y(f));
+    ctx.strokeStyle='rgba(0,0,0,.14)'; ctx.lineWidth=1;
+    for (let k=-200; k<200; k+=8){ ctx.beginPath(); ctx.moveTo(x0+k, yb); ctx.lineTo(x0+k+(yb-y(f)), y(f)); ctx.stroke(); }
+    if (bands){ ctx.fillStyle='rgba(60,207,125,.32)'; ctx.fillRect(x0, y(c+half), win, y(c-half)-y(c+half)); }
+    ctx.restore();
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=1.5; ctx.strokeRect(x0, yt0, win, yb-yt0+14);
+    // B'den detaya kesik bağlantı
+    ctx.strokeStyle=C['--koi']; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x0, yt0 + (yb-yt0)*.5); ctx.stroke(); ctx.setLineDash([]);
+    // başlık
+    ctx.fillStyle=C['--koi']; ctx.font=`700 10px ${MONO}`; ctx.textAlign='left'; ctx.fillText('DETAY B · mm', x0, top+10);
+    // milimetre ölçeği
+    const every = ppm >= 13 ? 1 : ppm >= 6 ? 2 : 5;
+    ctx.fillStyle=C['--line']; ctx.font=`600 ${ppm>=13?11:10}px ${MONO}`;
+    for (let mm=0; mm<=max; mm++){
+      const yy = y(mm), major = mm%5===0;
+      ctx.fillStyle = major ? C['--line'] : C['--line-dim'];
+      ctx.fillRect(xr, yy, major ? 10 : 6, major ? 1.5 : 1);
+      if (mm%every===0) ctx.fillText(String(mm), xr+13, yy+4);
+    }
+    if (bands){ ctx.fillStyle=C['--ok']; ctx.font=`700 10px ${MONO}`; ctx.fillText(`${c}`, x0-2-ctx.measureText(String(c)).width, y(c)+4); }
+    // sensör işareti (Başmühendis'te gecikmeli)
+    const yd = y(Math.max(0, Math.min(max, S.disp[3])));
+    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.moveTo(xr+1, yd); ctx.lineTo(xr+9, yd-5); ctx.lineTo(xr+9, yd+5); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=C['--koi']; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x0, yd); ctx.lineTo(xr, yd); ctx.stroke();
+    ctx.font=`500 10px ${MONO}`;
   }
 
   let lastClock = 0;
