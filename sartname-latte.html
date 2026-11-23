@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Şartnameye Uygun Kahve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#17345c;
+  --paper-deep:#112848;
+  --line:#e8eef7;
+  --line-dim:rgba(232,238,247,.42);
+  --koi:#f2792e;
+  --ok:#3ccf7d;
+  --warn:#ffb020;
+  --bad:#ff5a4f;
+  --espresso:#4a2614;
+  --milk:#c99a6b;
+  --foam:#f4e6cf;
+  --display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --body:'Barlow','Helvetica Neue',Arial,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--paper);
+  background-image:
+    linear-gradient(rgba(232,238,247,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,238,247,.07) 1px,transparent 1px),
+    linear-gradient(rgba(232,238,247,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,238,247,.035) 1px,transparent 1px);
+  background-size:80px 80px,80px 80px,16px 16px,16px 16px;
+  color:var(--line);font-family:var(--body);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  display:flex;justify-content:center;
+}
+.sheet{width:100%;max-width:460px;min-height:100%;padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;
+  border-left:1px solid var(--line-dim);border-right:1px solid var(--line-dim)}
+.top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--line-dim)}
+.top b{color:var(--koi);font-weight:700}
+.top > span{white-space:nowrap}
+@media (max-width:420px){.top .pk{display:none}}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(36px,11vw,52px);line-height:.86;margin:0;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
+h1 span{color:var(--koi)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mode{appearance:none;border:1.5px solid var(--line-dim);background:transparent;color:var(--line-dim);border-radius:8px;padding:7px 2px;
+  font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.mode[aria-checked="true"]{border-color:var(--koi);background:var(--koi);color:#1b0f08}
+.mode:focus-visible{outline:3px solid var(--line);outline-offset:2px}
+.modesub{font-family:var(--mono);font-size:10px;color:var(--line-dim);display:flex;justify-content:space-between;gap:8px;margin-top:-4px}
+.modesub b{color:var(--koi);font-weight:700;white-space:nowrap}
+.specs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.spec{border:1.5px solid var(--line-dim);border-radius:6px;padding:5px 5px;font-family:var(--mono);font-size:10px;line-height:1.35;color:var(--line-dim);transition:border-color .2s,color .2s,background .2s;min-width:0}
+.spec b{display:block;font-size:11px;letter-spacing:-.03em;color:var(--line);font-weight:700;white-space:nowrap;overflow:hidden}
+.spec.active{border-color:var(--koi);color:var(--line);background:rgba(242,121,46,.12)}
+.spec.done{border-style:dashed}
+.spec .pts{float:right;color:var(--koi);font-weight:700}
+.stage{position:relative;flex:1;min-height:300px;border:1.5px solid var(--line);border-radius:4px;overflow:hidden;background:rgba(17,40,72,.35)}
+canvas{display:block;width:100%;height:100%}
+.stage-label{position:absolute;left:10px;top:8px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--line-dim)}
+.readout{position:absolute;right:10px;top:6px;text-align:right;font-family:var(--mono)}
+.readout .v{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.readout .u{font-size:11px;color:var(--line-dim);letter-spacing:.08em}
+.msg{min-height:44px;font-size:16px;line-height:1.3;font-weight:600;text-align:center;text-wrap:balance}
+.msg em{font-style:normal;color:var(--koi)}
+.hold{appearance:none;border:0;width:100%;height:74px;border-radius:14px;background:var(--koi);color:#1b0f08;
+  font-family:var(--display);font-weight:900;font-size:34px;letter-spacing:.04em;text-transform:uppercase;
+  box-shadow:0 6px 0 #a94d17;touch-action:none;cursor:pointer;transition:transform .05s,box-shadow .05s}
+.hold.down{transform:translateY(5px);box-shadow:0 1px 0 #a94d17}
+.hold:focus-visible{outline:3px solid var(--line);outline-offset:3px}
+.hold[disabled]{opacity:.45}
+.antet{display:grid;grid-template-columns:1.4fr 1fr 1fr;border:1.5px solid var(--line);font-family:var(--mono);font-size:9.5px;letter-spacing:.04em}
+.antet div{padding:4px 6px;border-right:1px solid var(--line-dim)}
+.antet div:last-child{border-right:0}
+.antet small{display:block;color:var(--line-dim);font-size:8.5px}
+/* overlays */
+.overlay{position:absolute;inset:0;background:rgba(14,32,58,.96);display:none;flex-direction:column;align-items:center;gap:8px;padding:14px;overflow:auto;text-align:center}
+.overlay.show{display:flex}
+.overlay > :first-child{margin-top:auto}
+.overlay > :last-child{margin-bottom:auto}
+.pickhead{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--line-dim)}
+.drinks{display:grid;gap:8px;width:100%;max-width:340px}
+.drink{appearance:none;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;text-align:left;border:1.5px solid var(--line);background:transparent;color:var(--line);
+  border-radius:10px;padding:10px 12px;cursor:pointer;font-family:var(--body)}
+.drink:hover{background:rgba(242,121,46,.12);border-color:var(--koi)}
+.drink:focus-visible{outline:3px solid var(--koi);outline-offset:2px}
+.drink b{font-family:var(--display);font-weight:900;font-size:28px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.drink .mm{grid-row:span 2;font-family:var(--mono);font-weight:700;font-size:20px;color:var(--koi);text-align:right}
+.drink .mm small{display:block;font-size:9px;color:var(--line-dim);letter-spacing:.06em}
+.drink span{font-family:var(--mono);font-size:10.5px;color:var(--line-dim)}
+.giftnote{font-size:13px;line-height:1.35;color:var(--line);max-width:330px}
+.giftnote em{font-style:normal;color:var(--koi);font-weight:700}
+.score{font-family:var(--display);font-weight:900;font-size:72px;line-height:.85;font-variant-numeric:tabular-nums}
+.score small{font-size:30px;color:var(--line-dim)}
+.stamp{font-family:var(--display);font-weight:900;font-size:36px;letter-spacing:.06em;padding:4px 18px;border:5px solid currentColor;border-radius:8px;transform:rotate(-7deg)}
+.stamp.pop{animation:slam .32s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes slam{from{transform:rotate(-7deg) scale(2.6);opacity:0}to{transform:rotate(-7deg) scale(1);opacity:1}}
+.gift{display:none;width:100%;max-width:340px;border:2px dashed var(--ok);border-radius:12px;padding:10px 12px;background:rgba(60,207,125,.1)}
+.gift.show{display:block}
+.gift .g1{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ok)}
+.gift .g2{font-family:var(--display);font-weight:900;font-size:30px;line-height:1.05;text-transform:uppercase}
+.gift .code{font-family:var(--mono);font-weight:700;font-size:18px;letter-spacing:.08em;color:var(--koi);margin:4px 0 2px}
+.gift .clock{font-family:var(--mono);font-size:11px;color:var(--line-dim)}
+.gift .clock b{color:var(--line);font-variant-numeric:tabular-nums}
+.gift .redeem{margin-top:8px;width:100%}
+.gift.used{border-color:var(--line-dim);background:transparent;opacity:.7}
+.gift.used .g1{color:var(--bad)}
+.lines{width:100%;max-width:400px;text-align:left;display:grid;gap:7px}
+.ln{--c:var(--line-dim);border-left:5px solid var(--c);background:rgba(232,238,247,.06);border-radius:8px;padding:8px 10px}
+.ln.t0{--c:var(--ok)} .ln.t1{--c:var(--warn)} .ln.t2{--c:var(--bad)}
+.lh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.lh b{font-size:16px;font-weight:700}
+.lv{font-family:var(--mono);font-size:15px;font-weight:700;flex:1;min-width:0}
+.lv small{color:var(--line-dim);font-size:12px;font-weight:500}
+.chip{font-family:var(--mono);font-size:11.5px;font-weight:700;color:#0e203a;background:var(--c);border-radius:5px;padding:2px 6px;letter-spacing:.03em}
+.lp{font-family:var(--mono);font-size:13px;color:var(--line-dim);white-space:nowrap}
+.ln p{margin:4px 0 0;font-size:14.5px;line-height:1.4;color:var(--line)}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;font-family:var(--mono);font-size:11.5px;color:var(--line-dim)}
+.legend i{font-style:normal;font-weight:700}
+#result{position:fixed;inset:0;z-index:20;background:var(--paper-deep);padding:18px 16px 22px;gap:10px}
+#result .score{font-size:60px;text-align:center}
+.score .cap{display:block;font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.12em;color:var(--line-dim);margin-bottom:4px}
+#result .stamp{font-size:32px;margin:6px 0 4px}
+#result .teaser{font-size:15px;line-height:1.4;max-width:400px;font-weight:600}
+#result .row,#result .gift{max-width:400px}
+.spec .tg{color:var(--ok)} .spec .ta{color:var(--warn)}
+.best{font-family:var(--mono);font-size:11px;color:var(--line-dim)}
+.teaser{font-size:13px;color:var(--warn);max-width:320px}
+.row{display:flex;gap:8px;width:100%;max-width:340px}
+.btn{flex:1;appearance:none;border:1.5px solid var(--line);background:transparent;color:var(--line);border-radius:10px;padding:12px 8px;font-family:var(--body);font-weight:700;font-size:15px;cursor:pointer}
+.btn.primary{background:var(--line);color:var(--paper)}
+.btn.go{background:var(--ok);border-color:var(--ok);color:#06210f}
+.btn:focus-visible{outline:3px solid var(--koi);outline-offset:2px}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn.pin{flex:none;width:100%;max-width:340px;font-size:12px;padding:7px;border-color:var(--line-dim);color:var(--line-dim)}
+.pinform{display:none;gap:8px;width:100%;max-width:340px}
+.pinform.show{display:flex}
+.pinform input{flex:1;min-width:0;-webkit-user-select:text;user-select:text;background:transparent;border:1.5px solid var(--line);border-radius:10px;color:var(--line);font-family:var(--mono);font-size:18px;letter-spacing:.2em;padding:10px 12px}
+.pinform input:focus{outline:3px solid var(--koi);outline-offset:1px}
+.pinform .btn{flex:none;padding:10px 18px}
+.pinerr{min-height:16px;font-family:var(--mono);font-size:11px;color:var(--bad)}
+.lockt{font-family:var(--display);font-weight:900;font-size:40px;line-height:.95;text-transform:uppercase}
+@media (prefers-reduced-motion:reduce){.stamp.pop{animation:none}.hold{transition:none}}
+</style>
+</head>
+<body>
+<main class="sheet">
+  <div class="top"><span><b>ATELIER KOI</b><span class="pk"> · PROJE KONTROL</span></span><span id="roundNo">PAFTA 1/4</span></div>
+  <h1>Şartnameye<br><span id="title" lang="en">uygun kahve</span></h1>
+  <div class="modes" role="radiogroup" aria-label="Zorluk">
+    <button class="mode" role="radio" data-m="stajyer">İLK MÜŞTERİ</button>
+    <button class="mode" role="radio" data-m="muhendis">BARİSTA</button>
+    <button class="mode" role="radio" data-m="bas">MÜHENDİS</button>
+  </div>
+  <div class="modesub"><span id="modeDesc"></span><b id="modeBest"></b></div>
+  <div class="specs">
+    <div class="spec active" id="sp0"></div>
+    <div class="spec" id="sp1"></div>
+    <div class="spec" id="sp2"></div>
+    <div class="spec" id="sp3"></div>
+  </div>
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+    <div class="stage-label">KESİT A-A · ÖLÇEK 1:1</div>
+    <div class="readout"><div class="v" id="rv">0,0</div><div class="u" id="ru"></div></div>
+
+    <div class="overlay" id="pick">
+      <div class="pickhead">SİPARİŞ · KAHVENİ SEÇ</div>
+      <div class="drinks" id="drinks"></div>
+      <div class="giftnote"><em>Mühendis</em> seviyesinde dört değerin hepsi <em>±1</em> içindeyse seçtiğin kahve <em>bizden</em>.<br>Bir değer ±1–±2 arasındaysa <em>REVİZE</em>: 1 hakkın daha olur. ±2'yi aşarsa <em>UYGUNSUZ</em>: hakkın biter.</div>
+    </div>
+
+    <div class="overlay" id="locked">
+      <div class="pickhead">MÜHENDİS SEVİYESİ · BUGÜNKÜ HAK</div>
+      <div class="lockt" id="lockTitle">Hakkın bitti</div>
+      <div class="giftnote" id="lockText"></div>
+      <div class="row"><button class="btn primary" id="toBarista">Barista seviyesinde pratik yap</button></div>
+      <button class="btn pin" id="pinReset">Barista: hakkı sıfırla</button>
+      <form class="pinform" id="pinForm" autocomplete="off">
+        <input id="pinIn" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Barista PIN" aria-label="Barista PIN">
+        <button class="btn primary" type="submit">Aç</button>
+      </form>
+      <div class="pinerr" id="pinErr"></div>
+    </div>
+
+    <div class="overlay" id="result" aria-live="polite">
+      <div class="best" id="resHead">PROJE KONTROL RAPORU</div>
+      <div class="score" id="score">0<small>/100</small></div>
+      <div class="stamp" id="stamp">UYGUNDUR</div>
+      <div class="gift" id="gift">
+        <div class="g1" id="giftG1">HEDİYE KAZANDIN</div>
+        <div class="g2" id="giftName">Latte bizden</div>
+        <div class="code" id="giftCode">KOI-LT-0000-XXXX</div>
+        <div class="clock">Canlı ekran · <b id="giftClock">--:--:--</b></div>
+        <button class="btn go redeem" id="redeem">Barista onayı · Teslim edildi</button>
+      </div>
+      <div class="lines" id="lines"></div>
+      <div class="teaser" id="teaser"></div>
+      <div class="best" id="best"></div>
+      <div class="row"><button class="btn primary" id="again">Tekrar dene</button><button class="btn" id="change">Kahve değiştir</button></div>
+    </div>
+  </div>
+  <div class="msg" id="msg"></div>
+  <button class="hold" id="hold" aria-label="Basılı tut">Basılı tut</button>
+  <div class="antet">
+    <div><small>PROJE</small><span id="antetName">Kahve</span> · Şartname Rev.03</div>
+    <div><small>ÇİZEN</small>Mühendis Kafeci</div>
+    <div><small>KONTROL</small><span id="ctrl">—</span></div>
+  </div>
+</main>
+<script>
+(() => {
+  const num = (v, d) => (+v.toFixed(d)).toString().replace('.', ',');
+
+  // Gerçek specialty reçete: 18 g → 36 ml (1:2), süt 65 °C, köpük içeceğe göre
+  const DRINKS = {
+    fw:    {name:'Flat White', code:'FW', foam:5,  info:'İpeksi, çok ince mikroköpük'},
+    latte: {name:'Latte',      code:'LT', foam:10, info:'İnce mikroköpük katmanı'},
+    capp:  {name:'Cappuccino', code:'CP', foam:15, info:'Kalın, hacimli köpük'},
+  };
+  const FOAM_NOTES = {
+    fw:    ['Köpük çok ince', "Köpük kalın, latte'ye döndü"],
+    latte: ["Köpük ince, flat white'a döndü", "Köpük kalın, cappuccino'ya döndü"],
+    capp:  ["Köpük ince, latte'ye döndü", 'Köpük fazla, kuru cappuccino'],
+  };
+
+  const MODES = {
+    stajyer:  {label:'İLK MÜŞTERİ', wob:0,   hide:false, bands:true,  lag:0,   tol:[2,4,3,3],     spd:1,   gift:false,
+               desc:'Göstergeler açık · geniş tolerans'},
+    muhendis: {label:'BARİSTA',     wob:.12, hide:true,  bands:true,  lag:0,   tol:[1.5,2.5,2,2], spd:1.1, gift:false,
+               desc:'Dijital ekran kapalı · akış dalgalı'},
+    bas:      {label:'MÜHENDİS',    wob:.20, hide:true,  bands:false, lag:0,   tol:[1,1,1,1],     spd:1.2, gift:true,
+               desc:'Hediye: dört değer de ±1 içinde'},
+  };
+
+  // Her adımın durumu: tolerans içi UYGUN, 2 katına kadar REVİZE, ötesi UYGUNSUZ.
+  // Genel sonuç en kötü adımdır. Mühendis seviyesinde tolerans ±1 → hediye için dört değer de ±1 içinde.
+  const TIER = [['UYGUN','var(--ok)'], ['REVİZE','var(--warn)'], ['UYGUNSUZ','var(--bad)']];
+  const VERDICT = [['UYGUNDUR','var(--ok)'], ['REVİZE','var(--warn)'], ['UYGUNSUZ','var(--bad)']];
+
+  // Yanlış değerle fincanda ne olur: oyuncuya kaliteli kahveyi öğreten notlar
+  const TASTE = {
+    dose: {ok:'Doğru doz: gövde, tatlılık ve asidite dengede.',
+           low:'Az kahve: su kahveden çok hızlı geçer. Espresso sulu, ince gövdeli ve ekşimsi olur; krema çabuk dağılır.',
+           high:'Fazla kahve: su zorlanarak geçer. Espresso ağır, boğuk ve acımsı olur; tatlar birbirine karışır.'},
+    shot: {ok:'1:2 oran: tatlılık, asidite ve acılık dengede; temiz ve uzun bir bitiş.',
+           low:'Kısa çıkış: kahve tam demlenmez (az ekstraksiyon). Keskin ekşilik, tuzumsu bir tat ve kısa bir bitiş bırakır.',
+           high:'Uzun çıkış: kahve fazla demlenir (aşırı ekstraksiyon). Acı, kuru ve buruk bir bitiş; gövde sulanır.'},
+    milk: {ok:'65 °C: sütün doğal tatlılığı en üst seviyede, içimi rahat.',
+           low:'Ilık süt: sütün tatlılığı tam açığa çıkmaz, kremamsı his zayıf kalır ve içecek çabuk soğur.',
+           high:'Fazla sıcak süt: tatlılık azalır, pişmiş süt kokusu başlar ve dili yakar.',
+           burn:'Yanık süt: süt proteinleri bozulur, köpük çöker; pişmiş, kükürtlü bir tat gelir.'},
+    foam: {
+      fw:    {ok:"İnce, ipeksi mikroköpük: flat white'ın yoğun kahve tadı öne çıkar.",
+              low:'Köpük çok ince: ağızdaki ipeksi doku kaybolur, latte art tutmaz.',
+              high:"Köpük kalın: kahvenin yoğunluğu sütte kaybolur, içecek latte'ye döner."},
+      latte: {ok:'Dengeli mikroköpük: kadifemsi doku, kahve ile süt uyumlu.',
+              low:"Köpük ince: doku düz ve sulu kalır, içecek flat white'a yaklaşır.",
+              high:"Köpük kalın: doku havalanır, kahve tadı geri planda kalır; cappuccino'ya döner."},
+      capp:  {ok:'Hacimli köpük: hafif, havalı bir içim; klasik cappuccino dengesi.',
+              low:"Köpük ince: cappuccino'nun hafif, köpüklü dokusu yok; latte gibi içilir.",
+              high:'Köpük fazla: kuru cappuccino. İlk yudumlar sadece köpük, kahve-süt dengesi bozulur.'},
+      over:  'Fincan taştı: bu haliyle servis edilemez.'},
+  };
+  const BARISTA_PIN = '2468';   // kilitli hakkı kasada sıfırlamak için
+
+  const STEPS = [
+    {key:'dose', name:'Öğütme', unit:'G · ÖĞÜTÜLMÜŞ KAHVE', suf:' g', fall:3, d:1,
+     ready:t=>`Değirmeni <em>basılı tut</em>. Doz <em>${t}</em>. Bırakınca biraz daha kahve düşer.`, low:'Az doz, sulu', high:'Fazla doz, boğuk'},
+    {key:'shot', name:'Espresso', unit:'ML · ESPRESSO ÇIKIŞI', suf:' ml', fall:8, d:1,
+     ready:t=>`Shot'ı çek. Çıkış <em>${t}</em>. Bıraktıktan sonra birkaç damla daha akar.`, low:'Kısa çıkış, ekşi', high:'Uzun çıkış, acı'},
+    {key:'milk', name:'Süt', unit:'°C · SÜT SICAKLIĞI', suf:' °C', fall:7, d:0,
+     ready:t=>`Sütü ısıt. Hedef <em>${t}</em>. Bırakınca da bir süre ısınır.`, low:'Ilık kaldı', high:'Fazla ısındı', burn:'Süt yandı'},
+    {key:'foam', name:'Köpük', unit:'MM · KÖPÜK KALINLIĞI', suf:' mm', fall:6, d:1,
+     ready:t=>`Sütü dök. Köpük <em>${t}</em> olunca bırak. Bırakınca biraz kabarır, taşırma.`},
+  ];
+  const targetOf = i => [18, 36, 65, DRINKS[drink].foam][i];
+  const rnd1 = (i, v) => STEPS[i].d ? Math.round(v*10)/10 : Math.round(v);
+  const fmtV = (i, v) => STEPS[i].d ? v.toFixed(1).replace('.', ',') : String(Math.round(v));
+  const fmtT = i => `${targetOf(i)}${STEPS[i].suf} ±${num(MODES[mode].tol[i],1)}`;
+
+  const $ = id => document.getElementById(id);
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  const holdBtn = $('hold'), msg = $('msg');
+  const rnd = (a,b) => a+Math.random()*(b-a);
+
+  let mode = 'muhendis', drink = null;
+  try { const m = localStorage.getItem('koiMode3'); if (MODES[m]) mode = m; } catch(e) {}
+  const bests = {};
+  for (const k in MODES){ try { bests[k] = +localStorage.getItem('koiBest3_'+k) || 0; } catch(e){ bests[k]=0; } }
+
+  let S;
+  function fresh(){
+    return {step:0, phase: drink ? 'ready' : 'pick', holdT:0,
+      dose:0, shot:0, temp:6, foam:0, disp:[0,0,6,0], val:[0,0,0,0],
+      rate:[0,1,2,3].map(()=>rnd(.88,1.15)), ph:[0,1,2,3,4,5,6,7].map(()=>rnd(0,6.28)),
+      after:[rnd(.2,.5), rnd(.4,1.0), rnd(2.5,3.5), rnd(.2,.5)],   // bıraktıktan sonra eklenen miktar
+      atRelease:0, tf:1, pts:[null,null,null,null], notes:['','','',''], post:0, overflow:false};
+  }
+  function wob(i, t){ const a=MODES[mode].wob; return 1 + a*(.7*Math.sin(t*1.3+S.ph[i]) + .3*Math.sin(t*2.9+S.ph[i+4])); }   // yavaş, okunabilir dalga
+
+  // ---------- puanlama: her adım 25 puan ----------
+  function score(i, v){
+    const st = STEPS[i], c = targetOf(i), half = MODES[mode].tol[i];
+    if (st.key==='milk' && v>=72) return [0, st.burn];
+    if (st.key==='foam' && S.overflow) return [0, 'Fincan taştı'];
+    const d = Math.abs(v - c);
+    if (d <= half) return [25*(1 - .35*(d/half)**2), d <= .25*half ? 'Tam şartname' : 'Şartnameye uygun'];
+    const low  = st.key==='foam' ? FOAM_NOTES[drink][0] : st.low;
+    const high = st.key==='foam' ? FOAM_NOTES[drink][1] : st.high;
+    return [25*Math.max(0, .45*(1-(d-half)/st.fall)), v<c ? low : high];
+  }
+  const okStep = (i, dev) => !(i===2 && S.val[2]>=72) && !(i===3 && S.overflow) && Math.abs(rnd1(i, S.val[i]) - targetOf(i)) <= dev + 1e-9;
+  function tier(i){
+    const t = MODES[mode].tol[i];
+    return okStep(i, t) ? 0 : okStep(i, 2*t) ? 1 : 2;
+  }
+  function taste(i){
+    const v = rnd1(i, S.val[i]), c = targetOf(i);
+    if (i===2 && v>=72) return TASTE.milk.burn;
+    if (i===3 && S.overflow) return TASTE.foam.over;
+    const t = i===3 ? TASTE.foam[drink] : TASTE[STEPS[i].key];
+    return tier(i)===0 ? t.ok : (v < c ? t.low : t.high);
+  }
+
+  // günlük hak durumu (bu cihazda): fresh → playing → revise → won / out
+  const today = () => { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; };
+  function getG(){ try{ const g=JSON.parse(localStorage.getItem('koiGiftDay')||'null'); if (g && g.day===today()) return g; }catch(e){} return {day:today(), status:'fresh', attempt:1, drink:null}; }
+  function setG(p){ const g=Object.assign(getG(), p); try{ localStorage.setItem('koiGiftDay', JSON.stringify(g)); }catch(e){} return g; }
+  const roundLabel = () => (MODES[mode].gift && S.attempt ? `DENEME ${S.attempt}/2 · ${S.step+1}/4` : `PAFTA ${S.step+1}/4`);
+
+  // ---------- fizik ----------
+  let last = performance.now(), holding = false;
+  const get = i => [S.dose, S.shot, S.temp, S.foam][i];
+  function set(i, v){ if (i===0) S.dose=v; else if (i===1) S.shot=v; else if (i===2) S.temp=v; else S.foam=v; }
+  function update(dt){
+    const M = MODES[mode], i = S.step;
+    if (S.phase==='holding'){
+      S.holdT += dt; const h = S.holdT, k = M.spd*S.rate[i]*wob(i,h);
+      if (i===0) S.dose += dt*(4+1.5*h)*k;
+      if (i===1) S.shot += dt*(9+.5*h)*k*S.tf;   // ön ıslatmadan sonra hafif hızlanma
+      if (i===2) S.temp += dt*11*k;   // buharla sabit hızda ısınma
+      if (i===3){ S.foam += dt*(3+1*h)*k; if (liquidTop()>8.9){ S.overflow=true; release(); } }
+    } else if (S.phase==='settle'){
+      S.post += dt;
+      const dur = i===2 ? .9 : .6, k = Math.min(1, S.post/dur);
+      if (!S.overflow) set(i, S.atRelease + S.after[i]*(1-Math.pow(1-k,2)));
+      if (S.post > dur+.15) finishStep();
+    }
+    const real = [S.dose, S.shot, S.temp, S.foam];
+    for (let n=0;n<4;n++){
+      if (!M.lag) S.disp[n] = real[n];
+      else S.disp[n] += (real[n]-S.disp[n])*Math.min(1, dt/M.lag);
+    }
+    const v = S.disp[i], c = targetOf(i), half = M.tol[i], rv = $('rv');
+    if (M.hide && (S.phase==='holding' || S.phase==='settle')){ rv.textContent = '– –'; rv.style.color = 'var(--line-dim)'; return; }
+    rv.textContent = fmtV(i, v);
+    rv.style.color = S.phase==='ready' ? 'var(--line)' : (Math.abs(v-c)<=half ? 'var(--ok)' : (v>c ? 'var(--bad)' : 'var(--line)'));
+  }
+  function espH(){ return Math.min(2.6, S.shot*0.055); }
+  function milkH(){ const f = DRINKS[drink||'latte'].foam/10; return (S.foam/10)*(4.5-f)/f; }
+  function liquidTop(){ return espH() + (S.foam>0 ? milkH() + S.foam/10 : 0); }
+
+  // ---------- akış ----------
+  function press(){
+    if (S.phase!=='ready') return;
+    if (MODES[mode].gift && S.step===0) setG({status:'playing', attempt:S.attempt, drink});
+    holdBtn.classList.add('down');
+    holding = true; S.holdT = 0; S.phase='holding';
+  }
+  function release(){
+    holdBtn.classList.remove('down');
+    if (!holding) return; holding=false;
+    if (S.phase!=='holding') return;
+    S.phase='settle'; S.post=0; S.atRelease = get(S.step);
+    holdBtn.disabled = true;
+  }
+  function finishStep(){
+    const i = S.step, st = STEPS[i], v = get(i);
+    S.disp[i] = v; S.val[i] = v;
+    const [p, note] = score(i, rnd1(i, v)); S.pts[i]=p; S.notes[i]=note;
+    const ti = tier(i);
+    $('pt'+i).textContent = TIER[ti][0]==='UYGUN' ? '✓' : TIER[ti][0]==='REVİZE' ? '~' : '✗';
+    $('pt'+i).style.color = TIER[ti][1];
+    $('sp'+i).classList.remove('active'); $('sp'+i).classList.add('done');
+    $('rv').textContent = fmtV(i, v);
+    let extra = '';
+    if (i===0){
+      S.tf = Math.max(.6, Math.min(1.6, 1 + (18 - v)*.07));
+      extra = S.tf>1.06 ? ' Az doz: shot <em>hızlı</em> akacak.' : S.tf<.94 ? ' Fazla doz: shot <em>yavaş</em> akacak.' : '';
+    }
+    msg.innerHTML = `${st.name}: <em>${fmtV(i,v)}${st.suf}</em> · <span style="color:${TIER[ti][1]}">${TIER[ti][0]}</span>. ${note}.${extra}`;
+    S.phase='wait';
+    setTimeout(()=>{
+      if (S.step<3){ S.step++; S.phase='ready'; holdBtn.disabled=false;
+        $('sp'+S.step).classList.add('active'); $('ru').textContent=STEPS[S.step].unit; $('roundNo').textContent=roundLabel();
+        msg.innerHTML = STEPS[S.step].ready(fmtT(S.step)); }
+      else showResult();
+    }, extra ? 1700 : 1300);
+  }
+
+  // hediye kodu: içecek + tarih + değerlerden türetilen kısa iz
+  function giftCode(){
+    const d = new Date(), dd = String(d.getDate()).padStart(2,'0') + String(d.getMonth()+1).padStart(2,'0');
+    let h = 2166136261; const src = `${drink}|${S.val.map(v=>v.toFixed(2)).join('|')}|${Date.now()}`;
+    for (const ch of src){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    return `KOI-${DRINKS[drink].code}-${dd}-${h.toString(36).toUpperCase().slice(-4).padStart(4,'0')}`;
+  }
+  function usedCodes(){ try { return JSON.parse(localStorage.getItem('koiGiftUsed')||'[]'); } catch(e){ return []; } }
+
+  function showResult(){
+    const M = MODES[mode];
+    const total = Math.round(S.pts.reduce((a,b)=>a+b,0));
+    const tiers = [0,1,2,3].map(tier), worst = Math.max(...tiers);
+    const [vtxt, vcol] = VERDICT[worst];
+    const won = M.gift && worst===0;
+    const canRevise = M.gift && worst===1 && S.attempt===1;
+    if (M.gift) setG(won ? {status:'won', drink} : canRevise ? {status:'revise', attempt:2, drink} : {status:'out', reason:'sonuc'});
+
+    $('resHead').textContent = `PROJE KONTROL RAPORU · ${DRINKS[drink].name.toUpperCase()} · ${M.label}` + (M.gift ? ` · DENEME ${S.attempt}/2` : '');
+    $('score').innerHTML = `<span class="cap">KALİTE PUANI</span>${total}<small>/100</small>`;
+    const stp=$('stamp'); stp.style.display = won ? 'none' : '';
+    stp.textContent=vtxt; stp.style.color=vcol; stp.classList.remove('pop'); void stp.offsetWidth; stp.classList.add('pop');
+    const tolTxt = i => `±${num(M.tol[i],1)}`;
+    $('lines').innerHTML =
+      `<div class="legend"><span><i style="color:var(--ok)">●</i> UYGUN: tolerans içi</span><span><i style="color:var(--warn)">●</i> REVİZE: 2 katına kadar</span><span><i style="color:var(--bad)">●</i> UYGUNSUZ: ötesi</span></div>` +
+      STEPS.map((st,i)=>`<div class="ln t${tiers[i]}">
+        <div class="lh"><b>${st.name}</b><span class="lv">${fmtV(i,S.val[i])}${st.suf} <small>/ hedef ${targetOf(i)}${st.suf} ${tolTxt(i)}</small></span><span class="chip">${TIER[tiers[i]][0]}</span></div>
+        <p>${taste(i)}</p></div>`).join('');
+    const g = $('gift');
+    g.classList.toggle('show', won); g.classList.remove('used');
+    if (won){
+      S.code = giftCode();
+      $('giftG1').textContent = 'UYGUNDUR · HEDİYE KAZANDIN';
+      $('giftName').innerHTML = `<span lang="en">${DRINKS[drink].name}</span> bizden`;
+      $('giftCode').textContent = S.code;
+      $('redeem').disabled = false; $('redeem').textContent = 'Barista onayı · Teslim edildi';
+    }
+    const names = t => [0,1,2,3].filter(n => tiers[n]===t).map(n => STEPS[n].name).join(', ');
+    $('teaser').innerHTML = !M.gift ? ([0,1,2,3].every(n => okStep(n,1)) ? 'Dört değer de ±1 içinde! Bunu Mühendis seviyesinde yaparsan kahve bizden.' : '')
+      : won ? ''
+      : canRevise ? `Son deneme hakkın var. <b>${names(1)}</b> ±1 dışında kaldı; ikinci denemede dördü de ±1 içinde olmalı.`
+      : worst===2 ? `Hakkın kalmadı: <b>${names(2)}</b> ±2'yi aştı.`
+      : `Hakkın kalmadı: ikinci denemede de <b>${names(1)}</b> ±1 dışında kaldı.`;
+    const isBest = total>bests[mode]; if (isBest){ bests[mode]=total; try{localStorage.setItem('koiBest3_'+mode, String(total));}catch(e){} }
+    $('best').textContent = isBest && total>0 ? `YENİ REKOR · ${total}/100` : `REKORUN · ${bests[mode]}/100`;
+    $('ctrl').textContent = won ? 'HEDİYE' : vtxt; $('ctrl').style.color = won ? 'var(--ok)' : vcol;
+    $('again').textContent = !M.gift ? 'Tekrar dene' : canRevise ? 'Revizyon · son deneme' : 'Tamam';
+    $('change').style.display = M.gift ? 'none' : '';
+    $('result').classList.add('show'); $('result').scrollTop = 0;
+    msg.innerHTML = won ? `Şartnameye uygun. <em>${DRINKS[drink].name} bizden!</em> Ekranı kasada göster.`
+      : canRevise ? 'Revizyon gerekli. <em>Son deneme hakkın var.</em>'
+      : M.gift ? 'Şartname dışı. <em>Bugünkü hakkın bitti.</em>'
+      : worst===0 ? 'Proje onaylandı. <em>Afiyet olsun.</em>' : worst===1 ? 'Revizyon gerekli. <em>Bir daha dene.</em>' : 'Şartname dışı. <em>Yeniden hesapla.</em>';
+    holdBtn.disabled = true;
+    renderModes();
+  }
+  $('redeem').addEventListener('click', () => {
+    if (!S.code) return;
+    const r = $('redeem');
+    if (!r.dataset.armed){   // iki dokunuşla onay (açılır pencere bu çerçevede çalışmıyor)
+      r.dataset.armed = '1'; r.textContent = 'Emin misin? Onaylamak için tekrar bas';
+      clearTimeout(r._t); r._t = setTimeout(() => { if (!r.disabled){ delete r.dataset.armed; r.textContent = 'Barista onayı · Teslim edildi'; } }, 4000);
+      return;
+    }
+    delete r.dataset.armed;
+    const u = usedCodes(); u.push(S.code); try{ localStorage.setItem('koiGiftUsed', JSON.stringify(u.slice(-200))); }catch(e){}
+    $('gift').classList.add('used'); $('giftG1').textContent = 'TESLİM EDİLDİ';
+    $('redeem').disabled = true; $('redeem').textContent = 'Kullanıldı';
+  });
+
+  function renderSpecs(){
+    STEPS.forEach((st,i)=>{
+      $('sp'+i).innerHTML = `<b>${st.name}</b><span class="pts" id="pt${i}"></span>${drink ? targetOf(i) : '–'}${st.suf}<br><span class="tg">±${num(MODES[mode].tol[i],1)}</span> <span class="ta">±${num(2*MODES[mode].tol[i],1)}</span>`;
+    });
+  }
+  function renderModes(){
+    document.querySelectorAll('.mode').forEach(b => b.setAttribute('aria-checked', String(b.dataset.m===mode)));
+    $('modeDesc').textContent = MODES[mode].desc;
+    $('modeBest').textContent = `REKOR ${bests[mode]}`;
+  }
+  function renderPick(){
+    $('drinks').innerHTML = Object.entries(DRINKS).map(([k,d]) =>
+      `<button class="drink" data-d="${k}"><b lang="en">${d.name}</b><div class="mm">${d.foam} mm<small>KÖPÜK</small></div><span>18 g → 36 ml · süt 65 °C · ${d.info.toLowerCase()}</span></button>`).join('');
+    document.querySelectorAll('.drink').forEach(b => b.addEventListener('click', () => { drink = b.dataset.d; restart(); }));
+  }
+  function restart(){
+    const M = MODES[mode];
+    let locked = null, attempt = 1;
+    if (M.gift){
+      let g = getG();
+      if (g.status==='playing') g = setG({status:'out', reason:'yarim'});   // yarım bırakılan deneme hak sayılır
+      if (g.status==='won' || g.status==='out') locked = g;
+      else if (g.status==='revise'){ attempt = 2; drink = g.drink; }
+    }
+    S = fresh(); holding=false; S.code=null; S.attempt = M.gift ? attempt : 0;
+    if (locked) S.phase = 'pick';
+    $('result').classList.remove('show'); $('pick').classList.toggle('show', !locked && !drink);
+    $('locked').classList.toggle('show', !!locked);
+    $('pinReset').style.display = ''; $('pinForm').classList.remove('show'); $('pinErr').textContent = ''; $('pinIn').value = '';
+    if (locked){
+      $('lockTitle').textContent = locked.status==='won' ? 'Bugünün hediyesi alındı' : 'Bugünkü hakkın bitti';
+      $('lockText').innerHTML = locked.status==='won' ? 'Tebrikler! Mühendis seviyesi yarın yeniden açılır.'
+        : (locked.reason==='yarim' ? 'Yarım bırakılan deneme hak sayılır. ' : '') + 'Mühendis seviyesi <em>yarın</em> yeniden açılır. O zamana kadar Barista seviyesinde pratik yapabilirsin.';
+    }
+    holdBtn.disabled = !!locked || !drink; holdBtn.classList.remove('down');
+    renderSpecs(); renderModes();
+    for (let i=0;i<4;i++) $('sp'+i).classList.remove('done','active');
+    $('sp0').classList.add('active'); $('ru').textContent=STEPS[0].unit; $('roundNo').textContent = locked ? 'BUGÜN KAPALI' : roundLabel();
+    $('ctrl').textContent='—'; $('ctrl').style.color='';
+    $('title').textContent = drink ? `uygun ${DRINKS[drink].name}` : 'uygun kahve';
+    $('antetName').textContent = drink ? DRINKS[drink].name : 'Kahve';
+    document.title = drink ? `Şartnameye Uygun ${DRINKS[drink].name}` : 'Şartnameye Uygun Kahve';
+    msg.innerHTML = locked ? 'Mühendis seviyesi <em>bugün kapalı</em>.'
+      : !drink ? 'Önce <em>kahveni seç</em>.'
+      : (attempt===2 ? '<em>Revizyon · son deneme.</em> ' : '') + STEPS[0].ready(fmtT(0));
+  }
+  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => {
+    mode = b.dataset.m; try{localStorage.setItem('koiMode3', mode);}catch(e){}
+    restart();
+  }));
+  $('again').addEventListener('click', restart);
+  $('change').addEventListener('click', () => { drink = null; restart(); });
+  $('toBarista').addEventListener('click', () => { mode = 'muhendis'; try{localStorage.setItem('koiMode3', mode);}catch(e){} restart(); });
+  $('pinReset').addEventListener('click', () => {
+    $('pinReset').style.display = 'none'; $('pinForm').classList.add('show'); $('pinErr').textContent = '';
+    $('pinIn').value = ''; $('pinIn').focus();
+  });
+  $('pinForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if ($('pinIn').value.trim() !== BARISTA_PIN){ $('pinErr').textContent = 'PIN hatalı'; $('pinIn').value = ''; $('pinIn').focus(); return; }
+    try{ localStorage.removeItem('koiGiftDay'); }catch(e){}
+    drink = null; restart();
+  });
+  holdBtn.addEventListener('pointerdown', e => { e.preventDefault(); try{holdBtn.setPointerCapture(e.pointerId);}catch(_){} press(); });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev => holdBtn.addEventListener(ev, release));
+  holdBtn.addEventListener('contextmenu', e => e.preventDefault());
+  window.addEventListener('keydown', e => { if ((e.code==='Space'||e.code==='Enter') && !e.repeat && document.activeElement===holdBtn){ e.preventDefault(); press(); } });
+  window.addEventListener('keyup', e => { if ((e.code==='Space'||e.code==='Enter') && e.target!==$('pinIn')) release(); });
+
+  // ---------- çizim ----------
+  let W=0,H=0,dpr=1;
+  function resize(){ const r=cv.getBoundingClientRect(); dpr=Math.min(2,window.devicePixelRatio||1); W=r.width; H=r.height; cv.width=W*dpr; cv.height=H*dpr; }
+  new ResizeObserver(resize).observe(cv); resize();
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const C = {}; ['--line','--line-dim','--koi','--ok','--bad','--espresso','--milk','--foam','--warn'].forEach(k=>C[k]=css(k));
+  const MONO = css('--mono');
+
+  function draw(now){
+    const M = MODES[mode];
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+    const cupH = 9, top = H*0.17, bot = H*0.9, pxcm = (bot-top)/cupH;
+    const cx = W*0.4, topW = Math.min(W*0.27, pxcm*3.6), botW = topW*0.68;
+    const xAt = h => topW - (topW-botW)*(1-h/cupH);
+    const yAt = h => bot - h*pxcm;
+    function layer(h0,h1,fill,hatch){
+      if (h1<=h0) return;
+      ctx.beginPath(); ctx.moveTo(cx-xAt(h0),yAt(h0)); ctx.lineTo(cx+xAt(h0),yAt(h0)); ctx.lineTo(cx+xAt(h1),yAt(h1)); ctx.lineTo(cx-xAt(h1),yAt(h1)); ctx.closePath();
+      ctx.fillStyle=fill; ctx.fill();
+      if (hatch){ ctx.save(); ctx.clip(); ctx.strokeStyle='rgba(0,0,0,.12)'; ctx.lineWidth=1;
+        for (let x=-H; x<W; x+=9){ ctx.beginPath(); ctx.moveTo(x,yAt(h0)); ctx.lineTo(x+(yAt(h0)-yAt(h1)),yAt(h1)); ctx.stroke(); } ctx.restore(); }
+    }
+    const e = espH(), foamTop = Math.min(9.2, liquidTop()), foamBot = S.foam>0 ? foamTop - S.foam/10 : e;
+    layer(0, e, C['--espresso']);
+    layer(e, foamBot, C['--milk']);
+    layer(foamBot, foamTop, C['--foam'], true);
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2.2; ctx.lineJoin='round';
+    ctx.beginPath(); ctx.moveTo(cx-topW-6,top); ctx.lineTo(cx-botW-6,bot+6); ctx.lineTo(cx+botW+6,bot+6); ctx.lineTo(cx+topW+6,top); ctx.stroke();
+    ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(cx-topW,top); ctx.lineTo(cx-botW,bot); ctx.lineTo(cx+botW,bot); ctx.lineTo(cx+topW,top); ctx.stroke();
+    ctx.save(); ctx.beginPath(); ctx.moveTo(cx-topW-6,top); ctx.lineTo(cx-botW-6,bot+6); ctx.lineTo(cx+botW+6,bot+6); ctx.lineTo(cx+topW+6,top);
+    ctx.lineTo(cx+topW,top); ctx.lineTo(cx+botW,bot); ctx.lineTo(cx-botW,bot); ctx.lineTo(cx-topW,top); ctx.closePath(); ctx.clip();
+    ctx.strokeStyle=C['--line-dim']; ctx.lineWidth=1; for (let x=-H;x<W;x+=6){ ctx.beginPath(); ctx.moveTo(x,bot+8); ctx.lineTo(x+H,bot+8-H); ctx.stroke(); } ctx.restore();
+    ctx.lineWidth=2.2; ctx.strokeStyle=C['--line']; ctx.beginPath(); ctx.ellipse(cx-topW-4-pxcm*.9, yAt(5.2), pxcm*1.0, pxcm*1.5, 0, Math.PI*.42, Math.PI*1.58); ctx.stroke();
+    ctx.setLineDash([14,4,3,4]); ctx.lineWidth=1; ctx.strokeStyle=C['--line-dim']; ctx.beginPath(); ctx.moveTo(cx,top-14); ctx.lineTo(cx,bot+18); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = `500 10px ${MONO}`; ctx.fillStyle=C['--line-dim'];
+
+    if (drink && S.phase!=='pick'){
+      const gx = cx + topW + 26, i = S.step, c = targetOf(i), half = M.tol[i];
+      if (i===0) drawGauge(gx+(W-gx)/2-8, H*0.55, Math.max(26, Math.min((W-gx)/2-26, 56)), c, half, M.bands);
+      if (i===1) drawScale(gx + 14, top, bot, c, half, M.bands);
+      if (i===2) drawThermo(gx + 22, top, bot, c, half, M.bands);
+      if (i===3){
+        // köpük yüzeyindeki B dairesi → sağdaki büyütülmüş detay
+        const by = yAt((foamBot+foamTop)/2), bx = cx + xAt(foamTop) - 6;
+        ctx.strokeStyle=C['--koi']; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(bx, by, 11, 0, 7); ctx.stroke();
+        ctx.fillStyle=C['--koi']; ctx.font=`700 10px ${MONO}`; ctx.textAlign='center'; ctx.fillText('B', bx, by-15);
+        ctx.font=`500 10px ${MONO}`;
+        drawDetail(cx+topW+18, W-8, top+14, bot, c, half, M.bands, bx+11, by);
+      }
+      if (S.phase==='holding'){
+        ctx.lineCap='round';
+        if (i===0){ // değirmenden düşen kahve
+          ctx.fillStyle=C['--espresso'];
+          for (let k=0;k<14;k++){ const y=((now/6 + k*23)%(H*.5)); ctx.fillRect(cx-3+((k*7)%7), y, 2.5, 2.5); }
+        }
+        if (i===1 || i===3){ ctx.strokeStyle = i===1 ? C['--espresso'] : C['--foam']; ctx.lineWidth = i===1?4:7;
+          const sx = cx + (i===3?10:0); ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, yAt(i===1?e:foamTop)); ctx.stroke(); }
+      }
+      if (i===2){
+        const k = Math.max(0,(S.temp-30)/40);
+        ctx.strokeStyle=`rgba(232,238,247,${0.25*k})`; ctx.lineWidth=3;
+        for (let n=0;n<3;n++){ const ph=(now/900+n/3)%1; const x=cx-20+n*20, y=top-10-ph*50; ctx.beginPath(); ctx.moveTo(x,y+30); ctx.quadraticCurveTo(x+10*Math.sin(now/300+n),y+15,x,y); ctx.stroke(); }
+      }
+    }
+    ctx.strokeStyle=C['--line-dim']; ctx.lineWidth=1; const dx = cx-topW-pxcm*2.6;
+    ctx.beginPath(); ctx.moveTo(dx, top); ctx.lineTo(dx, bot); ctx.stroke();
+    [top,bot].forEach(y=>{ctx.beginPath(); ctx.moveTo(dx-5,y); ctx.lineTo(dx+5,y); ctx.stroke();});
+    ctx.save(); ctx.translate(dx-6,(top+bot)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillStyle=C['--line-dim']; ctx.fillText('h = 9,0 cm',0,0); ctx.restore();
+  }
+  // terazi (0–30 g)
+  function drawGauge(x,y,r,c,half,bands){
+    const A = v => Math.PI + (Math.min(30,v)/30)*Math.PI;
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,r,Math.PI,0); ctx.lineTo(x-r,y); ctx.stroke();
+    if (bands){ ctx.strokeStyle=C['--ok']; ctx.lineWidth=7; ctx.beginPath(); ctx.arc(x,y,r-6,A(c-half),A(c+half)); ctx.stroke(); }
+    ctx.strokeStyle=C['--line-dim']; ctx.fillStyle=C['--line-dim']; ctx.lineWidth=1; ctx.textAlign='center';
+    for (let v=0; v<=30; v+=1){ const a=A(v), l = v%5===0 ? 10 : 4;
+      ctx.beginPath(); ctx.moveTo(x+Math.cos(a)*(r-2),y+Math.sin(a)*(r-2)); ctx.lineTo(x+Math.cos(a)*(r-2-l),y+Math.sin(a)*(r-2-l)); ctx.stroke();
+      if (v%10===0) ctx.fillText(String(v), x+Math.cos(a)*(r+10), y+Math.sin(a)*(r+10)+3); }
+    const a=A(S.disp[0]); ctx.strokeStyle=C['--koi']; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+Math.cos(a)*(r-10),y+Math.sin(a)*(r-10)); ctx.stroke();
+    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fill();
+    ctx.fillStyle=C['--line-dim']; ctx.fillText('gram', x, y+16);
+  }
+  // dereceli mezür (0–50 ml)
+  function drawScale(x,top,bot,c,half,bands){
+    const max=50, y=v=>bot-6-(Math.min(max,v)/max)*(bot-top-26);
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x-11, top); ctx.lineTo(x-11, bot-6); ctx.lineTo(x+11, bot-6); ctx.lineTo(x+11, top); ctx.stroke();
+    if (bands){ ctx.fillStyle='rgba(60,207,125,.25)'; ctx.fillRect(x-24, y(c+half), 48, y(c-half)-y(c+half)); }
+    ctx.fillStyle=C['--espresso']; ctx.fillRect(x-9.5, y(S.disp[1]), 19, bot-6-y(S.disp[1]));
+    ctx.fillStyle=C['--koi']; ctx.fillRect(x-14, y(S.disp[1])-1, 28, 2);
+    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left';
+    for (let v=0; v<=max; v+=2){ ctx.fillRect(x+12, y(v), v%10===0?8:4, 1); if (v%10===0) ctx.fillText(String(v), x+23, y(v)+3); }
+    if (bands){ ctx.fillStyle=C['--ok']; ctx.fillText(`${num(c-half,1)}–${num(c+half,1)}`, x+23, y(c)+3); }
+    ctx.fillStyle=C['--line-dim']; ctx.textAlign='center'; ctx.fillText('ml', x, bot+8);
+  }
+  function drawThermo(x,top,bot,c,half,bands){
+    const y=v=>bot-(v/80)*(bot-top-20);
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.roundRect(x-9, top, 18, bot-top-6, 9); ctx.stroke();
+    if (bands){ ctx.fillStyle='rgba(60,207,125,.25)'; ctx.fillRect(x-30, y(c+half), 60, y(c-half)-y(c+half)); }
+    ctx.fillStyle='rgba(255,90,79,.18)'; ctx.fillRect(x-30, y(80), 60, y(72)-y(80));
+    const v=Math.min(80,S.disp[2]); ctx.fillStyle = S.disp[2]>c+half ? C['--bad'] : C['--koi'];
+    ctx.beginPath(); ctx.roundRect(x-4.5, y(v), 9, bot-6-y(v)-2, 4); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, bot-4, 12, 0, 7); ctx.fill();
+    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left';
+    for (let k=0;k<=80;k+=2){ ctx.fillRect(x+12, y(k), k%10===0?7:3, 1); if (k%10===0) ctx.fillText(String(k), x+21, y(k)+3); }
+    if (bands){ ctx.fillStyle=C['--ok']; ctx.fillText(`${num(c-half,1)}–${num(c+half,1)}`, x+21, y(c)+3); }
+    ctx.fillStyle=C['--bad']; ctx.fillText('YANIK', x-28, y(76)+3);
+  }
+  // DETAY B: köpük katmanının büyütülmüş kesiti, her mm okunur
+  function drawDetail(x0, x1, top, bot, c, half, bands, px, py){
+    const max = Math.max(15, c + 10), win = Math.min(42, Math.max(26, (x1-x0)*.42));
+    const head = 16, yb = bot - 14, yt0 = top + head + 6, ppm = (yb - yt0)/max;
+    const y = mm => yb - mm*ppm, xr = x0 + win;
+    // pencere
+    ctx.save(); ctx.beginPath(); ctx.rect(x0, yt0, win, yb-yt0+14); ctx.clip();
+    ctx.fillStyle=C['--milk']; ctx.fillRect(x0, yb, win, 14);
+    const f = Math.max(0, Math.min(max, S.foam));
+    ctx.fillStyle=C['--foam']; ctx.fillRect(x0, y(f), win, yb - y(f));
+    ctx.strokeStyle='rgba(0,0,0,.14)'; ctx.lineWidth=1;
+    for (let k=-200; k<200; k+=8){ ctx.beginPath(); ctx.moveTo(x0+k, yb); ctx.lineTo(x0+k+(yb-y(f)), y(f)); ctx.stroke(); }
+    if (bands){ ctx.fillStyle='rgba(60,207,125,.32)'; ctx.fillRect(x0, y(c+half), win, y(c-half)-y(c+half)); }
+    ctx.restore();
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=1.5; ctx.strokeRect(x0, yt0, win, yb-yt0+14);
+    // B'den detaya kesik bağlantı
+    ctx.strokeStyle=C['--koi']; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x0, yt0 + (yb-yt0)*.5); ctx.stroke(); ctx.setLineDash([]);
+    // başlık
+    ctx.fillStyle=C['--koi']; ctx.font=`700 10px ${MONO}`; ctx.textAlign='left'; ctx.fillText('DETAY B · mm', x0, top+10);
+    // milimetre ölçeği
+    const every = ppm >= 13 ? 1 : ppm >= 6 ? 2 : 5;
+    ctx.fillStyle=C['--line']; ctx.font=`600 ${ppm>=13?11:10}px ${MONO}`;
+    for (let mm=0; mm<=max; mm++){
+      const yy = y(mm), major = mm%5===0;
+      ctx.fillStyle = major ? C['--line'] : C['--line-dim'];
+      ctx.fillRect(xr, yy, major ? 10 : 6, major ? 1.5 : 1);
+      if (mm%every===0) ctx.fillText(String(mm), xr+13, yy+4);
+    }
+    if (bands){ ctx.fillStyle=C['--ok']; ctx.font=`700 10px ${MONO}`; ctx.fillText(`${c}`, x0-2-ctx.measureText(String(c)).width, y(c)+4); }
+    // köpük göstergesi
+    const yd = y(Math.max(0, Math.min(max, S.disp[3])));
+    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.moveTo(xr+1, yd); ctx.lineTo(xr+9, yd-5); ctx.lineTo(xr+9, yd+5); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=C['--koi']; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x0, yd); ctx.lineTo(xr, yd); ctx.stroke();
+    ctx.font=`500 10px ${MONO}`;
+  }
+
+  let lastClock = 0;
+  function loop(now){
+    const dt = Math.min(0.05,(now-last)/1000); last=now;
+    if (S.phase!=='wait' && S.phase!=='pick') update(dt);
+    if (now-lastClock > 250){ lastClock = now; $('giftClock').textContent = new Date().toLocaleTimeString('tr-TR'); }
+    draw(now);
+    requestAnimationFrame(loop);
+  }
+  renderPick();
+  restart();
+  window.claude?.hot?.snapshot?.(() => ({bests, mode, drink}));
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
