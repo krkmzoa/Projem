@@ -43,6 +43,8 @@ body{
   border-left:1px solid var(--line-dim);border-right:1px solid var(--line-dim)}
 .top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--line-dim)}
 .top b{color:var(--koi);font-weight:700}
+.top > span{white-space:nowrap}
+@media (max-width:420px){.top .pk{display:none}}
 h1{font-family:var(--display);font-weight:900;font-size:clamp(36px,11vw,52px);line-height:.86;margin:0;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
 h1 span{color:var(--koi)}
 .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -120,12 +122,14 @@ canvas{display:block;width:100%;height:100%}
 .btn.go{background:var(--ok);border-color:var(--ok);color:#06210f}
 .btn:focus-visible{outline:3px solid var(--koi);outline-offset:2px}
 .btn[disabled]{opacity:.5;cursor:default}
+.btn.pin{flex:none;width:100%;max-width:340px;font-size:12px;padding:7px;border-color:var(--line-dim);color:var(--line-dim)}
+.lockt{font-family:var(--display);font-weight:900;font-size:40px;line-height:.95;text-transform:uppercase}
 @media (prefers-reduced-motion:reduce){.stamp.pop{animation:none}.hold{transition:none}}
 </style>
 </head>
 <body>
 <main class="sheet">
-  <div class="top"><span><b>ATELIER KOI</b> · PROJE KONTROL</span><span id="roundNo">PAFTA 1/4</span></div>
+  <div class="top"><span><b>ATELIER KOI</b><span class="pk"> · PROJE KONTROL</span></span><span id="roundNo">PAFTA 1/4</span></div>
   <h1>Şartnameye<br><span id="title" lang="en">uygun kahve</span></h1>
   <div class="modes" role="radiogroup" aria-label="Zorluk">
     <button class="mode" role="radio" data-m="stajyer">İLK MÜŞTERİ</button>
@@ -147,7 +151,15 @@ canvas{display:block;width:100%;height:100%}
     <div class="overlay" id="pick">
       <div class="pickhead">SİPARİŞ · KAHVENİ SEÇ</div>
       <div class="drinks" id="drinks"></div>
-      <div class="giftnote"><em>Mühendis</em> seviyesinde dört değerin hepsini <em>±1</em> sapmayla tuttur, seçtiğin kahve <em>bizden</em>.<br>Kazanan en az <em>65 puan</em> alır, ama yüksek puan tek başına yetmez.</div>
+      <div class="giftnote"><em>Mühendis</em> seviyesinde <em>en az 85 puan</em> al ve hiçbir değer <em>±2</em>'yi geçmesin: seçtiğin kahve <em>bizden</em>.<br><em>REVİZE</em> çıkarsa 1 hakkın daha olur, <em>UYGUNSUZ</em> çıkarsa hakkın biter.</div>
+    </div>
+
+    <div class="overlay" id="locked">
+      <div class="pickhead">MÜHENDİS SEVİYESİ · BUGÜNKÜ HAK</div>
+      <div class="lockt" id="lockTitle">Hakkın bitti</div>
+      <div class="giftnote" id="lockText"></div>
+      <div class="row"><button class="btn primary" id="toBarista">Barista seviyesinde pratik yap</button></div>
+      <button class="btn pin" id="pinReset">Barista: hakkı sıfırla</button>
     </div>
 
     <div class="overlay" id="result" aria-live="polite">
@@ -197,10 +209,12 @@ canvas{display:block;width:100%;height:100%}
     muhendis: {label:'BARİSTA',     wob:.22, hide:true,  bands:true,  lag:0,   tol:[1.5,2.5,2,2], spd:1.1, gift:false,
                desc:'Dijital ekran kapalı · akış dalgalı'},
     bas:      {label:'MÜHENDİS',    wob:.38, hide:true,  bands:false, lag:.22, tol:[1,1,1,1],     spd:1.2, gift:true,
-               desc:'Hediye: dört değerin hepsi ±1 içinde'},
+               desc:'Hediye: 85+ puan · sapma ±2 içinde'},
   };
 
-  const GIFT_MIN = Math.round(4*25*.65); // ±1'in tam kenarında bile alınan en düşük toplam
+  // Mühendis seviyesi hediye kuralı
+  const WIN_MIN = 85, WIN_DEV = 2, REVISE_MIN = 70;
+  const BARISTA_PIN = '2468';   // kilitli hakkı kasada sıfırlamak için
 
   const STEPS = [
     {key:'dose', name:'Öğütme', unit:'G · ÖĞÜTÜLMÜŞ KAHVE', suf:' g', fall:3, d:1,
@@ -248,7 +262,13 @@ canvas{display:block;width:100%;height:100%}
     const high = st.key==='foam' ? FOAM_NOTES[drink][1] : st.high;
     return [25*Math.max(0, .45*(1-(d-half)/st.fall)), v<c ? low : high];
   }
-  const withinOne = i => !(i===2 && S.val[2]>=72) && !(i===3 && S.overflow) && Math.abs(rnd1(i, S.val[i]) - targetOf(i)) <= 1 + 1e-9;
+  const okStep = (i, dev) => !(i===2 && S.val[2]>=72) && !(i===3 && S.overflow) && Math.abs(rnd1(i, S.val[i]) - targetOf(i)) <= dev + 1e-9;
+
+  // günlük hak durumu (bu cihazda): fresh → playing → revise → won / out
+  const today = () => { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; };
+  function getG(){ try{ const g=JSON.parse(localStorage.getItem('koiGiftDay')||'null'); if (g && g.day===today()) return g; }catch(e){} return {day:today(), status:'fresh', attempt:1, drink:null}; }
+  function setG(p){ const g=Object.assign(getG(), p); try{ localStorage.setItem('koiGiftDay', JSON.stringify(g)); }catch(e){} return g; }
+  const roundLabel = () => (MODES[mode].gift && S.attempt ? `DENEME ${S.attempt}/2 · ${S.step+1}/4` : `PAFTA ${S.step+1}/4`);
 
   // ---------- fizik ----------
   let last = performance.now(), holding = false;
@@ -285,6 +305,7 @@ canvas{display:block;width:100%;height:100%}
   // ---------- akış ----------
   function press(){
     if (S.phase!=='ready') return;
+    if (MODES[mode].gift && S.step===0) setG({status:'playing', attempt:S.attempt, drink});
     holdBtn.classList.add('down');
     holding = true; S.holdT = 0; S.phase='holding';
   }
@@ -311,7 +332,7 @@ canvas{display:block;width:100%;height:100%}
     S.phase='wait';
     setTimeout(()=>{
       if (S.step<3){ S.step++; S.phase='ready'; holdBtn.disabled=false;
-        $('sp'+S.step).classList.add('active'); $('ru').textContent=STEPS[S.step].unit; $('roundNo').textContent=`PAFTA ${S.step+1}/4`;
+        $('sp'+S.step).classList.add('active'); $('ru').textContent=STEPS[S.step].unit; $('roundNo').textContent=roundLabel();
         msg.innerHTML = STEPS[S.step].ready(fmtT(S.step)); }
       else showResult();
     }, extra ? 1700 : 1300);
@@ -330,33 +351,48 @@ canvas{display:block;width:100%;height:100%}
   function showResult(){
     const M = MODES[mode];
     const total = Math.round(S.pts.reduce((a,b)=>a+b,0));
-    const [vtxt, vcol] = verdict(total);
-    const allOne = [0,1,2,3].every(withinOne);
-    const won = M.gift && allOne;
-    $('resHead').textContent = `PROJE KONTROL RAPORU · ${DRINKS[drink].name.toUpperCase()} · ${M.label}`;
+    const devOK = [0,1,2,3].every(i => okStep(i, WIN_DEV));
+    let vtxt, vcol, won = false;
+    if (M.gift){
+      won = total>=WIN_MIN && devOK;
+      [vtxt, vcol] = won ? ['UYGUNDUR','var(--ok)'] : total>=REVISE_MIN ? ['REVİZE','var(--warn)'] : ['UYGUNSUZ','var(--bad)'];
+    } else [vtxt, vcol] = verdict(total);
+    const canRevise = M.gift && !won && vtxt==='REVİZE' && S.attempt===1;
+    if (M.gift) setG(won ? {status:'won', drink} : canRevise ? {status:'revise', attempt:2, drink} : {status:'out', reason:'sonuc'});
+
+    $('resHead').textContent = `PROJE KONTROL RAPORU · ${DRINKS[drink].name.toUpperCase()} · ${M.label}` + (M.gift ? ` · DENEME ${S.attempt}/2` : '');
     $('score').innerHTML = `${total}<small>/100</small>`;
     const stp=$('stamp'); stp.style.display = won ? 'none' : '';
     stp.textContent=vtxt; stp.style.color=vcol; stp.classList.remove('pop'); void stp.offsetWidth; stp.classList.add('pop');
     $('lines').innerHTML = STEPS.map((st,i)=>{
-      const mark = M.gift ? (withinOne(i) ? ' <b class="y">±1 ✓</b>' : ' <b class="n">±1 ✗</b>') : '';
+      const mark = M.gift ? (okStep(i, WIN_DEV) ? ' <b class="y">±2 ✓</b>' : ' <b class="n">±2 ✗</b>') : '';
       return `<div><span>${st.name} · ${fmtV(i,S.val[i])}${st.suf} / ${targetOf(i)}${st.suf} · ${S.notes[i]}${mark}</span><span>${Math.round(S.pts[i])}</span></div>`;
     }).join('');
     const g = $('gift');
     g.classList.toggle('show', won); g.classList.remove('used');
     if (won){
       S.code = giftCode();
-      $('giftG1').textContent = 'TEBRİKLER · HEDİYE KAZANDIN';
+      $('giftG1').textContent = 'UYGUNDUR · HEDİYE KAZANDIN';
       $('giftName').innerHTML = `<span lang="en">${DRINKS[drink].name}</span> bizden`;
       $('giftCode').textContent = S.code;
       $('redeem').disabled = false; $('redeem').textContent = 'Barista onayı · Teslim edildi';
     }
-    $('teaser').textContent = (!M.gift && allOne) ? 'Dört değer de ±1 içinde! Bunu Mühendis seviyesinde yaparsan kahve bizden.'
-      : (M.gift && !won) ? `Hediye kazanılmadı: ${[0,1,2,3].filter(n => !withinOne(n)).map(n => `${STEPS[n].name} ${fmtV(n,S.val[n])}${STEPS[n].suf} (hedef ${targetOf(n)}${STEPS[n].suf})`).join(', ')} ±1 dışında. Puan ne olursa olsun dört değerin hepsi ±1 içinde olmalı.` : '';
+    const why = [];
+    if (total < WIN_MIN) why.push(`puan ${total}, en az ${WIN_MIN} gerekli`);
+    [0,1,2,3].filter(n => !okStep(n, WIN_DEV)).forEach(n => why.push(`${STEPS[n].name} ${fmtV(n,S.val[n])}${STEPS[n].suf} (hedef ${targetOf(n)}${STEPS[n].suf}) ±${WIN_DEV} dışında`));
+    $('teaser').textContent = !M.gift ? ((total>=WIN_MIN && devOK) ? 'Bu sonuç Mühendis seviyesinde hediye kazandırırdı!' : '')
+      : won ? ''
+      : canRevise ? `REVİZE: 1 deneme hakkın daha var. Eksik: ${why.join('; ')}.`
+      : `Hakkın kalmadı. Eksik: ${why.join('; ')}.`;
     const isBest = total>bests[mode]; if (isBest){ bests[mode]=total; try{localStorage.setItem('koiBest3_'+mode, String(total));}catch(e){} }
     $('best').textContent = isBest && total>0 ? `YENİ REKOR · ${total}/100` : `REKORUN · ${bests[mode]}/100`;
     $('ctrl').textContent = won ? 'HEDİYE' : vtxt; $('ctrl').style.color = won ? 'var(--ok)' : vcol;
+    $('again').textContent = !M.gift ? 'Tekrar dene' : canRevise ? 'Revizyon · son deneme' : 'Tamam';
+    $('change').style.display = M.gift ? 'none' : '';
     $('result').classList.add('show');
-    msg.innerHTML = won ? `Şartnameye birebir uygun. <em>${DRINKS[drink].name} bizden!</em> Ekranı kasada göster.`
+    msg.innerHTML = won ? `Şartnameye uygun. <em>${DRINKS[drink].name} bizden!</em> Ekranı kasada göster.`
+      : canRevise ? 'Revizyon gerekli. <em>Son deneme hakkın var.</em>'
+      : M.gift ? 'Şartname dışı. <em>Bugünkü hakkın bitti.</em>'
       : total>=90 ? 'Proje onaylandı. <em>Afiyet olsun.</em>' : total>=70 ? 'Revizyon gerekli. <em>Bir daha dene.</em>' : 'Şartname dışı. <em>Yeniden hesapla.</em>';
     holdBtn.disabled = true;
     renderModes();
@@ -385,17 +421,34 @@ canvas{display:block;width:100%;height:100%}
     document.querySelectorAll('.drink').forEach(b => b.addEventListener('click', () => { drink = b.dataset.d; restart(); }));
   }
   function restart(){
-    S = fresh(); holding=false; S.code=null;
-    $('result').classList.remove('show'); $('pick').classList.toggle('show', !drink);
-    holdBtn.disabled = !drink; holdBtn.classList.remove('down');
+    const M = MODES[mode];
+    let locked = null, attempt = 1;
+    if (M.gift){
+      let g = getG();
+      if (g.status==='playing') g = setG({status:'out', reason:'yarim'});   // yarım bırakılan deneme hak sayılır
+      if (g.status==='won' || g.status==='out') locked = g;
+      else if (g.status==='revise'){ attempt = 2; drink = g.drink; }
+    }
+    S = fresh(); holding=false; S.code=null; S.attempt = M.gift ? attempt : 0;
+    if (locked) S.phase = 'pick';
+    $('result').classList.remove('show'); $('pick').classList.toggle('show', !locked && !drink);
+    $('locked').classList.toggle('show', !!locked);
+    if (locked){
+      $('lockTitle').textContent = locked.status==='won' ? 'Bugünün hediyesi alındı' : 'Bugünkü hakkın bitti';
+      $('lockText').innerHTML = locked.status==='won' ? 'Tebrikler! Mühendis seviyesi yarın yeniden açılır.'
+        : (locked.reason==='yarim' ? 'Yarım bırakılan deneme hak sayılır. ' : '') + 'Mühendis seviyesi <em>yarın</em> yeniden açılır. O zamana kadar Barista seviyesinde pratik yapabilirsin.';
+    }
+    holdBtn.disabled = !!locked || !drink; holdBtn.classList.remove('down');
     renderSpecs(); renderModes();
     for (let i=0;i<4;i++) $('sp'+i).classList.remove('done','active');
-    $('sp0').classList.add('active'); $('ru').textContent=STEPS[0].unit; $('roundNo').textContent='PAFTA 1/4';
+    $('sp0').classList.add('active'); $('ru').textContent=STEPS[0].unit; $('roundNo').textContent = locked ? 'BUGÜN KAPALI' : roundLabel();
     $('ctrl').textContent='—'; $('ctrl').style.color='';
     $('title').textContent = drink ? `uygun ${DRINKS[drink].name}` : 'uygun kahve';
     $('antetName').textContent = drink ? DRINKS[drink].name : 'Kahve';
     document.title = drink ? `Şartnameye Uygun ${DRINKS[drink].name}` : 'Şartnameye Uygun Kahve';
-    msg.innerHTML = drink ? STEPS[0].ready(fmtT(0)) : 'Önce <em>kahveni seç</em>.';
+    msg.innerHTML = locked ? 'Mühendis seviyesi <em>bugün kapalı</em>.'
+      : !drink ? 'Önce <em>kahveni seç</em>.'
+      : (attempt===2 ? '<em>Revizyon · son deneme.</em> ' : '') + STEPS[0].ready(fmtT(0));
   }
   document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => {
     mode = b.dataset.m; try{localStorage.setItem('koiMode3', mode);}catch(e){}
@@ -403,6 +456,14 @@ canvas{display:block;width:100%;height:100%}
   }));
   $('again').addEventListener('click', restart);
   $('change').addEventListener('click', () => { drink = null; restart(); });
+  $('toBarista').addEventListener('click', () => { mode = 'muhendis'; try{localStorage.setItem('koiMode3', mode);}catch(e){} restart(); });
+  $('pinReset').addEventListener('click', () => {
+    const p = prompt('Barista PIN');
+    if (p === null) return;
+    if (p !== BARISTA_PIN){ alert('PIN hatalı'); return; }
+    try{ localStorage.removeItem('koiGiftDay'); }catch(e){}
+    drink = null; restart();
+  });
   holdBtn.addEventListener('pointerdown', e => { e.preventDefault(); try{holdBtn.setPointerCapture(e.pointerId);}catch(_){} press(); });
   ['pointerup','pointercancel','lostpointercapture'].forEach(ev => holdBtn.addEventListener(ev, release));
   holdBtn.addEventListener('contextmenu', e => e.preventDefault());
