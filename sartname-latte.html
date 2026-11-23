@@ -84,13 +84,13 @@ canvas{display:block;width:100%;height:100%}
 .overlay > :first-child{margin-top:auto}
 .overlay > :last-child{margin-bottom:auto}
 .pickhead{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--line-dim)}
-.drinks{display:grid;gap:8px;width:100%;max-width:340px}
+.drinks{display:grid;gap:6px;width:100%;max-width:340px}
 .drink{appearance:none;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;text-align:left;border:1.5px solid var(--line);background:transparent;color:var(--line);
   border-radius:10px;padding:10px 12px;cursor:pointer;font-family:var(--body)}
 .drink:hover{background:rgba(242,121,46,.12);border-color:var(--koi)}
 .drink:focus-visible{outline:3px solid var(--koi);outline-offset:2px}
-.drink b{font-family:var(--display);font-weight:900;font-size:28px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
-.drink .mm{grid-row:span 2;font-family:var(--mono);font-weight:700;font-size:20px;color:var(--koi);text-align:right}
+.drink b{font-family:var(--display);font-weight:900;font-size:24px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.drink .mm{grid-row:span 2;font-family:var(--mono);font-weight:700;font-size:18px;color:var(--koi);text-align:right}
 .drink .mm small{display:block;font-size:9px;color:var(--line-dim);letter-spacing:.06em}
 .drink span{font-family:var(--mono);font-size:10.5px;color:var(--line-dim)}
 .giftnote{font-size:13px;line-height:1.35;color:var(--line);max-width:330px}
@@ -128,7 +128,12 @@ canvas{display:block;width:100%;height:100%}
 #result .stamp{font-size:32px;margin:6px 0 4px}
 #result .teaser{font-size:15px;line-height:1.4;max-width:400px;font-weight:600}
 #result .row,#result .gift{max-width:400px}
-.spec .tg{color:var(--ok)} .spec .ta{color:var(--warn)}
+.spec .ta{color:var(--koi)}
+.scoring{width:100%;max-width:340px;display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;font-family:var(--mono);font-size:11.5px;text-align:left;color:var(--line-dim);border-top:1px dashed var(--line-dim);padding-top:7px}
+.scoring b{color:var(--line);font-weight:700}
+.scoring .h{grid-column:1/-1;font-size:10.5px;letter-spacing:.08em}
+.scoring .c{display:flex;justify-content:space-between;gap:6px}
+.scoring .pen{color:var(--koi)}
 .best{font-family:var(--mono);font-size:11px;color:var(--line-dim)}
 .teaser{font-size:13px;color:var(--warn);max-width:320px}
 .row{display:flex;gap:8px;width:100%;max-width:340px}
@@ -172,7 +177,8 @@ canvas{display:block;width:100%;height:100%}
     <div class="overlay" id="pick">
       <div class="pickhead">SİPARİŞ · KAHVENİ SEÇ</div>
       <div class="drinks" id="drinks"></div>
-      <div class="giftnote"><em>Mühendis</em> seviyesinde dört değerin hepsi <em>±1</em> içindeyse seçtiğin kahve <em>bizden</em>.<br>Bir değer ±1–±2 arasındaysa <em>REVİZE</em>: 1 hakkın daha olur. ±2'yi aşarsa <em>UYGUNSUZ</em>: hakkın biter.</div>
+      <div class="giftnote"><em>Mühendis</em> seviyesinde <em>85+ puan</em>: seçtiğin kahve <em>bizden</em>. 70–84 <em>REVİZE</em>: 1 hakkın daha olur. 70 altı: hakkın biter.</div>
+      <div class="scoring" id="scoring"></div>
     </div>
 
     <div class="overlay" id="locked">
@@ -230,18 +236,25 @@ canvas{display:block;width:100%;height:100%}
   };
 
   const MODES = {
-    stajyer:  {label:'İLK MÜŞTERİ', wob:0,   hide:false, bands:true,  lag:0,   tol:[2,4,3,3],     spd:1,   gift:false,
-               desc:'Göstergeler açık · geniş tolerans'},
-    muhendis: {label:'BARİSTA',     wob:.12, hide:true,  bands:true,  lag:0,   tol:[1.5,2.5,2,2], spd:1.1, gift:false,
-               desc:'Dijital ekran kapalı · akış dalgalı'},
-    bas:      {label:'MÜHENDİS',    wob:.20, hide:true,  bands:false, lag:0,   tol:[1,1,1,1],     spd:1.2, gift:true,
-               desc:'Hediye: dört değer de ±1 içinde'},
+    stajyer:  {label:'İLK MÜŞTERİ', wob:0,   hide:false, bands:true,  lag:0,   pen:1/3, spd:1,   gift:false,
+               desc:'Göstergeler açık · cezalar üçte bir'},
+    muhendis: {label:'BARİSTA',     wob:.12, hide:true,  bands:true,  lag:0,   pen:.5,  spd:1.1, gift:false,
+               desc:'Dijital ekran kapalı · cezalar yarım'},
+    bas:      {label:'MÜHENDİS',    wob:.20, hide:true,  bands:false, lag:0,   pen:1,   spd:1.2, gift:true,
+               desc:'Hediye: 85+ puan · 70–84 revize'},
   };
 
   // Her adımın durumu: tolerans içi UYGUN, 2 katına kadar REVİZE, ötesi UYGUNSUZ.
   // Genel sonuç en kötü adımdır. Mühendis seviyesinde tolerans ±1 → hediye için dört değer de ±1 içinde.
-  const TIER = [['UYGUN','var(--ok)'], ['REVİZE','var(--warn)'], ['UYGUNSUZ','var(--bad)']];
+  // Puanlama: her adımın ağırlığı var, hedeften her birim sapma sabit puan götürür (uçurum yok).
+  const WT  = [30, 30, 20, 20];   // öğütme, espresso, süt, köpük
+  const PEN = [10, 5, 4, 4];      // Mühendis'te birim başına ceza: g, ml, °C, mm
+  const WIN = 85, REV = 70;       // UYGUNDUR / REVİZE eşikleri (tüm seviyeler)
   const VERDICT = [['UYGUNDUR','var(--ok)'], ['REVİZE','var(--warn)'], ['UYGUNSUZ','var(--bad)']];
+  const verdictOf = t => t>=WIN ? 0 : t>=REV ? 1 : 2;
+  const penOf = (i, m=mode) => PEN[i]*MODES[m].pen;
+  const band  = i => .15*WT[i]/penOf(i);   // göstergede yeşil bölge: adım puanının %85'i korunuyor
+  const stepColor = i => { const r = S.pts[i]/WT[i]; return r>=.85 ? 'var(--ok)' : r>=.7 ? 'var(--warn)' : 'var(--bad)'; };
 
   // Yanlış değerle fincanda ne olur: oyuncuya kaliteli kahveyi öğreten notlar
   const TASTE = {
@@ -282,7 +295,8 @@ canvas{display:block;width:100%;height:100%}
   const targetOf = i => [18, 36, 65, DRINKS[drink].foam][i];
   const rnd1 = (i, v) => STEPS[i].d ? Math.round(v*10)/10 : Math.round(v);
   const fmtV = (i, v) => STEPS[i].d ? v.toFixed(1).replace('.', ',') : String(Math.round(v));
-  const fmtT = i => `${targetOf(i)}${STEPS[i].suf} ±${num(MODES[mode].tol[i],1)}`;
+  const fmtT = i => `${targetOf(i)}${STEPS[i].suf}`;
+  const penTxt = i => `−${num(penOf(i),1)}/${STEPS[i].suf.trim()}`;
 
   const $ = id => document.getElementById(id);
   const cv = $('cv'), ctx = cv.getContext('2d');
@@ -304,28 +318,27 @@ canvas{display:block;width:100%;height:100%}
   }
   function wob(i, t){ const a=MODES[mode].wob; return 1 + a*(.7*Math.sin(t*1.3+S.ph[i]) + .3*Math.sin(t*2.9+S.ph[i+4])); }   // yavaş, okunabilir dalga
 
-  // ---------- puanlama: her adım 25 puan ----------
+  // ---------- puanlama ----------
+  function rawScore(i, v, m=mode){
+    if (STEPS[i].key==='milk' && v>=72) return 0;
+    if (STEPS[i].key==='foam' && S.overflow) return 0;
+    return Math.max(0, WT[i] - penOf(i, m)*Math.abs(v - targetOf(i)));
+  }
   function score(i, v){
-    const st = STEPS[i], c = targetOf(i), half = MODES[mode].tol[i];
+    const st = STEPS[i], c = targetOf(i), p = rawScore(i, v);
     if (st.key==='milk' && v>=72) return [0, st.burn];
     if (st.key==='foam' && S.overflow) return [0, 'Fincan taştı'];
-    const d = Math.abs(v - c);
-    if (d <= half) return [25*(1 - .35*(d/half)**2), d <= .25*half ? 'Tam şartname' : 'Şartnameye uygun'];
+    if (p >= .85*WT[i]) return [p, Math.abs(v-c) < .05 ? 'Tam şartname' : 'Şartnameye uygun'];
     const low  = st.key==='foam' ? FOAM_NOTES[drink][0] : st.low;
     const high = st.key==='foam' ? FOAM_NOTES[drink][1] : st.high;
-    return [25*Math.max(0, .45*(1-(d-half)/st.fall)), v<c ? low : high];
-  }
-  const okStep = (i, dev) => !(i===2 && S.val[2]>=72) && !(i===3 && S.overflow) && Math.abs(rnd1(i, S.val[i]) - targetOf(i)) <= dev + 1e-9;
-  function tier(i){
-    const t = MODES[mode].tol[i];
-    return okStep(i, t) ? 0 : okStep(i, 2*t) ? 1 : 2;
+    return [p, v<c ? low : high];
   }
   function taste(i){
     const v = rnd1(i, S.val[i]), c = targetOf(i);
     if (i===2 && v>=72) return TASTE.milk.burn;
     if (i===3 && S.overflow) return TASTE.foam.over;
     const t = i===3 ? TASTE.foam[drink] : TASTE[STEPS[i].key];
-    return tier(i)===0 ? t.ok : (v < c ? t.low : t.high);
+    return S.pts[i] >= .85*WT[i] ? t.ok : (v < c ? t.low : t.high);
   }
 
   // günlük hak durumu (bu cihazda): fresh → playing → revise → won / out
@@ -357,7 +370,7 @@ canvas{display:block;width:100%;height:100%}
       if (!M.lag) S.disp[n] = real[n];
       else S.disp[n] += (real[n]-S.disp[n])*Math.min(1, dt/M.lag);
     }
-    const v = S.disp[i], c = targetOf(i), half = M.tol[i], rv = $('rv');
+    const v = S.disp[i], c = targetOf(i), half = band(i), rv = $('rv');
     if (M.hide && (S.phase==='holding' || S.phase==='settle')){ rv.textContent = '– –'; rv.style.color = 'var(--line-dim)'; return; }
     rv.textContent = fmtV(i, v);
     rv.style.color = S.phase==='ready' ? 'var(--line)' : (Math.abs(v-c)<=half ? 'var(--ok)' : (v>c ? 'var(--bad)' : 'var(--line)'));
@@ -384,9 +397,8 @@ canvas{display:block;width:100%;height:100%}
     const i = S.step, st = STEPS[i], v = get(i);
     S.disp[i] = v; S.val[i] = v;
     const [p, note] = score(i, rnd1(i, v)); S.pts[i]=p; S.notes[i]=note;
-    const ti = tier(i);
-    $('pt'+i).textContent = TIER[ti][0]==='UYGUN' ? '✓' : TIER[ti][0]==='REVİZE' ? '~' : '✗';
-    $('pt'+i).style.color = TIER[ti][1];
+    $('pt'+i).textContent = num(p,1);
+    $('pt'+i).style.color = stepColor(i);
     $('sp'+i).classList.remove('active'); $('sp'+i).classList.add('done');
     $('rv').textContent = fmtV(i, v);
     let extra = '';
@@ -394,7 +406,8 @@ canvas{display:block;width:100%;height:100%}
       S.tf = Math.max(.6, Math.min(1.6, 1 + (18 - v)*.07));
       extra = S.tf>1.06 ? ' Az doz: shot <em>hızlı</em> akacak.' : S.tf<.94 ? ' Fazla doz: shot <em>yavaş</em> akacak.' : '';
     }
-    msg.innerHTML = `${st.name}: <em>${fmtV(i,v)}${st.suf}</em> · <span style="color:${TIER[ti][1]}">${TIER[ti][0]}</span>. ${note}.${extra}`;
+    const lost = WT[i]-p;
+    msg.innerHTML = `${st.name}: <em>${fmtV(i,v)}${st.suf}</em> · <span style="color:${stepColor(i)}">${lost<.05 ? 'tam puan' : '−'+num(lost,1)+' puan'}</span>. ${note}.${extra}`;
     S.phase='wait';
     setTimeout(()=>{
       if (S.step<3){ S.step++; S.phase='ready'; holdBtn.disabled=false;
@@ -416,7 +429,7 @@ canvas{display:block;width:100%;height:100%}
   function showResult(){
     const M = MODES[mode];
     const total = Math.round(S.pts.reduce((a,b)=>a+b,0));
-    const tiers = [0,1,2,3].map(tier), worst = Math.max(...tiers);
+    const worst = verdictOf(total);
     const [vtxt, vcol] = VERDICT[worst];
     const won = M.gift && worst===0;
     const canRevise = M.gift && worst===1 && S.attempt===1;
@@ -426,12 +439,12 @@ canvas{display:block;width:100%;height:100%}
     $('score').innerHTML = `<span class="cap">KALİTE PUANI</span>${total}<small>/100</small>`;
     const stp=$('stamp'); stp.style.display = won ? 'none' : '';
     stp.textContent=vtxt; stp.style.color=vcol; stp.classList.remove('pop'); void stp.offsetWidth; stp.classList.add('pop');
-    const tolTxt = i => `±${num(M.tol[i],1)}`;
     $('lines').innerHTML =
-      `<div class="legend"><span><i style="color:var(--ok)">●</i> UYGUN: tolerans içi</span><span><i style="color:var(--warn)">●</i> REVİZE: 2 katına kadar</span><span><i style="color:var(--bad)">●</i> UYGUNSUZ: ötesi</span></div>` +
-      STEPS.map((st,i)=>`<div class="ln t${tiers[i]}">
-        <div class="lh"><b>${st.name}</b><span class="lv">${fmtV(i,S.val[i])}${st.suf} <small>/ hedef ${targetOf(i)}${st.suf} ${tolTxt(i)}</small></span><span class="chip">${TIER[tiers[i]][0]}</span></div>
-        <p>${taste(i)}</p></div>`).join('');
+      `<div class="legend"><span><i style="color:var(--ok)">●</i> ${M.gift ? 'Hediye' : 'Uygun'} ${WIN}+</span><span><i style="color:var(--warn)">●</i> Revize ${REV}–${WIN-1}</span><span><i style="color:var(--bad)">●</i> Uygunsuz ${REV}'in altı</span></div>` +
+      STEPS.map((st,i)=>{ const lost = WT[i]-S.pts[i];
+        return `<div class="ln" style="--c:${stepColor(i)}">
+        <div class="lh"><b>${st.name}</b><span class="lv">${fmtV(i,S.val[i])}${st.suf} <small>/ hedef ${targetOf(i)}${st.suf}</small></span><span class="chip">${num(S.pts[i],1)}/${WT[i]}</span></div>
+        <p>${lost>=.05 ? `<b style="color:${stepColor(i)}">−${num(lost,1)} puan.</b> ` : ''}${taste(i)}</p></div>`; }).join('');
     const g = $('gift');
     g.classList.toggle('show', won); g.classList.remove('used');
     if (won){
@@ -441,12 +454,14 @@ canvas{display:block;width:100%;height:100%}
       $('giftCode').textContent = S.code;
       $('redeem').disabled = false; $('redeem').textContent = 'Barista onayı · Teslim edildi';
     }
-    const names = t => [0,1,2,3].filter(n => tiers[n]===t).map(n => STEPS[n].name).join(', ');
-    $('teaser').innerHTML = !M.gift ? ([0,1,2,3].every(n => okStep(n,1)) ? 'Dört değer de ±1 içinde! Bunu Mühendis seviyesinde yaparsan kahve bizden.' : '')
+    const big = [0,1,2,3].reduce((a,n) => (WT[n]-S.pts[n]) > (WT[a]-S.pts[a]) ? n : a, 0);
+    const bigTxt = `En çok puanı <b>${STEPS[big].name}</b> kaybettirdi (−${num(WT[big]-S.pts[big],1)}).`;
+    const asEng = Math.round([0,1,2,3].reduce((a,n) => a + rawScore(n, rnd1(n, S.val[n]), 'bas'), 0));
+    $('teaser').innerHTML = !M.gift ? (asEng>=WIN ? `Bu fincan Mühendis seviyesinde de ${asEng} puan alırdı. Orada yaparsan kahve bizden!` : '')
       : won ? ''
-      : canRevise ? `Son deneme hakkın var. <b>${names(1)}</b> ±1 dışında kaldı; ikinci denemede dördü de ±1 içinde olmalı.`
-      : worst===2 ? `Hakkın kalmadı: <b>${names(2)}</b> ±2'yi aştı.`
-      : `Hakkın kalmadı: ikinci denemede de <b>${names(1)}</b> ±1 dışında kaldı.`;
+      : canRevise ? `Son deneme hakkın var. Hediye için ${WIN} puan gerekli, sen ${total} aldın. ${bigTxt}`
+      : worst===2 ? `Hakkın kalmadı: ${total} puan, en az ${REV} gerekliydi. ${bigTxt}`
+      : `Hakkın kalmadı: ikinci denemede de ${WIN} puana ulaşılamadı (${total}). ${bigTxt}`;
     const isBest = total>bests[mode]; if (isBest){ bests[mode]=total; try{localStorage.setItem('koiBest3_'+mode, String(total));}catch(e){} }
     $('best').textContent = isBest && total>0 ? `YENİ REKOR · ${total}/100` : `REKORUN · ${bests[mode]}/100`;
     $('ctrl').textContent = won ? 'HEDİYE' : vtxt; $('ctrl').style.color = won ? 'var(--ok)' : vcol;
@@ -476,8 +491,12 @@ canvas{display:block;width:100%;height:100%}
 
   function renderSpecs(){
     STEPS.forEach((st,i)=>{
-      $('sp'+i).innerHTML = `<b>${st.name}</b><span class="pts" id="pt${i}"></span>${drink ? targetOf(i) : '–'}${st.suf}<br><span class="tg">±${num(MODES[mode].tol[i],1)}</span> <span class="ta">±${num(2*MODES[mode].tol[i],1)}</span>`;
+      $('sp'+i).innerHTML = `<b>${st.name}</b><span class="pts" id="pt${i}" style="color:var(--line-dim)">${WT[i]}</span>${drink ? targetOf(i) : '–'}${st.suf}<br><span class="ta">${penTxt(i)}</span>`;
     });
+  }
+  function renderScoring(){
+    $('scoring').innerHTML = `<span class="h">PUANLAMA · ${MODES[mode].label} · 18 g → 36 ml · 65 °C</span>` +
+      STEPS.map((st,i)=>`<span class="c"><b>${st.name} ${WT[i]}</b><span class="pen">${penTxt(i)}</span></span>`).join('');
   }
   function renderModes(){
     document.querySelectorAll('.mode').forEach(b => b.setAttribute('aria-checked', String(b.dataset.m===mode)));
@@ -486,8 +505,9 @@ canvas{display:block;width:100%;height:100%}
   }
   function renderPick(){
     $('drinks').innerHTML = Object.entries(DRINKS).map(([k,d]) =>
-      `<button class="drink" data-d="${k}"><b lang="en">${d.name}</b><div class="mm">${d.foam} mm<small>KÖPÜK</small></div><span>18 g → 36 ml · süt 65 °C · ${d.info.toLowerCase()}</span></button>`).join('');
+      `<button class="drink" data-d="${k}"><b lang="en">${d.name}</b><div class="mm">${d.foam} mm<small>KÖPÜK</small></div><span>${d.info}</span></button>`).join('');
     document.querySelectorAll('.drink').forEach(b => b.addEventListener('click', () => { drink = b.dataset.d; restart(); }));
+    renderScoring();
   }
   function restart(){
     const M = MODES[mode];
@@ -509,7 +529,7 @@ canvas{display:block;width:100%;height:100%}
         : (locked.reason==='yarim' ? 'Yarım bırakılan deneme hak sayılır. ' : '') + 'Mühendis seviyesi <em>yarın</em> yeniden açılır. O zamana kadar Barista seviyesinde pratik yapabilirsin.';
     }
     holdBtn.disabled = !!locked || !drink; holdBtn.classList.remove('down');
-    renderSpecs(); renderModes();
+    renderSpecs(); renderModes(); renderScoring();
     for (let i=0;i<4;i++) $('sp'+i).classList.remove('done','active');
     $('sp0').classList.add('active'); $('ru').textContent=STEPS[0].unit; $('roundNo').textContent = locked ? 'BUGÜN KAPALI' : roundLabel();
     $('ctrl').textContent='—'; $('ctrl').style.color='';
@@ -580,7 +600,7 @@ canvas{display:block;width:100%;height:100%}
     ctx.font = `500 10px ${MONO}`; ctx.fillStyle=C['--line-dim'];
 
     if (drink && S.phase!=='pick'){
-      const gx = cx + topW + 26, i = S.step, c = targetOf(i), half = M.tol[i];
+      const gx = cx + topW + 26, i = S.step, c = targetOf(i), half = band(i);
       if (i===0) drawGauge(gx+(W-gx)/2-8, H*0.55, Math.max(26, Math.min((W-gx)/2-26, 56)), c, half, M.bands);
       if (i===1) drawScale(gx + 14, top, bot, c, half, M.bands);
       if (i===2) drawThermo(gx + 22, top, bot, c, half, M.bands);
