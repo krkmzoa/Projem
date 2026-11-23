@@ -110,10 +110,25 @@ canvas{display:block;width:100%;height:100%}
 .gift .redeem{margin-top:8px;width:100%}
 .gift.used{border-color:var(--line-dim);background:transparent;opacity:.7}
 .gift.used .g1{color:var(--bad)}
-.lines{width:100%;max-width:340px;font-family:var(--mono);font-size:11px;text-align:left;display:grid;gap:4px}
-.lines div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line-dim);padding-bottom:3px}
-.lines span:last-child{color:var(--koi);white-space:nowrap}
-.lines .y{color:var(--ok)} .lines .n{color:var(--bad)}
+.lines{width:100%;max-width:400px;text-align:left;display:grid;gap:7px}
+.ln{--c:var(--line-dim);border-left:5px solid var(--c);background:rgba(232,238,247,.06);border-radius:8px;padding:8px 10px}
+.ln.t0{--c:var(--ok)} .ln.t1{--c:var(--warn)} .ln.t2{--c:var(--bad)}
+.lh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.lh b{font-size:16px;font-weight:700}
+.lv{font-family:var(--mono);font-size:15px;font-weight:700;flex:1;min-width:0}
+.lv small{color:var(--line-dim);font-size:12px;font-weight:500}
+.chip{font-family:var(--mono);font-size:11.5px;font-weight:700;color:#0e203a;background:var(--c);border-radius:5px;padding:2px 6px;letter-spacing:.03em}
+.lp{font-family:var(--mono);font-size:13px;color:var(--line-dim);white-space:nowrap}
+.ln p{margin:4px 0 0;font-size:14.5px;line-height:1.4;color:var(--line)}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;font-family:var(--mono);font-size:11.5px;color:var(--line-dim)}
+.legend i{font-style:normal;font-weight:700}
+#result{position:fixed;inset:0;z-index:20;background:var(--paper-deep);padding:18px 16px 22px;gap:10px}
+#result .score{font-size:60px;text-align:center}
+.score .cap{display:block;font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.12em;color:var(--line-dim);margin-bottom:4px}
+#result .stamp{font-size:32px;margin:6px 0 4px}
+#result .teaser{font-size:15px;line-height:1.4;max-width:400px;font-weight:600}
+#result .row,#result .gift{max-width:400px}
+.spec .tg{color:var(--ok)} .spec .ta{color:var(--warn)}
 .best{font-family:var(--mono);font-size:11px;color:var(--line-dim)}
 .teaser{font-size:13px;color:var(--warn);max-width:320px}
 .row{display:flex;gap:8px;width:100%;max-width:340px}
@@ -157,7 +172,7 @@ canvas{display:block;width:100%;height:100%}
     <div class="overlay" id="pick">
       <div class="pickhead">SİPARİŞ · KAHVENİ SEÇ</div>
       <div class="drinks" id="drinks"></div>
-      <div class="giftnote"><em>Mühendis</em> seviyesinde <em>en az 80 puan</em> al ve hiçbir değer <em>±2</em>'yi geçmesin: seçtiğin kahve <em>bizden</em>.<br><em>REVİZE</em> çıkarsa 1 hakkın daha olur, <em>UYGUNSUZ</em> çıkarsa hakkın biter.</div>
+      <div class="giftnote"><em>Mühendis</em> seviyesinde dört değerin hepsi <em>±1</em> içindeyse seçtiğin kahve <em>bizden</em>.<br>Bir değer ±1–±2 arasındaysa <em>REVİZE</em>: 1 hakkın daha olur. ±2'yi aşarsa <em>UYGUNSUZ</em>: hakkın biter.</div>
     </div>
 
     <div class="overlay" id="locked">
@@ -220,11 +235,38 @@ canvas{display:block;width:100%;height:100%}
     muhendis: {label:'BARİSTA',     wob:.12, hide:true,  bands:true,  lag:0,   tol:[1.5,2.5,2,2], spd:1.1, gift:false,
                desc:'Dijital ekran kapalı · akış dalgalı'},
     bas:      {label:'MÜHENDİS',    wob:.20, hide:true,  bands:false, lag:0,   tol:[1,1,1,1],     spd:1.2, gift:true,
-               desc:'Hediye: 80+ puan · sapma ±2 içinde'},
+               desc:'Hediye: dört değer de ±1 içinde'},
   };
 
-  // Mühendis seviyesi hediye kuralı
-  const WIN_MIN = 80, WIN_DEV = 2, REVISE_MIN = 70;
+  // Her adımın durumu: tolerans içi UYGUN, 2 katına kadar REVİZE, ötesi UYGUNSUZ.
+  // Genel sonuç en kötü adımdır. Mühendis seviyesinde tolerans ±1 → hediye için dört değer de ±1 içinde.
+  const TIER = [['UYGUN','var(--ok)'], ['REVİZE','var(--warn)'], ['UYGUNSUZ','var(--bad)']];
+  const VERDICT = [['UYGUNDUR','var(--ok)'], ['REVİZE','var(--warn)'], ['UYGUNSUZ','var(--bad)']];
+
+  // Yanlış değerle fincanda ne olur: oyuncuya kaliteli kahveyi öğreten notlar
+  const TASTE = {
+    dose: {ok:'Doğru doz: gövde, tatlılık ve asidite dengede.',
+           low:'Az kahve: su kahveden çok hızlı geçer. Espresso sulu, ince gövdeli ve ekşimsi olur; krema çabuk dağılır.',
+           high:'Fazla kahve: su zorlanarak geçer. Espresso ağır, boğuk ve acımsı olur; tatlar birbirine karışır.'},
+    shot: {ok:'1:2 oran: tatlılık, asidite ve acılık dengede; temiz ve uzun bir bitiş.',
+           low:'Kısa çıkış: kahve tam demlenmez (az ekstraksiyon). Keskin ekşilik, tuzumsu bir tat ve kısa bir bitiş bırakır.',
+           high:'Uzun çıkış: kahve fazla demlenir (aşırı ekstraksiyon). Acı, kuru ve buruk bir bitiş; gövde sulanır.'},
+    milk: {ok:'65 °C: sütün doğal tatlılığı en üst seviyede, içimi rahat.',
+           low:'Ilık süt: sütün tatlılığı tam açığa çıkmaz, kremamsı his zayıf kalır ve içecek çabuk soğur.',
+           high:'Fazla sıcak süt: tatlılık azalır, pişmiş süt kokusu başlar ve dili yakar.',
+           burn:'Yanık süt: süt proteinleri bozulur, köpük çöker; pişmiş, kükürtlü bir tat gelir.'},
+    foam: {
+      fw:    {ok:"İnce, ipeksi mikroköpük: flat white'ın yoğun kahve tadı öne çıkar.",
+              low:'Köpük çok ince: ağızdaki ipeksi doku kaybolur, latte art tutmaz.',
+              high:"Köpük kalın: kahvenin yoğunluğu sütte kaybolur, içecek latte'ye döner."},
+      latte: {ok:'Dengeli mikroköpük: kadifemsi doku, kahve ile süt uyumlu.',
+              low:"Köpük ince: doku düz ve sulu kalır, içecek flat white'a yaklaşır.",
+              high:"Köpük kalın: doku havalanır, kahve tadı geri planda kalır; cappuccino'ya döner."},
+      capp:  {ok:'Hacimli köpük: hafif, havalı bir içim; klasik cappuccino dengesi.',
+              low:"Köpük ince: cappuccino'nun hafif, köpüklü dokusu yok; latte gibi içilir.",
+              high:'Köpük fazla: kuru cappuccino. İlk yudumlar sadece köpük, kahve-süt dengesi bozulur.'},
+      over:  'Fincan taştı: bu haliyle servis edilemez.'},
+  };
   const BARISTA_PIN = '2468';   // kilitli hakkı kasada sıfırlamak için
 
   const STEPS = [
@@ -274,6 +316,17 @@ canvas{display:block;width:100%;height:100%}
     return [25*Math.max(0, .45*(1-(d-half)/st.fall)), v<c ? low : high];
   }
   const okStep = (i, dev) => !(i===2 && S.val[2]>=72) && !(i===3 && S.overflow) && Math.abs(rnd1(i, S.val[i]) - targetOf(i)) <= dev + 1e-9;
+  function tier(i){
+    const t = MODES[mode].tol[i];
+    return okStep(i, t) ? 0 : okStep(i, 2*t) ? 1 : 2;
+  }
+  function taste(i){
+    const v = rnd1(i, S.val[i]), c = targetOf(i);
+    if (i===2 && v>=72) return TASTE.milk.burn;
+    if (i===3 && S.overflow) return TASTE.foam.over;
+    const t = i===3 ? TASTE.foam[drink] : TASTE[STEPS[i].key];
+    return tier(i)===0 ? t.ok : (v < c ? t.low : t.high);
+  }
 
   // günlük hak durumu (bu cihazda): fresh → playing → revise → won / out
   const today = () => { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; };
@@ -331,7 +384,9 @@ canvas{display:block;width:100%;height:100%}
     const i = S.step, st = STEPS[i], v = get(i);
     S.disp[i] = v; S.val[i] = v;
     const [p, note] = score(i, rnd1(i, v)); S.pts[i]=p; S.notes[i]=note;
-    $('pt'+i).textContent = Math.round(p);
+    const ti = tier(i);
+    $('pt'+i).textContent = TIER[ti][0]==='UYGUN' ? '✓' : TIER[ti][0]==='REVİZE' ? '~' : '✗';
+    $('pt'+i).style.color = TIER[ti][1];
     $('sp'+i).classList.remove('active'); $('sp'+i).classList.add('done');
     $('rv').textContent = fmtV(i, v);
     let extra = '';
@@ -339,7 +394,7 @@ canvas{display:block;width:100%;height:100%}
       S.tf = Math.max(.6, Math.min(1.6, 1 + (18 - v)*.07));
       extra = S.tf>1.06 ? ' Az doz: shot <em>hızlı</em> akacak.' : S.tf<.94 ? ' Fazla doz: shot <em>yavaş</em> akacak.' : '';
     }
-    msg.innerHTML = `${st.name}: <em>${fmtV(i,v)}${st.suf}</em>. ${note}.${extra}`;
+    msg.innerHTML = `${st.name}: <em>${fmtV(i,v)}${st.suf}</em> · <span style="color:${TIER[ti][1]}">${TIER[ti][0]}</span>. ${note}.${extra}`;
     S.phase='wait';
     setTimeout(()=>{
       if (S.step<3){ S.step++; S.phase='ready'; holdBtn.disabled=false;
@@ -348,7 +403,6 @@ canvas{display:block;width:100%;height:100%}
       else showResult();
     }, extra ? 1700 : 1300);
   }
-  function verdict(total){ return total>=90?['UYGUNDUR','var(--ok)']: total>=70?['REVİZE','var(--warn)']:['UYGUNSUZ','var(--bad)']; }
 
   // hediye kodu: içecek + tarih + değerlerden türetilen kısa iz
   function giftCode(){
@@ -362,23 +416,22 @@ canvas{display:block;width:100%;height:100%}
   function showResult(){
     const M = MODES[mode];
     const total = Math.round(S.pts.reduce((a,b)=>a+b,0));
-    const devOK = [0,1,2,3].every(i => okStep(i, WIN_DEV));
-    let vtxt, vcol, won = false;
-    if (M.gift){
-      won = total>=WIN_MIN && devOK;
-      [vtxt, vcol] = won ? ['UYGUNDUR','var(--ok)'] : total>=REVISE_MIN ? ['REVİZE','var(--warn)'] : ['UYGUNSUZ','var(--bad)'];
-    } else [vtxt, vcol] = verdict(total);
-    const canRevise = M.gift && !won && vtxt==='REVİZE' && S.attempt===1;
+    const tiers = [0,1,2,3].map(tier), worst = Math.max(...tiers);
+    const [vtxt, vcol] = VERDICT[worst];
+    const won = M.gift && worst===0;
+    const canRevise = M.gift && worst===1 && S.attempt===1;
     if (M.gift) setG(won ? {status:'won', drink} : canRevise ? {status:'revise', attempt:2, drink} : {status:'out', reason:'sonuc'});
 
     $('resHead').textContent = `PROJE KONTROL RAPORU · ${DRINKS[drink].name.toUpperCase()} · ${M.label}` + (M.gift ? ` · DENEME ${S.attempt}/2` : '');
-    $('score').innerHTML = `${total}<small>/100</small>`;
+    $('score').innerHTML = `<span class="cap">KALİTE PUANI</span>${total}<small>/100</small>`;
     const stp=$('stamp'); stp.style.display = won ? 'none' : '';
     stp.textContent=vtxt; stp.style.color=vcol; stp.classList.remove('pop'); void stp.offsetWidth; stp.classList.add('pop');
-    $('lines').innerHTML = STEPS.map((st,i)=>{
-      const mark = M.gift ? (okStep(i, WIN_DEV) ? ' <b class="y">±2 ✓</b>' : ' <b class="n">±2 ✗</b>') : '';
-      return `<div><span>${st.name} · ${fmtV(i,S.val[i])}${st.suf} / ${targetOf(i)}${st.suf} · ${S.notes[i]}${mark}</span><span>${Math.round(S.pts[i])}</span></div>`;
-    }).join('');
+    const tolTxt = i => `±${num(M.tol[i],1)}`;
+    $('lines').innerHTML =
+      `<div class="legend"><span><i style="color:var(--ok)">●</i> UYGUN: tolerans içi</span><span><i style="color:var(--warn)">●</i> REVİZE: 2 katına kadar</span><span><i style="color:var(--bad)">●</i> UYGUNSUZ: ötesi</span></div>` +
+      STEPS.map((st,i)=>`<div class="ln t${tiers[i]}">
+        <div class="lh"><b>${st.name}</b><span class="lv">${fmtV(i,S.val[i])}${st.suf} <small>/ hedef ${targetOf(i)}${st.suf} ${tolTxt(i)}</small></span><span class="chip">${TIER[tiers[i]][0]}</span></div>
+        <p>${taste(i)}</p></div>`).join('');
     const g = $('gift');
     g.classList.toggle('show', won); g.classList.remove('used');
     if (won){
@@ -388,23 +441,22 @@ canvas{display:block;width:100%;height:100%}
       $('giftCode').textContent = S.code;
       $('redeem').disabled = false; $('redeem').textContent = 'Barista onayı · Teslim edildi';
     }
-    const why = [];
-    if (total < WIN_MIN) why.push(`puan ${total}, en az ${WIN_MIN} gerekli`);
-    [0,1,2,3].filter(n => !okStep(n, WIN_DEV)).forEach(n => why.push(`${STEPS[n].name} ${fmtV(n,S.val[n])}${STEPS[n].suf} (hedef ${targetOf(n)}${STEPS[n].suf}) ±${WIN_DEV} dışında`));
-    $('teaser').textContent = !M.gift ? ((total>=WIN_MIN && devOK) ? 'Bu sonuç Mühendis seviyesinde hediye kazandırırdı!' : '')
+    const names = t => [0,1,2,3].filter(n => tiers[n]===t).map(n => STEPS[n].name).join(', ');
+    $('teaser').innerHTML = !M.gift ? ([0,1,2,3].every(n => okStep(n,1)) ? 'Dört değer de ±1 içinde! Bunu Mühendis seviyesinde yaparsan kahve bizden.' : '')
       : won ? ''
-      : canRevise ? `REVİZE: 1 deneme hakkın daha var. Eksik: ${why.join('; ')}.`
-      : `Hakkın kalmadı. Eksik: ${why.join('; ')}.`;
+      : canRevise ? `Son deneme hakkın var. <b>${names(1)}</b> ±1 dışında kaldı; ikinci denemede dördü de ±1 içinde olmalı.`
+      : worst===2 ? `Hakkın kalmadı: <b>${names(2)}</b> ±2'yi aştı.`
+      : `Hakkın kalmadı: ikinci denemede de <b>${names(1)}</b> ±1 dışında kaldı.`;
     const isBest = total>bests[mode]; if (isBest){ bests[mode]=total; try{localStorage.setItem('koiBest3_'+mode, String(total));}catch(e){} }
     $('best').textContent = isBest && total>0 ? `YENİ REKOR · ${total}/100` : `REKORUN · ${bests[mode]}/100`;
     $('ctrl').textContent = won ? 'HEDİYE' : vtxt; $('ctrl').style.color = won ? 'var(--ok)' : vcol;
     $('again').textContent = !M.gift ? 'Tekrar dene' : canRevise ? 'Revizyon · son deneme' : 'Tamam';
     $('change').style.display = M.gift ? 'none' : '';
-    $('result').classList.add('show');
+    $('result').classList.add('show'); $('result').scrollTop = 0;
     msg.innerHTML = won ? `Şartnameye uygun. <em>${DRINKS[drink].name} bizden!</em> Ekranı kasada göster.`
       : canRevise ? 'Revizyon gerekli. <em>Son deneme hakkın var.</em>'
       : M.gift ? 'Şartname dışı. <em>Bugünkü hakkın bitti.</em>'
-      : total>=90 ? 'Proje onaylandı. <em>Afiyet olsun.</em>' : total>=70 ? 'Revizyon gerekli. <em>Bir daha dene.</em>' : 'Şartname dışı. <em>Yeniden hesapla.</em>';
+      : worst===0 ? 'Proje onaylandı. <em>Afiyet olsun.</em>' : worst===1 ? 'Revizyon gerekli. <em>Bir daha dene.</em>' : 'Şartname dışı. <em>Yeniden hesapla.</em>';
     holdBtn.disabled = true;
     renderModes();
   }
@@ -424,7 +476,7 @@ canvas{display:block;width:100%;height:100%}
 
   function renderSpecs(){
     STEPS.forEach((st,i)=>{
-      $('sp'+i).innerHTML = `<b>${st.name}</b><span class="pts" id="pt${i}"></span>${drink ? targetOf(i) : '–'}${st.suf}<br>±${num(MODES[mode].tol[i],1)}`;
+      $('sp'+i).innerHTML = `<b>${st.name}</b><span class="pts" id="pt${i}"></span>${drink ? targetOf(i) : '–'}${st.suf}<br><span class="tg">±${num(MODES[mode].tol[i],1)}</span> <span class="ta">±${num(2*MODES[mode].tol[i],1)}</span>`;
     });
   }
   function renderModes(){
