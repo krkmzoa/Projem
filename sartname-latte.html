@@ -157,7 +157,7 @@ canvas{display:block;width:100%;height:100%}
     <div class="overlay" id="pick">
       <div class="pickhead">SİPARİŞ · KAHVENİ SEÇ</div>
       <div class="drinks" id="drinks"></div>
-      <div class="giftnote"><em>Mühendis</em> seviyesinde <em>en az 85 puan</em> al ve hiçbir değer <em>±2</em>'yi geçmesin: seçtiğin kahve <em>bizden</em>.<br><em>REVİZE</em> çıkarsa 1 hakkın daha olur, <em>UYGUNSUZ</em> çıkarsa hakkın biter.</div>
+      <div class="giftnote"><em>Mühendis</em> seviyesinde <em>en az 80 puan</em> al ve hiçbir değer <em>±2</em>'yi geçmesin: seçtiğin kahve <em>bizden</em>.<br><em>REVİZE</em> çıkarsa 1 hakkın daha olur, <em>UYGUNSUZ</em> çıkarsa hakkın biter.</div>
     </div>
 
     <div class="overlay" id="locked">
@@ -220,11 +220,11 @@ canvas{display:block;width:100%;height:100%}
     muhendis: {label:'BARİSTA',     wob:.22, hide:true,  bands:true,  lag:0,   tol:[1.5,2.5,2,2], spd:1.1, gift:false,
                desc:'Dijital ekran kapalı · akış dalgalı'},
     bas:      {label:'MÜHENDİS',    wob:.38, hide:true,  bands:false, lag:.22, tol:[1,1,1,1],     spd:1.2, gift:true,
-               desc:'Hediye: 85+ puan · sapma ±2 içinde'},
+               desc:'Hediye: 80+ puan · sapma ±2 içinde'},
   };
 
   // Mühendis seviyesi hediye kuralı
-  const WIN_MIN = 85, WIN_DEV = 2, REVISE_MIN = 70;
+  const WIN_MIN = 80, WIN_DEV = 2, REVISE_MIN = 70;
   const BARISTA_PIN = '2468';   // kilitli hakkı kasada sıfırlamak için
 
   const STEPS = [
