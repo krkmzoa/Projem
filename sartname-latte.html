@@ -123,6 +123,12 @@ canvas{display:block;width:100%;height:100%}
 .btn:focus-visible{outline:3px solid var(--koi);outline-offset:2px}
 .btn[disabled]{opacity:.5;cursor:default}
 .btn.pin{flex:none;width:100%;max-width:340px;font-size:12px;padding:7px;border-color:var(--line-dim);color:var(--line-dim)}
+.pinform{display:none;gap:8px;width:100%;max-width:340px}
+.pinform.show{display:flex}
+.pinform input{flex:1;min-width:0;-webkit-user-select:text;user-select:text;background:transparent;border:1.5px solid var(--line);border-radius:10px;color:var(--line);font-family:var(--mono);font-size:18px;letter-spacing:.2em;padding:10px 12px}
+.pinform input:focus{outline:3px solid var(--koi);outline-offset:1px}
+.pinform .btn{flex:none;padding:10px 18px}
+.pinerr{min-height:16px;font-family:var(--mono);font-size:11px;color:var(--bad)}
 .lockt{font-family:var(--display);font-weight:900;font-size:40px;line-height:.95;text-transform:uppercase}
 @media (prefers-reduced-motion:reduce){.stamp.pop{animation:none}.hold{transition:none}}
 </style>
@@ -160,6 +166,11 @@ canvas{display:block;width:100%;height:100%}
       <div class="giftnote" id="lockText"></div>
       <div class="row"><button class="btn primary" id="toBarista">Barista seviyesinde pratik yap</button></div>
       <button class="btn pin" id="pinReset">Barista: hakkı sıfırla</button>
+      <form class="pinform" id="pinForm" autocomplete="off">
+        <input id="pinIn" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="Barista PIN" aria-label="Barista PIN">
+        <button class="btn primary" type="submit">Aç</button>
+      </form>
+      <div class="pinerr" id="pinErr"></div>
     </div>
 
     <div class="overlay" id="result" aria-live="polite">
@@ -399,7 +410,13 @@ canvas{display:block;width:100%;height:100%}
   }
   $('redeem').addEventListener('click', () => {
     if (!S.code) return;
-    if (!confirm('Bu hediye teslim edildi olarak işaretlensin mi? (Sadece barista)')) return;
+    const r = $('redeem');
+    if (!r.dataset.armed){   // iki dokunuşla onay (açılır pencere bu çerçevede çalışmıyor)
+      r.dataset.armed = '1'; r.textContent = 'Emin misin? Onaylamak için tekrar bas';
+      clearTimeout(r._t); r._t = setTimeout(() => { if (!r.disabled){ delete r.dataset.armed; r.textContent = 'Barista onayı · Teslim edildi'; } }, 4000);
+      return;
+    }
+    delete r.dataset.armed;
     const u = usedCodes(); u.push(S.code); try{ localStorage.setItem('koiGiftUsed', JSON.stringify(u.slice(-200))); }catch(e){}
     $('gift').classList.add('used'); $('giftG1').textContent = 'TESLİM EDİLDİ';
     $('redeem').disabled = true; $('redeem').textContent = 'Kullanıldı';
@@ -433,6 +450,7 @@ canvas{display:block;width:100%;height:100%}
     if (locked) S.phase = 'pick';
     $('result').classList.remove('show'); $('pick').classList.toggle('show', !locked && !drink);
     $('locked').classList.toggle('show', !!locked);
+    $('pinReset').style.display = ''; $('pinForm').classList.remove('show'); $('pinErr').textContent = ''; $('pinIn').value = '';
     if (locked){
       $('lockTitle').textContent = locked.status==='won' ? 'Bugünün hediyesi alındı' : 'Bugünkü hakkın bitti';
       $('lockText').innerHTML = locked.status==='won' ? 'Tebrikler! Mühendis seviyesi yarın yeniden açılır.'
@@ -458,9 +476,12 @@ canvas{display:block;width:100%;height:100%}
   $('change').addEventListener('click', () => { drink = null; restart(); });
   $('toBarista').addEventListener('click', () => { mode = 'muhendis'; try{localStorage.setItem('koiMode3', mode);}catch(e){} restart(); });
   $('pinReset').addEventListener('click', () => {
-    const p = prompt('Barista PIN');
-    if (p === null) return;
-    if (p !== BARISTA_PIN){ alert('PIN hatalı'); return; }
+    $('pinReset').style.display = 'none'; $('pinForm').classList.add('show'); $('pinErr').textContent = '';
+    $('pinIn').value = ''; $('pinIn').focus();
+  });
+  $('pinForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if ($('pinIn').value.trim() !== BARISTA_PIN){ $('pinErr').textContent = 'PIN hatalı'; $('pinIn').value = ''; $('pinIn').focus(); return; }
     try{ localStorage.removeItem('koiGiftDay'); }catch(e){}
     drink = null; restart();
   });
@@ -468,7 +489,7 @@ canvas{display:block;width:100%;height:100%}
   ['pointerup','pointercancel','lostpointercapture'].forEach(ev => holdBtn.addEventListener(ev, release));
   holdBtn.addEventListener('contextmenu', e => e.preventDefault());
   window.addEventListener('keydown', e => { if ((e.code==='Space'||e.code==='Enter') && !e.repeat && document.activeElement===holdBtn){ e.preventDefault(); press(); } });
-  window.addEventListener('keyup', e => { if (e.code==='Space'||e.code==='Enter') release(); });
+  window.addEventListener('keyup', e => { if ((e.code==='Space'||e.code==='Enter') && e.target!==$('pinIn')) release(); });
 
   // ---------- çizim ----------
   let W=0,H=0,dpr=1;
