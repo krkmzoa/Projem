@@ -47,6 +47,10 @@
   .landing.gone { opacity: 0; visibility: hidden; }
   .landing .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background-size: cover; background-position: center; }
   .landing .bg.kb { animation: kb 24s ease-in-out infinite alternate; }
+  /* yavaş dönme: kare, ekranın köşegeninden büyük; dönerken köşeler hiç boş kalmaz */
+  .landing .bg.spin { inset: auto; left: 50%; top: 50%; width: 150vmax; height: 150vmax; margin: -75vmax 0 0 -75vmax; animation: spin 140s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .landing .bg.kb, .landing .bg.spin { animation: none; } }
   @keyframes kb { from { transform: scale(1); } to { transform: scale(1.12) translate(-1%, -2%); } }
   .landing .bg.grad { background: radial-gradient(120% 80% at 30% 20%, color-mix(in srgb, var(--accent) 70%, #000) 0%, #120d0a 70%); }
   .landing .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.15) 40%, rgba(0,0,0,.6) 100%); }
@@ -198,7 +202,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 10;
+  var BUILD = 11;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -220,7 +224,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=10"></script>
+<script src="assets/core.js?v=11"></script>
 <script>
 (function () {
   'use strict';
@@ -279,7 +283,7 @@
   function renderLanding() {
     var cafe = menu.cafe, el = $('landing'), bg;
     if (cafe.cover && C.isVideo(cafe.cover)) bg = '<video class="bg" src="' + esc(cafe.cover) + '" autoplay muted loop playsinline preload="auto"></video>';
-    else if (cafe.cover) bg = '<div class="bg kb" style="background-image:url(\'' + esc(cafe.cover) + '\')"></div>';
+    else if (cafe.cover) bg = '<div class="bg' + ({ zoom: ' kb', spin: ' spin', none: '' })[menu.theme.landingMotion] + '" style="background-image:url(\'' + esc(cafe.cover) + '\')"></div>';
     else bg = '<div class="bg grad"></div>';
     el.innerHTML = bg + '<div class="shade"></div>' +
       '<div class="center">' + (cafe.logo && !cafe.cover ? '<img class="lg" src="' + esc(cafe.logo) + '" alt="">' : '') +
@@ -287,8 +291,17 @@
       (table ? '<div class="table">Masa ' + esc(table) + '</div>' : '') + '</div>' +
       '<div class="bottom"><button class="go" id="go">Menü<span></span></button>' + socialsHtml(cafe) + '</div>';
     $('go').onclick = hideLanding;
+    sizeSpin();
     var v = el.querySelector('video'); if (v) { v.muted = true; var p = v.play && v.play(); if (p && p.catch) p.catch(function () {}); }
   }
+  // Dönen resim: ekranın köşegeni kadar bir kare (köşeler boş kalmasın, resim de gereğinden fazla büyümesin)
+  function sizeSpin() {
+    var sp = document.querySelector('.landing .bg.spin'); if (!sp) return;
+    var d = Math.ceil(Math.sqrt(innerWidth * innerWidth + innerHeight * innerHeight)) + 4;
+    sp.style.width = sp.style.height = d + 'px';
+    sp.style.marginLeft = sp.style.marginTop = (-d / 2) + 'px';
+  }
+  window.addEventListener('resize', sizeSpin);
   function showLanding() { renderLanding(); var el = $('landing'); el.hidden = false; el.className = 'landing' + ((menu.cafe.name || '').length > 12 ? ' long' : ''); document.body.classList.add('lock'); }
   function hideLanding() {
     try { sessionStorage.setItem('landed', '1'); } catch (e) {}
