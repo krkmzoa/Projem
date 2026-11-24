@@ -140,6 +140,16 @@
   .info a { color: var(--accent); text-decoration: none; }
   .note { text-align: center; }
 
+  /* dil seçici */
+  .langs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--chip); }
+  .langs button { border: 0; background: none; color: var(--muted); font: 600 13px var(--sans); letter-spacing: .04em; padding: 6px 11px; border-radius: 999px; cursor: pointer; }
+  .langs button.on { background: var(--accent); color: var(--on-accent, #fff); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+  .hero .hero-langs { position: absolute; left: 12px; top: 16px; }
+  .drow.lrow .langs { margin-top: 8px; }
+  .ltop { position: absolute; top: calc(16px + env(safe-area-inset-top)); right: 16px; }
+  .langs.dark { background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .langs.dark button { color: rgba(255,255,255,.75); }
+  .langs.dark button.on { background: rgba(255,255,255,.92); color: #1c1714; }
   /* başa dön */
   .totop { position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 25; width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--text); color: var(--bg); box-shadow: 0 6px 20px rgba(0,0,0,.25); display: grid; place-items: center; cursor: pointer; opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; }
   .totop.on { opacity: .9; transform: none; pointer-events: auto; }
@@ -207,7 +217,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 14;
+  var BUILD = 15;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -229,8 +239,8 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=14"></script>
-<script src="assets/ripple.js?v=14"></script>
+<script src="assets/core.js?v=15"></script>
+<script src="assets/ripple.js?v=15"></script>
 <script>
 (function () {
   'use strict';
@@ -244,6 +254,61 @@
   if (!table) try { table = sessionStorage.getItem('masa'); } catch (e) {}
 
   var menu = null, lastJson = '', app = $('app');
+
+  // ---------- dil ----------
+  var UI = {
+    tr: { menu: 'Menü', search: 'Menüde ara…', noResult: 'Aramanızla eşleşen ürün yok.', empty: 'Menü henüz hazır değil.', table: 'Masa', soldOut: 'Tükendi',
+      price: 'Fiyat', wifi: 'Wi-Fi', password: 'Şifre', noPassword: 'Şifresiz', copy: 'Kopyala', wifiCopied: 'Wi-Fi şifresi kopyalandı', hours: 'Çalışma saatleri',
+      tapCall: 'Aramak için dokunun', address: 'Adres', phone: 'Telefon', linkCopied: 'Bağlantı kopyalandı', language: 'Dil', loading: 'Menü yükleniyor…',
+      loadErr: 'Menü şu an yüklenemedi. Lütfen sayfayı yenileyin.', back: 'Geri', share: 'Paylaş', close: 'Kapat', info: 'Bilgiler', top: 'Başa dön', searchBtn: 'Ara' },
+    en: { menu: 'Menu', search: 'Search the menu…', noResult: 'No items match your search.', empty: 'The menu is not ready yet.', table: 'Table', soldOut: 'Sold out',
+      price: 'Price', wifi: 'Wi-Fi', password: 'Password', noPassword: 'No password', copy: 'Copy', wifiCopied: 'Wi-Fi password copied', hours: 'Opening hours',
+      tapCall: 'Tap to call', address: 'Address', phone: 'Phone', linkCopied: 'Link copied', language: 'Language', loading: 'Loading the menu…',
+      loadErr: 'The menu could not be loaded. Please refresh the page.', back: 'Back', share: 'Share', close: 'Close', info: 'Info', top: 'Back to top', searchBtn: 'Search' },
+    ru: { menu: 'Меню', search: 'Поиск по меню…', noResult: 'Ничего не найдено.', empty: 'Меню пока не готово.', table: 'Стол', soldOut: 'Нет в наличии',
+      price: 'Цена', wifi: 'Wi-Fi', password: 'Пароль', noPassword: 'Без пароля', copy: 'Копировать', wifiCopied: 'Пароль Wi-Fi скопирован', hours: 'Часы работы',
+      tapCall: 'Нажмите, чтобы позвонить', address: 'Адрес', phone: 'Телефон', linkCopied: 'Ссылка скопирована', language: 'Язык', loading: 'Загрузка меню…',
+      loadErr: 'Не удалось загрузить меню. Обновите страницу.', back: 'Назад', share: 'Поделиться', close: 'Закрыть', info: 'Информация', top: 'Наверх', searchBtn: 'Поиск' }
+  };
+  var lang = 'tr';
+  function T(k) { return (UI[lang] && UI[lang][k]) || UI.tr[k]; }
+  function tx(obj, f) { return C.t(obj, f, lang); }
+  function savedLang() { try { return localStorage.getItem('qr.lang'); } catch (e) { return null; } }
+  // Seçim sırası: adresteki ?dil= → daha önce seçilen → telefonun dili → Türkçe
+  function pickLang() {
+    var ok = menu.theme.languages, want = [params.get('dil'), params.get('lang'), savedLang()];
+    var nav = navigator.languages || [navigator.language || 'tr'];
+    for (var i = 0; i < nav.length; i++) want.push(String(nav[i]).slice(0, 2).toLowerCase());
+    for (var j = 0; j < want.length; j++) if (want[j] && ok.indexOf(want[j]) !== -1) return want[j];
+    // telefon dili Türkçe/İngilizce/Rusça değilse (Almanca vb.) İngilizce daha anlaşılır
+    return ok.indexOf('en') !== -1 && nav.length && String(nav[0]).slice(0, 2) !== 'tr' ? 'en' : 'tr';
+  }
+  function setLang(l, user) {
+    if (!menu || menu.theme.languages.indexOf(l) === -1) return;
+    lang = l;
+    if (user) try { localStorage.setItem('qr.lang', l); } catch (e) {}
+    document.documentElement.lang = l;
+    staticTexts();
+  }
+  function langSwitch(cls) {
+    var L = menu.theme.languages; if (L.length < 2) return '';
+    return '<div class="langs ' + (cls || '') + '" role="group" aria-label="' + esc(T('language')) + '">' + L.map(function (l) {
+      return '<button data-lang="' + l + '" class="' + (l === lang ? 'on' : '') + '" aria-pressed="' + (l === lang) + '" title="' + esc(C.LANGS[l].name) + '">' + C.LANGS[l].short + '</button>';
+    }).join('') + '</div>';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-lang]'); if (!b) return;
+    var l = b.getAttribute('data-lang'); if (l === lang) return;
+    setLang(l, true);
+    render();
+    if (!$('landing').hidden && $('landing').className.indexOf('gone') === -1) renderLandingText();
+    if (sheetOpen && sheetItem) openSheet(sheetItem, true);
+  });
+  function staticTexts() {
+    $('barSearch').setAttribute('aria-label', T('searchBtn'));
+    $('totop').setAttribute('aria-label', T('top'));
+    $('bar').querySelector('[data-open-drawer]').setAttribute('aria-label', T('info'));
+  }
 
   // ---------- simgeler ----------
   var I = {
@@ -259,6 +324,7 @@
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     ig: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/>',
     fb: '<path d="M15 3h-2.5A4.5 4.5 0 0 0 8 7.5V10H5.5v3.5H8V21h3.5v-7.5H14l.5-3.5h-3V8a1 1 0 0 1 1-1H15z"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
     web: '<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'
   };
   function ico(n) { return '<svg class="ico" viewBox="0 0 24 24">' + I[n] + '</svg>'; }
@@ -296,9 +362,10 @@
     else bg = '<div class="bg grad"></div>';
     el.innerHTML = bg + '<div class="shade"></div>' +
       '<div class="center">' + (cafe.logo && !cafe.cover ? '<img class="lg" src="' + esc(cafe.logo) + '" alt="">' : '') +
-      '<h1>' + esc(cafe.name || 'Menü') + '</h1>' + (cafe.slogan ? '<p>' + esc(cafe.slogan) + '</p>' : '') +
-      (table ? '<div class="table">Masa ' + esc(table) + '</div>' : '') + '</div>' +
-      '<div class="bottom"><button class="go" id="go">Menü<span></span></button>' + socialsHtml(cafe) + '</div>';
+      '<h1>' + esc(cafe.name || T('menu')) + '</h1><p id="lSlogan"' + (tx(cafe, 'slogan') ? '' : ' hidden') + '>' + esc(tx(cafe, 'slogan')) + '</p>' +
+      (table ? '<div class="table" id="lTable">' + esc(T('table')) + ' ' + esc(table) + '</div>' : '') + '</div>' +
+      '<div class="bottom"><button class="go" id="go"><b id="lGo">' + esc(T('menu')) + '</b><span></span></button>' + socialsHtml(cafe) + '</div>' +
+      '<div class="ltop" id="lLangs">' + langSwitch('dark') + '</div>';
     $('go').onclick = hideLanding;
     sizeSpin();
     // su dalgası: WebGL yoksa yavaş yakınlaşmaya geç
@@ -316,7 +383,7 @@
     v.muted = true; v.defaultMuted = true;
     var fellBack = false;
     function fallback() {
-      if (fellBack || !v.paused || !window.Ripple) return;
+      if (fellBack || !v.paused || !window.Ripple || !v.parentNode || el.hidden || el.className.indexOf('gone') !== -1) return;
       fellBack = true;
       var cv = document.createElement('canvas'); cv.className = 'bg'; v.parentNode.insertBefore(cv, v.nextSibling);
       function go() { ripStop = window.Ripple.start(cv, v, { onReady: function () { cv.className = 'bg on'; } }); if (!ripStop && cv.parentNode) cv.parentNode.removeChild(cv); }
@@ -335,6 +402,14 @@
     setTimeout(function () { if (v.paused) fallback(); }, 1500);
     el.addEventListener('touchstart', function () { if (v.paused) tryPlay(); }, { passive: true });
     el.addEventListener('click', function () { if (v.paused) tryPlay(); });
+  }
+  // Açılış ekranı açıkken dil değişirse sadece yazıları güncelle (video/efekt baştan başlamasın)
+  function renderLandingText() {
+    var cafe = menu.cafe;
+    if ($('lSlogan')) { $('lSlogan').textContent = tx(cafe, 'slogan'); $('lSlogan').hidden = !tx(cafe, 'slogan'); }
+    if ($('lTable')) $('lTable').textContent = T('table') + ' ' + table;
+    if ($('lGo')) $('lGo').textContent = T('menu');
+    if ($('lLangs')) $('lLangs').innerHTML = langSwitch('dark');
   }
   var ripStop = null;
   function stopRipple() { if (ripStop) { ripStop(); ripStop = null; } }
@@ -356,15 +431,24 @@
   // ---------- menü ----------
   function priceHtml(it) {
     return C.prices(it).map(function (p) {
-      return '<span>' + (p.name ? '<small>' + esc(p.name) + '</small>' : '') + esc(C.price(p.price, menu.cafe.currency)) + '</span>';
+      return '<span>' + (p.name ? '<small>' + esc(C.sizeName(p, lang)) + '</small>' : '') + esc(C.price(p.price, menu.cafe.currency)) + '</span>';
     }).join('');
   }
+  function tagsHtml(it, style) {
+    return (it.tags || []).map(function (t) { return '<span class="tag"' + (style || '') + '>' + esc(C.word(t, lang)) + '</span>'; }).join('');
+  }
+  function searchText(it) {
+    // aramada hem seçili dil hem Türkçe geçerli
+    var parts = [it.name, it.description, it.tags.join(' '), tx(it, 'name'), tx(it, 'description'), it.tags.map(function (t) { return C.word(t, lang); }).join(' ')];
+    return parts.join(' ').toLocaleLowerCase(lang === 'tr' ? 'tr' : lang);
+  }
   function itemHtml(it, ci, ii) {
-    var tags = (it.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
-    if (!it.available) tags += '<span class="tag out">Tükendi</span>';
-    return '<button class="item' + (it.available ? '' : ' soldout') + '" data-c="' + ci + '" data-i="' + ii + '" data-q="' + esc((it.name + ' ' + it.description + ' ' + it.tags.join(' ')).toLocaleLowerCase('tr')) + '">' +
-      '<div class="body"><p class="name">' + esc(it.name) + tags + '</p>' +
-      (it.description ? '<p class="desc">' + esc(it.description) + '</p>' : '') +
+    var tags = tagsHtml(it);
+    if (!it.available) tags += '<span class="tag out">' + esc(T('soldOut')) + '</span>';
+    var d = tx(it, 'description');
+    return '<button class="item' + (it.available ? '' : ' soldout') + '" data-c="' + ci + '" data-i="' + ii + '" data-q="' + esc(searchText(it)) + '">' +
+      '<div class="body"><p class="name">' + esc(tx(it, 'name')) + tags + '</p>' +
+      (d ? '<p class="desc">' + esc(d) + '</p>' : '') +
       '<div class="price">' + priceHtml(it) + '</div></div>' +
       (it.image ? '<img loading="lazy" src="' + esc(it.image) + '" alt="">' : '') +
       '</button>';
@@ -373,20 +457,20 @@
   function render() {
     var cafe = menu.cafe, cats = C.visibleCategories(menu);
     var useTiles = cats.some(function (c) { return c.image; });
-    document.title = (cafe.name || 'Menü') + ' — Menü';
+    document.title = (cafe.name || T('menu')) + ' — ' + T('menu');
     C.applyTheme(menu, 'menu');
     if (params.get('tema')) document.documentElement.setAttribute('data-theme', params.get('tema'));
 
-    var chipsHtml = cats.map(function (c) { return '<button class="chip" data-target="c-' + esc(c.id) + '">' + (c.icon ? esc(c.icon) + ' ' : '') + esc(c.name) + '</button>'; }).join('');
-    var h = '<header class="hero wrap"><button class="icon-btn menu-btn" data-open-drawer aria-label="Bilgiler">' + ico('menu') + '</button>' +
+    var chipsHtml = cats.map(function (c) { return '<button class="chip" data-target="c-' + esc(c.id) + '">' + (c.icon ? esc(c.icon) + ' ' : '') + esc(tx(c, 'name')) + '</button>'; }).join('');
+    var h = '<header class="hero wrap">' + langSwitch('hero-langs') + '<button class="icon-btn menu-btn" data-open-drawer aria-label="' + esc(T('info')) + '">' + ico('menu') + '</button>' +
       (cafe.logo ? '<img class="logo" src="' + esc(cafe.logo) + '" alt="">' : '') +
-      '<h1>' + esc(cafe.name || 'Menü') + '</h1>' +
-      (cafe.slogan ? '<p>' + esc(cafe.slogan) + '</p>' : '') +
-      (table ? '<span class="table-badge">Masa ' + esc(table) + '</span>' : '') + '</header>';
-    h += '<div class="searchrow wrap"><label class="search">' + ico('search') + '<input id="q" type="search" placeholder="Menüde ara…" autocomplete="off" enterkeyhint="search"></label></div>';
+      '<h1>' + esc(cafe.name || T('menu')) + '</h1>' +
+      (tx(cafe, 'slogan') ? '<p>' + esc(tx(cafe, 'slogan')) + '</p>' : '') +
+      (table ? '<span class="table-badge">' + esc(T('table')) + ' ' + esc(table) + '</span>' : '') + '</header>';
+    h += '<div class="searchrow wrap"><label class="search">' + ico('search') + '<input id="q" type="search" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('searchBtn')) + '" autocomplete="off" enterkeyhint="search"></label></div>';
     if (useTiles) {
       h += '<nav class="tiles" id="nav">' + cats.map(function (c) {
-        return '<button class="tile" data-target="c-' + esc(c.id) + '"><span class="ph"' + (c.image ? ' style="background-image:url(\'' + esc(c.image) + '\')"' : '') + '>' + (c.image ? '' : esc(c.icon || '')) + '</span><span class="nm">' + esc(c.name) + '</span></button>';
+        return '<button class="tile" data-target="c-' + esc(c.id) + '"><span class="ph"' + (c.image ? ' style="background-image:url(\'' + esc(c.image) + '\')"' : '') + '>' + (c.image ? '' : esc(c.icon || '')) + '</span><span class="nm">' + esc(tx(c, 'name')) + '</span></button>';
       }).join('') + '</nav>';
     } else {
       h += '<nav class="chips inline-chips" id="nav">' + chipsHtml + '</nav>';
@@ -396,20 +480,20 @@
       var ci = menu.categories.indexOf(c);
       h += '<section class="cat" id="c-' + esc(c.id) + '">' +
         (c.image ? '<img class="cover" loading="lazy" src="' + esc(c.image) + '" alt="">' : '') +
-        '<div class="cat-head' + (c.image ? ' has-img' : '') + '"><h2>' + (c.icon && !c.image ? '<span>' + esc(c.icon) + '</span>' : '') + esc(c.name) + '</h2>' +
-        (c.description ? '<p class="cdesc">' + esc(c.description) + '</p>' : '') + '</div>' +
+        '<div class="cat-head' + (c.image ? ' has-img' : '') + '"><h2>' + (c.icon && !c.image ? '<span>' + esc(c.icon) + '</span>' : '') + esc(tx(c, 'name')) + '</h2>' +
+        (tx(c, 'description') ? '<p class="cdesc">' + esc(tx(c, 'description')) + '</p>' : '') + '</div>' +
         '<div class="items">' + c.items.map(function (it, ii) { return itemHtml(it, ci, ii); }).join('') + '</div></section>';
     });
-    if (!cats.length) h += '<p class="empty">Menü henüz hazır değil.</p>';
-    h += '<p class="empty" id="noResult" hidden>Aramanızla eşleşen ürün yok.</p></main>';
+    if (!cats.length) h += '<p class="empty">' + esc(T('empty')) + '</p>';
+    h += '<p class="empty" id="noResult" hidden>' + esc(T('noResult')) + '</p></main>';
 
     var info = [];
-    if (cafe.wifiName) info.push('<div><b>Wi-Fi</b>' + esc(cafe.wifiName) + (cafe.wifiPassword ? ' · Şifre: <span style="user-select:all">' + esc(cafe.wifiPassword) + '</span>' : '') + '</div>');
-    if (cafe.hours) info.push('<div><b>Çalışma saatleri</b><span style="white-space:pre-line">' + esc(cafe.hours) + '</span></div>');
-    if (cafe.phone) info.push('<div><b>Telefon</b><a href="tel:' + esc(cafe.phone.replace(/\s/g, '')) + '">' + esc(cafe.phone) + '</a></div>');
-    if (cafe.address) info.push('<div><b>Adres</b><a href="' + esc(mapsLink(cafe)) + '" target="_blank" rel="noopener">' + esc(cafe.address) + '</a></div>');
+    if (cafe.wifiName) info.push('<div><b>' + esc(T('wifi')) + '</b>' + esc(cafe.wifiName) + (cafe.wifiPassword ? ' · ' + esc(T('password')) + ': <span style="user-select:all">' + esc(cafe.wifiPassword) + '</span>' : '') + '</div>');
+    if (tx(cafe, 'hours')) info.push('<div><b>' + esc(T('hours')) + '</b><span style="white-space:pre-line">' + esc(tx(cafe, 'hours')) + '</span></div>');
+    if (cafe.phone) info.push('<div><b>' + esc(T('phone')) + '</b><a href="tel:' + esc(cafe.phone.replace(/\s/g, '')) + '">' + esc(cafe.phone) + '</a></div>');
+    if (cafe.address) info.push('<div><b>' + esc(T('address')) + '</b><a href="' + esc(mapsLink(cafe)) + '" target="_blank" rel="noopener">' + esc(cafe.address) + '</a></div>');
     h += '<footer><div class="wrap">' + (info.length ? '<div class="info">' + info.join('') + '</div>' : '') +
-      (cafe.note ? '<p class="note">' + esc(cafe.note) + '</p>' : '') + '</div></footer>';
+      (tx(cafe, 'note') ? '<p class="note">' + esc(tx(cafe, 'note')) + '</p>' : '') + '</div></footer>';
 
     var y = window.scrollY, q = $('q') ? $('q').value : '';
     app.innerHTML = h;
@@ -484,17 +568,18 @@
 
   // ---------- yan menü ----------
   function renderDrawer() {
-    var cafe = menu.cafe, h = '<button class="icon-btn x" id="dx" aria-label="Kapat">' + ico('close') + '</button>';
-    h += '<div class="brand">' + (cafe.logo ? '<img src="' + esc(cafe.logo) + '" alt="">' : '') + '<b>' + esc(cafe.name || 'Menü') + '</b>' + (cafe.slogan ? '<small>' + esc(cafe.slogan) + '</small>' : '') + '</div>';
-    if (cafe.wifiName) h += '<div class="drow">' + ico('wifi') + '<div><b>' + esc(cafe.wifiName) + '</b>' + (cafe.wifiPassword ? '<span>Şifre: ' + esc(cafe.wifiPassword) + '</span>' : '<span>Şifresiz</span>') + '</div>' +
-      (cafe.wifiPassword ? '<button class="copy" id="copyWifi">Kopyala</button>' : '') + '</div>';
-    if (cafe.hours) h += '<div class="drow">' + ico('clock') + '<div><b>Çalışma saatleri</b><span>' + esc(cafe.hours) + '</span></div></div>';
-    if (cafe.phone) h += '<a class="drow" href="tel:' + esc(cafe.phone.replace(/\s/g, '')) + '">' + ico('phone') + '<div><b>' + esc(cafe.phone) + '</b><span>Aramak için dokunun</span></div></a>';
-    if (cafe.address) h += '<a class="drow" href="' + esc(mapsLink(cafe)) + '" target="_blank" rel="noopener">' + ico('pin') + '<div><b>Adres</b><span>' + esc(cafe.address) + '</span></div></a>';
+    var cafe = menu.cafe, h = '<button class="icon-btn x" id="dx" aria-label="' + esc(T('close')) + '">' + ico('close') + '</button>';
+    h += '<div class="brand">' + (cafe.logo ? '<img src="' + esc(cafe.logo) + '" alt="">' : '') + '<b>' + esc(cafe.name || T('menu')) + '</b>' + (tx(cafe, 'slogan') ? '<small>' + esc(tx(cafe, 'slogan')) + '</small>' : '') + '</div>';
+    if (menu.theme.languages.length > 1) h += '<div class="drow lrow">' + ico('globe') + '<div><b>' + esc(T('language')) + '</b>' + langSwitch() + '</div></div>';
+    if (cafe.wifiName) h += '<div class="drow">' + ico('wifi') + '<div><b>' + esc(cafe.wifiName) + '</b>' + (cafe.wifiPassword ? '<span>' + esc(T('password')) + ': ' + esc(cafe.wifiPassword) + '</span>' : '<span>' + esc(T('noPassword')) + '</span>') + '</div>' +
+      (cafe.wifiPassword ? '<button class="copy" id="copyWifi">' + esc(T('copy')) + '</button>' : '') + '</div>';
+    if (tx(cafe, 'hours')) h += '<div class="drow">' + ico('clock') + '<div><b>' + esc(T('hours')) + '</b><span>' + esc(tx(cafe, 'hours')) + '</span></div></div>';
+    if (cafe.phone) h += '<a class="drow" href="tel:' + esc(cafe.phone.replace(/\s/g, '')) + '">' + ico('phone') + '<div><b>' + esc(cafe.phone) + '</b><span>' + esc(T('tapCall')) + '</span></div></a>';
+    if (cafe.address) h += '<a class="drow" href="' + esc(mapsLink(cafe)) + '" target="_blank" rel="noopener">' + ico('pin') + '<div><b>' + esc(T('address')) + '</b><span>' + esc(cafe.address) + '</span></div></a>';
     h += socialsHtml(cafe);
     $('drawer').innerHTML = h;
     $('dx').onclick = closeDrawer;
-    if ($('copyWifi')) $('copyWifi').onclick = function () { copyText(cafe.wifiPassword, 'Wi-Fi şifresi kopyalandı'); };
+    if ($('copyWifi')) $('copyWifi').onclick = function () { copyText(cafe.wifiPassword, T('wifiCopied')); };
   }
   function openDrawer() { $('drawer').className = 'drawer on'; $('dim').className = 'dim on'; document.body.classList.add('lock'); }
   function closeDrawer() { $('drawer').className = 'drawer'; if (!sheetOpen) { $('dim').className = 'dim'; document.body.classList.remove('lock'); } }
@@ -514,13 +599,13 @@
   }
   function openSheet(it, fromHistory) {
     sheetItem = it;
-    var rows = C.prices(it).map(function (p) { return '<div><span>' + esc(p.name || 'Fiyat') + '</span><span>' + esc(C.price(p.price, menu.cafe.currency)) + '</span></div>'; }).join('');
-    var tools = '<div class="tools"><button class="round" id="sBack" aria-label="Geri">' + ico('back') + '</button><button class="round" id="sShare" aria-label="Paylaş">' + ico('share') + '</button></div>';
+    var rows = C.prices(it).map(function (p) { return '<div><span>' + esc(p.name ? C.sizeName(p, lang) : T('price')) + '</span><span>' + esc(C.price(p.price, menu.cafe.currency)) + '</span></div>'; }).join('');
+    var tools = '<div class="tools"><button class="round" id="sBack" aria-label="' + esc(T('back')) + '">' + ico('back') + '</button><button class="round" id="sShare" aria-label="' + esc(T('share')) + '">' + ico('share') + '</button></div>';
     var kcal = it.calories ? '<div class="kcal">' + ico('fire') + it.calories + ' kcal</div>' : '';
     sheet.innerHTML = (it.image ? '<div class="media"><img src="' + esc(it.image) + '" alt="">' + tools + kcal + '</div>' : '<div class="media noimg">' + tools + '</div>') +
-      '<div class="content">' + (!it.image ? kcal : '') + '<h3>' + esc(it.name) + (it.available ? '' : ' <span class="tag out">Tükendi</span>') + '</h3>' +
-      (it.description ? '<p class="d">' + esc(it.description) + '</p>' : '') +
-      (it.tags.length ? '<p>' + it.tags.map(function (t) { return '<span class="tag" style="margin:0 6px 0 0">' + esc(t) + '</span>'; }).join('') + '</p>' : '') +
+      '<div class="content">' + (!it.image ? kcal : '') + '<h3>' + esc(tx(it, 'name')) + (it.available ? '' : ' <span class="tag out">' + esc(T('soldOut')) + '</span>') + '</h3>' +
+      (tx(it, 'description') ? '<p class="d">' + esc(tx(it, 'description')) + '</p>' : '') +
+      (it.tags.length ? '<p>' + tagsHtml(it, ' style="margin:0 6px 0 0"') + '</p>' : '') +
       '<div class="rows">' + rows + '</div></div>';
     sheet.scrollTop = 0;
     sheet.className = 'sheet on'; $('dim').className = 'dim on'; document.body.classList.add('lock');
@@ -542,9 +627,9 @@
     if (it) openSheet(it, true); else if (sheetOpen) hideSheet();
   });
   function shareItem(it) {
-    var url = C.baseUrl(menu) + '#u-' + it.id, title = it.name + ' — ' + (menu.cafe.name || 'Menü');
+    var url = C.baseUrl(menu) + (lang !== 'tr' ? '?dil=' + lang : '') + '#u-' + it.id, title = tx(it, 'name') + ' — ' + (menu.cafe.name || T('menu'));
     if (navigator.share) navigator.share({ title: title, text: title, url: url }).catch(function () {});
-    else copyText(url, 'Bağlantı kopyalandı');
+    else copyText(url, T('linkCopied'));
   }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (sheetOpen) closeSheet(); else closeDrawer(); } });
 
@@ -553,14 +638,16 @@
     return C.load().then(function (m) {
       var j = JSON.stringify(m);
       if (j === lastJson) return;
-      lastJson = j; menu = m; render();
+      lastJson = j; menu = m;
+      if (first || menu.theme.languages.indexOf(lang) === -1) setLang(pickLang(), false);
+      render();
       if (first) {
         var hm = location.hash.match(/^#u-(.+)$/), it = hm ? findItem(hm[1]) : null;
         if (it) { if (history.replaceState) history.replaceState(null, '', location.pathname + location.search); openSheet(it); }
         else if (shouldShowLanding()) showLanding();
       }
     }).catch(function (err) {
-      if (first) app.innerHTML = '<div class="loading">Menü şu an yüklenemedi. Lütfen sayfayı yenileyin.<br><small>' + esc(err.message) + '</small></div>';
+      if (first) app.innerHTML = '<div class="loading">' + esc(T('loadErr')) + '<br><small>' + esc(err.message) + '</small></div>';
     });
   }
   load(true);
