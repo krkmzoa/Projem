@@ -10,7 +10,12 @@
     "wifiName": "",
     "wifiPassword": "",
     "note": "Fiyatlarımıza KDV dahildir. Alerjen bilgisi için lütfen personelimize danışın.",
-    "menuUrl": ""
+    "menuUrl": "",
+    "cover": "images/acilis-mwuna52u.mp4",
+    "website": "",
+    "facebook": "",
+    "hours": "",
+    "mapsUrl": ""
   },
   "theme": {
     "accent": "#fefb41",
@@ -24,7 +29,10 @@
       "text": "#f5f0e6",
       "muted": "#ffffff"
     },
-    "tvScale": 1.15
+    "tvScale": 1.15,
+    "tvSlideSeconds": 8,
+    "landing": "always",
+    "landingMotion": "zoom"
   },
   "categories": [
     {
@@ -41,7 +49,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "espresso",
@@ -60,7 +69,8 @@
           ],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "americano",
@@ -70,7 +80,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "latte",
@@ -89,7 +100,8 @@
           ],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "cappuccino",
@@ -99,7 +111,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "flat-white",
@@ -111,7 +124,8 @@
             "Yeni"
           ],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "mocha",
@@ -121,9 +135,12 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         }
-      ]
+      ],
+      "image": "",
+      "description": ""
     },
     {
       "id": "soguk-kahveler",
@@ -139,7 +156,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "iced-americano",
@@ -149,7 +167,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "cold-brew",
@@ -159,7 +178,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "frappe",
@@ -169,9 +189,12 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": false
+          "available": false,
+          "calories": 0
         }
-      ]
+      ],
+      "image": "",
+      "description": ""
     },
     {
       "id": "caylar",
@@ -196,7 +219,8 @@
           ],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "bitki-cayi",
@@ -206,7 +230,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "sicak-cikolata",
@@ -216,7 +241,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "salep",
@@ -228,9 +254,12 @@
             "Mevsimlik"
           ],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         }
-      ]
+      ],
+      "image": "",
+      "description": ""
     },
     {
       "id": "soguk-icecekler",
@@ -246,7 +275,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "taze-portakal",
@@ -256,7 +286,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "soda",
@@ -266,7 +297,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "su",
@@ -276,9 +308,12 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         }
-      ]
+      ],
+      "image": "",
+      "description": ""
     },
     {
       "id": "tatlilar",
@@ -296,7 +331,8 @@
             "Popüler"
           ],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "brownie",
@@ -306,7 +342,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "tiramisu",
@@ -316,7 +353,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "kurabiye",
@@ -328,9 +366,12 @@
             "Vegan"
           ],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         }
-      ]
+      ],
+      "image": "",
+      "description": ""
     },
     {
       "id": "kahvalti",
@@ -346,7 +387,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "tost",
@@ -356,7 +398,8 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         },
         {
           "id": "sandvic",
@@ -366,9 +409,13 @@
           "sizes": [],
           "tags": [],
           "image": "",
-          "available": true
+          "available": true,
+          "calories": 0
         }
-      ]
+      ],
+      "image": "",
+      "description": ""
     }
-  ]
+  ],
+  "tvSlides": []
 }
