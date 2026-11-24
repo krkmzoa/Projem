@@ -73,8 +73,34 @@
     if (e) e.innerHTML = 'Hata: ' + String(msg).replace(/</g, '&lt;') + ' (satır ' + line + ')';
   };
 </script>
-<script src="assets/vendor/qrcode.js"></script>
-<script src="assets/core.js"></script>
+<script src="assets/vendor/qrcode.js?v=8"></script>
+<script>
+/* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
+   Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
+(function () {
+  var BUILD = 8;
+  function check() {
+    if (window.qrBusy && window.qrBusy()) return;
+    var x = new XMLHttpRequest();
+    x.open('GET', 'version.json?t=' + new Date().getTime(), true);
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4 || x.status !== 200) return;
+      var v; try { v = JSON.parse(x.responseText).v; } catch (e) { return; }
+      if (!(v > BUILD)) return;
+      if (location.search.indexOf('_v=' + v) !== -1) return; // döngüye girme
+      var parts = location.search.replace(/^\?/, '').split('&'), q = [];
+      for (var i = 0; i < parts.length; i++) if (parts[i] && parts[i].indexOf('_v=') !== 0) q.push(parts[i]);
+      q.push('_v=' + v);
+      location.replace(location.pathname + '?' + q.join('&') + location.hash);
+    };
+    x.send();
+  }
+  check();
+  setInterval(check, 5 * 60 * 1000);
+  if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+})();
+</script>
+<script src="assets/core.js?v=8"></script>
 <script>
 (function () {
   var C = window.MenuCore, esc = C.esc;

@@ -80,3 +80,4 @@ Sunucu, veritabanı veya aylık ücret yok: site **GitHub Pages** üzerinde ücr
 ## Teknik notlar
 - Saf HTML/CSS/JS; derleme adımı yok. QR üretimi için `assets/vendor/qrcode.js` (MIT, Kazuhiko Arase) depoya dahildir.
 - Yerelde denemek için: `python3 -m http.server` → `http://localhost:8000`
+- Otomatik güncelleme: sayfalar `version.json` dosyasını kontrol eder. Koddaki `BUILD` sayısından büyük bir sürüm görürlerse kendilerini yenilerler (ana ekran uygulaması, tablet ve TV eski sürümde kalmasın diye). Koda değişiklik yapıldığında `version.json` içindeki `v` ile sayfalardaki `BUILD` ve `?v=` numaraları birlikte artırılmalıdır.
