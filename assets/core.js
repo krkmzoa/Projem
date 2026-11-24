@@ -33,7 +33,7 @@
     m.tvSlides.forEach(function (s) { if (!s.id) s.id = MenuCore.uid(); s.active = s.active !== false; });
     if (['auto', 'light', 'dark', 'custom'].indexOf(m.theme.mode) === -1) m.theme.mode = 'auto';
     if (['always', 'noqr', 'never'].indexOf(m.theme.landing) === -1) m.theme.landing = 'always';
-    if (['zoom', 'spin', 'none'].indexOf(m.theme.landingMotion) === -1) m.theme.landingMotion = 'zoom';
+    if (['zoom', 'spin', 'ripple', 'none'].indexOf(m.theme.landingMotion) === -1) m.theme.landingMotion = 'zoom';
     if (m.theme.tvMode !== 'same') m.theme.tvMode = 'dark';
     var pc = m.theme.colors = m.theme.colors || {};
     ['bg', 'surface', 'text', 'muted'].forEach(function (k) { if (!/^#[0-9a-fA-F]{6}$/.test(pc[k] || '')) pc[k] = MenuCore.PALETTES.light[k]; });
