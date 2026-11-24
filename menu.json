@@ -23,7 +23,8 @@
       "surface": "#ffffff",
       "text": "#2a201a",
       "muted": "#7a6a5e"
-    }
+    },
+    "tvScale": 1.15
   },
   "categories": [
     {
