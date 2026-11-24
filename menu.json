@@ -4,26 +4,28 @@
     "slogan": "Specialty Coffee & Art",
     "logo": "images/logo-mwugr2oh.jpg",
     "currency": "₺",
-    "phone": "",
+    "phone": "05399553723",
     "instagram": "@atelierkoicoffee",
-    "address": "",
-    "wifiName": "",
-    "wifiPassword": "",
+    "address": "Saray Mah. Çelikler Sok. No: 2A Antalya/Alanya",
+    "wifiName": "Atolyekoi",
+    "wifiPassword": "10203040",
     "note": "Fiyatlarımıza KDV dahildir. Alerjen bilgisi için lütfen personelimize danışın.",
     "menuUrl": "",
     "cover": "images/acilis-mwuna52u.mp4",
     "website": "",
     "facebook": "",
-    "hours": "",
-    "mapsUrl": "",
+    "hours": "Her Gün 10:30 - 22:30",
+    "mapsUrl": "https://maps.app.goo.gl/UeGpzj4x3L7kC2JU9?g_st=ic",
     "i18n": {
       "en": {
         "slogan": "Specialty Coffee & Art",
-        "note": "Prices include VAT. Please ask our staff for allergen information."
+        "note": "Prices include VAT. Please ask our staff for allergen information.",
+        "hours": "Every Day 10:30 - 22:30"
       },
       "ru": {
         "slogan": "Спешелти-кофе и искусство",
-        "note": "Цены включают НДС. Информацию об аллергенах уточняйте у персонала."
+        "note": "Цены включают НДС. Информацию об аллергенах уточняйте у персонала.",
+        "hours": "Ежедневно 10:30 - 22:30"
       }
     }
   },
