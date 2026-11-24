@@ -27,6 +27,7 @@
     if (!m.theme.accent) m.theme.accent = '#b5651d';
     if (!m.theme.tvSeconds) m.theme.tvSeconds = 12;
     if (!m.theme.tvColumns) m.theme.tvColumns = 3;
+    m.theme.tvScale = Math.max(0.7, Math.min(2.5, Number(m.theme.tvScale) || 1));
     if (['auto', 'light', 'dark', 'custom'].indexOf(m.theme.mode) === -1) m.theme.mode = 'auto';
     if (m.theme.tvMode !== 'same') m.theme.tvMode = 'dark';
     var pc = m.theme.colors = m.theme.colors || {};
