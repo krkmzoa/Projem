@@ -13,16 +13,16 @@
     "menuUrl": ""
   },
   "theme": {
-    "accent": "#5b7a3a",
+    "accent": "#fdc700",
     "tvSeconds": 12,
     "tvColumns": 2,
     "mode": "custom",
     "tvMode": "same",
     "colors": {
-      "bg": "#eef0e6",
-      "surface": "#fbfcf7",
-      "text": "#22261c",
-      "muted": "#66705a"
+      "bg": "#121110",
+      "surface": "#1e1c1a",
+      "text": "#f5f0e6",
+      "muted": "#a39e93"
     },
     "tvScale": 1.15
   },
