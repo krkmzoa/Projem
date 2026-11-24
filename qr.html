@@ -83,12 +83,12 @@
 </div>
 <style id="printCols"></style>
 
-<script src="assets/vendor/qrcode.js?v=9"></script>
+<script src="assets/vendor/qrcode.js?v=10"></script>
 <script>
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 9;
+  var BUILD = 10;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -110,7 +110,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=9"></script>
+<script src="assets/core.js?v=10"></script>
 <script>
 (function () {
   'use strict';

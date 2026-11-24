@@ -117,6 +117,9 @@
   .pv .ch span.on { background: var(--accent); color: var(--on-accent, #fff); }
   .pv .it { background: var(--psurf); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
   .pv .it b { display: block; font-size: 14px; } .pv .it small { color: var(--pmuted); font-size: 12px; } .pv .it em { display: block; font-style: normal; font-weight: 700; color: var(--accent); margin-top: 4px; font-size: 14px; }
+  .cthumb { width: 28px; height: 20px; object-fit: cover; border-radius: 4px; display: block; }
+  .coverbox { width: 200px; height: 112px; border-radius: 10px; overflow: hidden; background: var(--surface2); border: 1px solid var(--line); display: grid; place-items: center; color: var(--muted); font-size: 13px; }
+  .coverbox img, .coverbox video { width: 100%; height: 100%; object-fit: cover; display: block; }
   .links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 </style>
 </head>
@@ -167,13 +170,37 @@
       </div>
     </div>
     <div class="card">
-      <h3>İletişim & Wi-Fi (menünün altında görünür)</h3>
+      <h3>Açılış ekranı</h3>
+      <p class="hint" style="margin-top:0">Menü açılınca önce tam ekran bir karşılama gösterilir: arka planda video ya da fotoğraf, ortada kafe adı, altta "Menü" düğmesi ve sosyal medya.</p>
+      <div class="imgbox" style="margin:10px 0 14px">
+        <div id="coverPreview" class="coverbox"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" id="coverImg">Fotoğraf yükle</button>
+          <button type="button" id="coverVid">Video yükle</button>
+          <button type="button" class="danger" id="coverRm">Kaldır</button>
+        </div>
+      </div>
+      <label class="f">Ne zaman gösterilsin?
+        <select data-f="theme.landing">
+          <option value="always">Her zaman (menü ilk açıldığında)</option>
+          <option value="noqr">Sadece masa QR'ı dışından gelenlere</option>
+          <option value="never">Hiç gösterme, doğrudan menü açılsın</option>
+        </select>
+      </label>
+      <p class="hint">Video: 5-10 saniyelik, sessiz, <b>MP4</b> ve en fazla <b>8 MB</b> olmalı (ideali 3 MB altı). iPhone videoları bazı Android telefonlarda oynamayabilir; CapCut veya Canva'dan "MP4" olarak dışa aktarın. Video yüklenmezse fotoğraf yavaşça yakınlaşarak gösterilir.</p>
+    </div>
+    <div class="card">
+      <h3>İletişim & Wi-Fi (☰ menüsünde ve sayfa altında görünür)</h3>
       <div class="grid">
         <label class="f">Wi-Fi adı<input data-f="cafe.wifiName"></label>
         <label class="f">Wi-Fi şifresi<input data-f="cafe.wifiPassword"></label>
         <label class="f">Instagram kullanıcı adı<input data-f="cafe.instagram" placeholder="@kafeadi"></label>
         <label class="f">Telefon<input data-f="cafe.phone" type="tel"></label>
+        <label class="f">Facebook (sayfa adı veya bağlantı)<input data-f="cafe.facebook"></label>
+        <label class="f">Web sitesi<input data-f="cafe.website" placeholder="ör. atelierkoi.com"></label>
         <label class="f full">Adres<input data-f="cafe.address"></label>
+        <label class="f full">Google Haritalar bağlantısı <span class="hint">(isteğe bağlı; boşsa adresten bulunur)</span><input data-f="cafe.mapsUrl" placeholder="https://maps.app.goo.gl/..."></label>
+        <label class="f full">Çalışma saatleri<textarea data-f="cafe.hours" rows="2" placeholder="Her gün 08:00 - 23:00"></textarea></label>
         <label class="f full">Alt not<textarea data-f="cafe.note" rows="2"></textarea></label>
       </div>
     </div>
@@ -322,7 +349,10 @@
         <div id="fSizes"></div>
         <button type="button" class="small" id="addSize" style="margin-top:6px">+ Seçenek ekle</button>
       </div>
-      <label class="f">Etiketler<input id="fTags" placeholder="ör. Yeni, Vegan, Glutensiz"><div class="hint">Virgülle ayırın.</div></label>
+      <div class="two">
+        <label class="f">Etiketler<input id="fTags" placeholder="ör. Yeni, Vegan"><div class="hint">Virgülle ayırın.</div></label>
+        <label class="f">Kalori (kcal)<input id="fKcal" inputmode="numeric" placeholder="İsteğe bağlı"></label>
+      </div>
       <div>
         <label class="f">Fotoğraf</label>
         <div class="imgbox" style="margin-top:6px">
@@ -342,7 +372,27 @@
   </form>
 </dialog>
 
+<!-- Kategori penceresi -->
+<dialog id="catDlg">
+  <form method="dialog" id="catForm">
+    <div class="dhead"><h2 id="catTitle">Kategori</h2><button type="button" class="ghost" data-close aria-label="Kapat">✕</button></div>
+    <div class="dbody">
+      <div>
+        <label class="f">Kategori fotoğrafı <span class="hint">(menüde üstte kutu ve kategori başında kapak olarak görünür)</span></label>
+        <div class="imgbox" style="margin-top:6px">
+          <img id="cImgPrev" alt="" hidden style="width:160px;height:90px">
+          <button type="button" id="cImgUp">Fotoğraf yükle</button>
+          <button type="button" class="danger" id="cImgRm" hidden>Kaldır</button>
+        </div>
+      </div>
+      <label class="f">Açıklama<textarea id="cDesc" rows="2" placeholder="ör. Her gün 08:30 - 14:00 arası"></textarea></label>
+    </div>
+    <div class="dfoot"><span class="sp"></span><button type="button" data-close>Vazgeç</button><button type="submit" class="primary">Tamam</button></div>
+  </form>
+</dialog>
+
 <input type="file" id="filePick" accept="image/*" hidden>
+<input type="file" id="videoPick" accept="video/mp4,video/webm,video/quicktime,.mp4,.mov,.webm" hidden>
 <input type="file" id="jsonPick" accept="application/json,.json" hidden>
 <div class="toast" id="toast"></div>
 
@@ -350,7 +400,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 9;
+  var BUILD = 10;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -372,7 +422,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=9"></script>
+<script src="assets/core.js?v=10"></script>
 <script>
 (() => {
   'use strict';
@@ -549,6 +599,7 @@
           <label class="switch" title="Menüde göster"><input type="checkbox" data-a="catShow" ${c.hidden ? '' : 'checked'}><span class="hide-sm">Göster</span></label>
           <button class="ghost" data-a="catUp" title="Yukarı" ${ci === 0 ? 'disabled' : ''}>↑</button>
           <button class="ghost" data-a="catDown" title="Aşağı" ${ci === menu.categories.length - 1 ? 'disabled' : ''}>↓</button>
+          <button class="ghost" data-a="catEdit" title="Fotoğraf ve açıklama">${c.image ? `<img class="cthumb" src="${esc(imgSrc(c.image))}" alt="">` : '🖼'}</button>
           <button class="ghost danger" data-a="catDel" title="Kategoriyi sil">🗑</button>
         </div>
         <div class="rows">
@@ -581,6 +632,7 @@
       case 'up': swap(cat.items, ii, ii - 1); break;
       case 'down': swap(cat.items, ii, ii + 1); break;
       case 'edit': openItem(ci, ii); return;
+      case 'catEdit': openCat(ci); return;
       case 'addItem': openItem(ci, -1); return;
       default: return;
     }
@@ -624,6 +676,7 @@
     $('#dlgTitle').textContent = ii >= 0 ? 'Ürünü düzenle' : 'Yeni ürün';
     $('#fName').value = it.name; $('#fDesc').value = it.description; $('#fPrice').value = priceInput(it.price);
     $('#fTags').value = it.tags.join(', '); $('#fAvail').checked = it.available;
+    $('#fKcal').value = it.calories || '';
     $('#fCat').innerHTML = menu.categories.map((c, i) => `<option value="${i}" ${i === ci ? 'selected' : ''}>${esc((c.icon ? c.icon + ' ' : '') + (c.name || 'Adsız'))}</option>`).join('');
     const sz = $('#fSizes'); sz.innerHTML = ''; it.sizes.forEach(s => sz.appendChild(sizeRow(s)));
     setImgPreview(it.image);
@@ -650,12 +703,70 @@
     it.sizes = $$('.size', $('#fSizes')).map(r => ({ name: r.children[0].value.trim(), price: parsePrice(r.children[1].value) })).filter(s => s.name);
     it.tags = $('#fTags').value.split(',').map(s => s.trim()).filter(Boolean);
     it.available = $('#fAvail').checked;
+    it.calories = Math.max(0, parseInt($('#fKcal').value, 10) || 0);
     const newCi = +$('#fCat').value;
     if (editing.ii >= 0) {
       if (newCi === editing.ci) menu.categories[editing.ci].items[editing.ii] = it;
       else { menu.categories[editing.ci].items.splice(editing.ii, 1); menu.categories[newCi].items.push(it); }
     } else menu.categories[newCi].items.push(it);
     dlg.close(); renderCats(); changed();
+  });
+
+  // ---------- kategori penceresi ----------
+  const catDlg = $('#catDlg');
+  let catEditing = null;
+  function setCatImg(p) {
+    $('#cImgPrev').hidden = !p; $('#cImgRm').hidden = !p;
+    if (p) $('#cImgPrev').src = imgSrc(p);
+    $('#cImgUp').textContent = p ? 'Değiştir' : 'Fotoğraf yükle';
+  }
+  function openCat(ci) {
+    const c = menu.categories[ci];
+    catEditing = { ci, image: c.image || '' };
+    $('#catTitle').textContent = (c.icon ? c.icon + ' ' : '') + (c.name || 'Kategori');
+    $('#cDesc').value = c.description || '';
+    setCatImg(catEditing.image);
+    catDlg.showModal();
+  }
+  $$('[data-close]', catDlg).forEach(b => b.onclick = () => catDlg.close());
+  $('#cImgUp').onclick = () => pickImage((p) => { catEditing.image = p; setCatImg(p); }, 'kategori-' + (slug(menu.categories[catEditing.ci].name) || 'x'), 1400);
+  $('#cImgRm').onclick = () => { catEditing.image = ''; setCatImg(''); };
+  $('#catForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const c = menu.categories[catEditing.ci];
+    c.image = catEditing.image; c.description = $('#cDesc').value.trim();
+    catDlg.close(); renderCats(); changed();
+  });
+
+  // ---------- açılış ekranı ----------
+  function renderCover() {
+    const p = menu.cafe.cover, box = $('#coverPreview');
+    if (!p) box.innerHTML = 'Yok';
+    else if (C.isVideo(p)) box.innerHTML = `<video src="${esc(imgSrc(p))}" muted autoplay loop playsinline></video>`;
+    else box.innerHTML = `<img src="${esc(imgSrc(p))}" alt="">`;
+    $('#coverRm').hidden = !p;
+  }
+  $('#coverImg').onclick = () => pickImage((p) => { menu.cafe.cover = p; renderCover(); changed(); }, 'acilis', 1600);
+  $('#coverRm').onclick = () => { menu.cafe.cover = ''; renderCover(); changed(); };
+  $('#coverVid').onclick = () => {
+    if (!connected()) { toast('Video yüklemek için önce Ayarlar\'dan GitHub bağlantısını kurun.', true); return; }
+    $('#videoPick').value = ''; $('#videoPick').click();
+  };
+  $('#videoPick').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const mb = f.size / 1048576;
+    if (mb > 8) { toast(`Video çok büyük (${mb.toFixed(1)} MB). En fazla 8 MB olmalı; daha kısa veya düşük kaliteli dışa aktarın.`, true); return; }
+    if (mb > 3 && !confirm(`Video ${mb.toFixed(1)} MB. Müşterilerin telefonunda yavaş açılabilir (3 MB altı önerilir). Yine de yüklensin mi?`)) return;
+    const ext = (f.name.match(/\.(mp4|webm|mov|m4v)$/i) || ['', 'mp4'])[1].toLowerCase();
+    toast('Video yükleniyor…');
+    try {
+      const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+      const path = `images/acilis-${Date.now().toString(36)}.${ext}`;
+      await api('PUT', path, { message: 'Açılış videosu eklendi', content: dataUrl.split(',')[1], branch: gh.branch });
+      imgCache[path] = dataUrl;
+      menu.cafe.cover = path; renderCover(); changed();
+      toast('Video yüklendi ✓ Görünmesi için "Yayınla"ya basın.');
+    } catch (err) { toast(err.message || 'Video yüklenemedi.', true); }
   });
 
   // ---------- görsel yükleme ----------
@@ -733,6 +844,7 @@
     $('#logoPreview').src = menu.cafe.logo ? imgSrc(menu.cafe.logo) : 'assets/icon.svg';
     $('#logoRemove').hidden = !menu.cafe.logo;
     renderColors();
+    renderCover();
   }
   $$('[data-f]').forEach(el => el.addEventListener('input', () => {
     setPath(el.dataset.f, el.dataset.num ? (+el.value || 0) : el.value);
@@ -844,7 +956,7 @@
     menu = C.normalize(JSON.parse(published)); renderAll(); changed();
   };
 
-  window.qrBusy = () => !menu || isDirty() || dlg.open;
+  window.qrBusy = () => !menu || isDirty() || dlg.open || catDlg.open;
   function renderAll() { C.applyAccent(menu); renderCats(); renderFields(); renderSlides(); renderSettings(); updateStatus(); }
   loadMenu();
 })();
