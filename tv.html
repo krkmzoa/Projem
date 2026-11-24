@@ -5,96 +5,127 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Menü Ekranı</title>
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* TV ekranı: koyu, uzaktan okunur, dokunmasız. Eski TV tarayıcıları için sade CSS. */
-  :root { --accent: #b5651d; --bg: #14100d; --text: #f5ede4; --muted: #a8988a; --line: #3a2f27; }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); cursor: none; }
-  body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 2.05vh; }
+  /* TV ekranı. Eski akıllı TV tarayıcılarında da çalışsın diye:
+     CSS değişkeni, vh/vw, flex ve CSS sütunları KULLANILMADI.
+     1rem = ekran yüksekliğinin %1'i (JS ayarlar). Renkler JS ile #theme stiline yazılır. */
+  html { font-size: 10.8px; }
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #14100d; color: #f5ede4; cursor: none; }
+  body { font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif; font-size: 2.05rem; }
   .serif { font-family: 'Fraunces', Georgia, 'Times New Roman', serif; }
 
-  .screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; padding: 3.2vh 3.4vw 2.6vh; }
-  .top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 1.8vh; border-bottom: 2px solid var(--line); }
-  .brand { display: flex; align-items: center; }
-  .brand img { height: 7vh; width: 7vh; border-radius: 50%; object-fit: cover; margin-right: 1.4vw; }
-  .brand h1 { margin: 0; font-size: 5vh; font-weight: 600; line-height: 1.05; }
-  .brand p { margin: .4vh 0 0; color: var(--muted); font-size: 2.1vh; }
-  .clock { font-size: 4.2vh; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+  #top { position: absolute; top: 3.2rem; left: 3.4%; right: 3.4%; height: 9rem; border-bottom: 2px solid #3a2f27; }
+  #brand { float: left; }
+  #brand img { float: left; height: 7rem; width: 7rem; border-radius: 50%; margin-right: 1.6rem; }
+  #brand h1 { margin: 0; font-size: 5rem; font-weight: 600; line-height: 1.05; }
+  #brand p { margin: .4rem 0 0; font-size: 2.1rem; }
+  #clock { float: right; font-size: 4.2rem; font-weight: 500; line-height: 7rem; }
 
-  .stage { flex: 1; position: relative; margin: 2.4vh 0 1.6vh; }
-  .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; transition: opacity .8s ease; }
-  .page.show { opacity: 1; }
-  .cols { height: 100%; overflow: hidden; column-fill: auto; -webkit-column-fill: auto; column-gap: 4vw; -webkit-column-gap: 4vw; }
+  #stage { position: absolute; top: 14.6rem; bottom: 16.2rem; left: 3.4%; right: 3.4%; }
+  .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; visibility: hidden; opacity: 0; -webkit-transition: opacity .8s; transition: opacity .8s; }
+  .page.show { visibility: visible; opacity: 1; }
+  .col { position: absolute; top: 0; overflow: hidden; }
+  #measure { position: absolute; left: -9999px; top: 0; visibility: hidden; }
 
-  .cat { margin: 0 0 1.2vh; padding-top: 1.2vh; font-size: 3.3vh; font-weight: 600; color: var(--accent); break-after: avoid; -webkit-column-break-after: avoid; page-break-after: avoid; }
-  .cat:first-child { padding-top: 0; }
-  .cat small { color: var(--muted); font-size: 1.8vh; font-weight: 400; font-family: 'Inter', sans-serif; }
-  .it { padding: .7vh 0 1vh; break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; display: block; }
-  .row { display: flex; align-items: baseline; }
-  .nm { font-size: 2.5vh; font-weight: 600; }
-  .dots { flex: 1; border-bottom: .25vh dotted var(--line); margin: 0 .8vw; transform: translateY(-.5vh); min-width: 2vw; }
-  .pr { font-size: 2.5vh; font-weight: 600; white-space: nowrap; }
-  .pr span + span { margin-left: 1vw; }
-  .pr small { color: var(--muted); font-weight: 500; font-size: 1.8vh; margin-right: .3vw; }
-  .ds { color: var(--muted); font-size: 1.85vh; margin-top: .2vh; }
-  .tg { flex: none; align-self: center; font-size: 1.4vh; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--on-accent, #fff); background: var(--accent); padding: .15vh .5vw; border-radius: .5vh; margin-left: .6vw; vertical-align: .3vh; }
-  .out .nm, .out .pr { color: var(--muted); text-decoration: line-through; }
-  .out .tg.o { background: #8c2a22; color: #fff; text-decoration: none; }
+  .cat { margin: 0 0 1.2rem; padding-top: 1.4rem; font-size: 3.3rem; font-weight: 600; }
+  .cat.first { padding-top: 0; }
+  .cat small { font-size: 1.8rem; font-weight: 400; font-family: 'Inter', Arial, sans-serif; }
+  .it { padding: .7rem 0 1rem; }
+  .row { overflow: hidden; }
+  .pr { float: right; font-size: 2.5rem; font-weight: 600; white-space: nowrap; margin-left: 1.5rem; }
+  .pr span { margin-left: 1.4rem; }
+  .pr span.f { margin-left: 0; }
+  .pr small { font-weight: 500; font-size: 1.8rem; margin-right: .4rem; }
+  .nm { font-size: 2.5rem; font-weight: 600; }
+  .ds { font-size: 1.85rem; margin-top: .2rem; }
+  .tg { display: inline-block; font-size: 1.4rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: .15rem .6rem; border-radius: .5rem; margin-left: .8rem; vertical-align: middle; position: relative; top: -.2rem; }
+  .out .nm, .out .pr { text-decoration: line-through; }
+  .tg.o { background: #8c2a22; color: #fff; }
 
-  .bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 1.6vh; border-top: 2px solid var(--line); color: var(--muted); font-size: 2vh; }
-  .qr { display: flex; align-items: center; }
-  .qr .code { width: 10vh; height: 10vh; background: #fff; border-radius: .8vh; overflow: hidden; margin-right: 1.2vw; }
-  .qr .code svg { width: 100%; height: 100%; display: block; }
-  .qr b { color: var(--text); display: block; font-size: 2.3vh; }
-  .dotsnav span { display: inline-block; width: 1.1vh; height: 1.1vh; border-radius: 50%; background: var(--line); margin-left: .7vh; }
-  .dotsnav span.on { background: var(--accent); }
-  .info span { margin-left: 2.2vw; }
-  .info b { color: var(--text); font-weight: 600; }
-  #measure { position: absolute; visibility: hidden; pointer-events: none; }
-  .msg { position: absolute; top: 40%; left: 0; right: 0; text-align: center; color: var(--muted); font-size: 3vh; }
+  #bottom { position: absolute; bottom: 2.6rem; left: 3.4%; right: 3.4%; height: 11.8rem; border-top: 2px solid #3a2f27; }
+  #qr { float: left; margin-top: 1.6rem; }
+  #qr .code { float: left; width: 10rem; height: 10rem; background: #fff; border-radius: .8rem; overflow: hidden; margin-right: 1.6rem; }
+  #qr .code img { width: 10rem; height: 10rem; display: block; }
+  #qr .txt { float: left; padding-top: 2.4rem; font-size: 2rem; }
+  #qr b { display: block; font-size: 2.3rem; }
+  #info { float: right; margin-top: 4.8rem; font-size: 2rem; }
+  #info span { margin-left: 3rem; }
+  #dots { position: absolute; left: 0; right: 0; top: 5.6rem; text-align: center; }
+  #dots span { display: inline-block; width: 1.1rem; height: 1.1rem; border-radius: 50%; margin: 0 .4rem; }
+  .msg { position: absolute; top: 40%; left: 0; right: 0; text-align: center; font-size: 3rem; }
+  #err { position: absolute; left: 1rem; bottom: .4rem; font-size: 1.4rem; color: #ff8a80; }
 </style>
+<style id="theme"></style>
 </head>
 <body>
-<div class="screen">
-  <div class="top">
-    <div class="brand" id="brand"></div>
-    <div class="clock" id="clock"></div>
-  </div>
-  <div class="stage" id="stage"><div class="msg">Menü yükleniyor…</div></div>
-  <div class="bottom">
-    <div class="qr" id="qr"></div>
-    <div class="dotsnav" id="dots"></div>
-    <div class="info" id="info"></div>
-  </div>
-</div>
+<div id="top"><div id="brand"></div><div id="clock"></div></div>
+<div id="stage"><div class="msg">Menü yükleniyor…</div></div>
+<div id="bottom"><div id="qr"></div><div id="dots"></div><div id="info"></div></div>
+<div id="err"></div>
 
+<script>
+  // Hata olursa ekranın köşesine yaz (sorun tespiti için).
+  window.onerror = function (msg, src, line) {
+    var e = document.getElementById('err');
+    if (e) e.innerHTML = 'Hata: ' + String(msg).replace(/</g, '&lt;') + ' (satır ' + line + ')';
+  };
+</script>
 <script src="assets/vendor/qrcode.js"></script>
 <script src="assets/core.js"></script>
 <script>
 (function () {
-  'use strict';
   var C = window.MenuCore, esc = C.esc;
-  var params = new URLSearchParams(location.search);
   var menu = null, lastJson = '', pages = [], pageIdx = 0, timer = null;
   var stage = document.getElementById('stage');
 
+  function param(name) {
+    var m = new RegExp('[?&]' + name + '=([^&#]*)').exec(location.search);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  function $(id) { return document.getElementById(id); }
+
+  // 1rem = ekran yüksekliğinin %1'i
+  function scale() {
+    var h = window.innerHeight || document.documentElement.clientHeight || 1080;
+    document.documentElement.style.fontSize = (h / 100) + 'px';
+  }
+  scale();
+
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
-  function tick() { var d = new Date(); document.getElementById('clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function tick() { var d = new Date(); $('clock').innerHTML = pad(d.getHours()) + ':' + pad(d.getMinutes()); }
   tick(); setInterval(tick, 10000);
 
+  // ---------- renkler (CSS değişkeni yerine düz CSS üretilir) ----------
+  function applyColors() {
+    var t = menu.theme, P = C.PALETTES, p = P.tv;
+    if (t.tvMode === 'same') p = t.mode === 'custom' ? t.colors : (t.mode === 'light' ? P.light : P.tv);
+    var a = /^#[0-9a-fA-F]{6}$/.test(t.accent) ? t.accent : '#b5651d';
+    var on = C.onAccent(a), line = C.mix(p.bg, p.text, 0.16);
+    var css =
+      'html,body{background:' + p.bg + ';color:' + p.text + '}' +
+      '#top,#bottom{border-color:' + line + '}' +
+      '#brand p,#clock,.ds,.cat small,.pr small,#qr .txt,#info,.out .nm,.out .pr,.msg{color:' + p.muted + '}' +
+      '#qr b,#info b{color:' + p.text + '}' +
+      '.cat{color:' + a + '}' +
+      '.tg{background:' + a + ';color:' + on + '}.tg.o{background:#8c2a22;color:#fff}' +
+      '#dots span{background:' + line + '}#dots span.on{background:' + a + '}';
+    var st = $('theme');
+    if (st.styleSheet) st.styleSheet.cssText = css; else st.innerHTML = css;
+  }
+
+  // ---------- menü öğeleri ----------
   function itemEl(it) {
-    var cur = menu.cafe.currency;
-    var prices = C.prices(it).map(function (p) {
-      return '<span>' + (p.name ? '<small>' + esc(p.name) + '</small>' : '') + esc(C.price(p.price, cur)) + '</span>';
-    }).join('');
-    var tags = it.tags.map(function (t) { return '<span class="tg">' + esc(t) + '</span>'; }).join('');
+    var cur = menu.cafe.currency, ps = C.prices(it), prices = '';
+    for (var i = 0; i < ps.length; i++) {
+      prices += '<span' + (i === 0 ? ' class="f"' : '') + '>' + (ps[i].name ? '<small>' + esc(ps[i].name) + '</small>' : '') + esc(C.price(ps[i].price, cur)) + '</span>';
+    }
+    var tags = '';
+    for (var j = 0; j < it.tags.length; j++) tags += '<span class="tg">' + esc(it.tags[j]) + '</span>';
     if (!it.available) tags += '<span class="tg o">Tükendi</span>';
     var d = document.createElement('div');
     d.className = 'it' + (it.available ? '' : ' out');
-    d.innerHTML = '<div class="row"><span class="nm">' + esc(it.name) + '</span>' + tags + '<span class="dots"></span><span class="pr">' + prices + '</span></div>' +
+    d.innerHTML = '<div class="row"><span class="pr">' + prices + '</span><span class="nm">' + esc(it.name) + '</span>' + tags + '</div>' +
       (it.description ? '<div class="ds">' + esc(it.description) + '</div>' : '');
     return d;
   }
@@ -104,60 +135,78 @@
     d.innerHTML = (c.icon ? esc(c.icon) + ' ' : '') + esc(c.name) + (cont ? ' <small>(devam)</small>' : '');
     return d;
   }
+  function build(mk) { return mk.head ? catEl(mk.c, mk.cont) : itemEl(mk.it); }
 
-  /* Kategorileri ekrana sığan sayfalara böler: öğeleri tek tek ekleyip taşma olunca yeni sayfaya geçer. */
-  function paginate() {
-    var cols = Math.max(1, Math.min(5, +menu.theme.tvColumns || 3));
-    var box = document.createElement('div');
-    box.className = 'cols'; box.id = 'measure';
-    box.style.width = stage.clientWidth + 'px';
-    box.style.height = stage.clientHeight + 'px';
-    box.style.columnCount = cols; box.style.webkitColumnCount = cols;
-    stage.appendChild(box);
-    var result = [], current = [];
-    function overflow() { return box.scrollWidth > box.clientWidth + 2; }
-    function flush() { if (current.length) result.push(current); current = []; box.innerHTML = ''; }
-    function add(el, mk) {
-      box.appendChild(el); current.push(mk);
+  // ---------- sayfalama: sütunları tek tek doldur, dolunca sonraki sütuna / sayfaya geç ----------
+  function layout() {
+    var n = Math.max(1, Math.min(5, +menu.theme.tvColumns || 3));
+    var W = stage.offsetWidth, H = stage.offsetHeight;
+    var gap = Math.round(W * 0.04), colW = Math.floor((W - gap * (n - 1)) / n);
+
+    var meas = document.createElement('div');
+    meas.id = 'measure'; meas.style.width = colW + 'px';
+    document.body.appendChild(meas);
+
+    var result = [], page = [], col = [];
+    function add(mk) {
+      var el = build(mk);
+      if (mk.head && !col.length) el.className += ' first';
+      meas.appendChild(el); col.push(mk);
     }
-    C.visibleCategories(menu).forEach(function (c) {
-      var headCont = false;
-      function head() { add(catEl(c, headCont), { c: c, head: true, cont: headCont }); headCont = true; }
-      head();
-      if (overflow() && current.length > 1) { box.removeChild(box.lastChild); current.pop(); flush(); headCont = false; head(); }
-      c.items.forEach(function (it) {
-        add(itemEl(it), { c: c, it: it });
-        if (!overflow()) return;
-        // sığmadı: ürünü (ve sayfanın dibinde yalnız kalan başlığı) yeni sayfaya taşı
-        box.removeChild(box.lastChild); current.pop();
-        var last = current[current.length - 1];
+    function fits() { return meas.offsetHeight <= H; }
+    function removeLast() { meas.removeChild(meas.lastChild); return col.pop(); }
+    function nextCol() {
+      page.push(col); col = []; meas.innerHTML = '';
+      if (page.length >= n) { result.push(page); page = []; }
+    }
+
+    var cats = C.visibleCategories(menu);
+    for (var ci = 0; ci < cats.length; ci++) {
+      var c = cats[ci];
+      add({ c: c, head: true, cont: false });
+      if (!fits() && col.length > 1) { removeLast(); nextCol(); add({ c: c, head: true, cont: false }); }
+      for (var ii = 0; ii < c.items.length; ii++) {
+        var mk = { c: c, it: c.items[ii] };
+        add(mk);
+        if (fits()) continue;
+        removeLast();
         var carried = null;
-        if (last && last.head) { box.removeChild(box.lastChild); current.pop(); carried = last; }
-        if (current.length) flush();
-        if (carried) { add(catEl(c, carried.cont), carried); } else { head(); }
-        add(itemEl(it), { c: c, it: it });
-      });
-    });
-    // sayfanın sonunda yalnız kalan başlığı at
-    if (current.length && current[current.length - 1].head) current.pop();
-    flush();
-    stage.removeChild(box);
-    return result;
+        if (col.length && col[col.length - 1].head) carried = removeLast();
+        if (col.length) nextCol();
+        add(carried || { c: c, head: true, cont: true });
+        add(mk);
+      }
+    }
+    if (col.length && col[col.length - 1].head) col.pop();
+    if (col.length) page.push(col);
+    if (page.length) result.push(page);
+    document.body.removeChild(meas);
+    return { pages: result, colW: colW, gap: gap };
   }
 
-  function build() {
-    var specs = paginate();
-    var cols = Math.max(1, Math.min(5, +menu.theme.tvColumns || 3));
+  function render() {
+    var L = layout();
     stage.innerHTML = '';
-    pages = specs.map(function (spec, i) {
-      var p = document.createElement('div');
-      p.className = 'page' + (i === 0 ? ' show' : '');
-      var box = document.createElement('div');
-      box.className = 'cols'; box.style.columnCount = cols; box.style.webkitColumnCount = cols;
-      spec.forEach(function (mk) { box.appendChild(mk.head ? catEl(mk.c, mk.cont) : itemEl(mk.it)); });
-      p.appendChild(box); stage.appendChild(p);
-      return p;
-    });
+    pages = [];
+    for (var p = 0; p < L.pages.length; p++) {
+      var pg = document.createElement('div');
+      pg.className = 'page' + (p === 0 ? ' show' : '');
+      for (var k = 0; k < L.pages[p].length; k++) {
+        var colEl = document.createElement('div');
+        colEl.className = 'col';
+        colEl.style.left = (k * (L.colW + L.gap)) + 'px';
+        colEl.style.width = L.colW + 'px';
+        var items = L.pages[p][k];
+        for (var x = 0; x < items.length; x++) {
+          var el = build(items[x]);
+          if (x === 0 && items[x].head) el.className += ' first';
+          colEl.appendChild(el);
+        }
+        pg.appendChild(colEl);
+      }
+      stage.appendChild(pg);
+      pages.push(pg);
+    }
     if (!pages.length) stage.innerHTML = '<div class="msg">Menü boş.</div>';
     pageIdx = 0; dots(); schedule();
   }
@@ -165,7 +214,7 @@
   function dots() {
     var h = '';
     if (pages.length > 1) for (var i = 0; i < pages.length; i++) h += '<span' + (i === pageIdx ? ' class="on"' : '') + '></span>';
-    document.getElementById('dots').innerHTML = h;
+    $('dots').innerHTML = h;
   }
   function schedule() {
     clearInterval(timer);
@@ -181,37 +230,55 @@
 
   function renderChrome() {
     var cafe = menu.cafe;
-    C.applyTheme(menu, 'tv');
     document.title = (cafe.name || 'Menü') + ' — TV';
-    document.getElementById('brand').innerHTML = (cafe.logo ? '<img src="' + esc(cafe.logo) + '" alt="">' : '') +
-      '<div><h1 class="serif">' + esc(cafe.name || 'Menü') + '</h1>' + (cafe.slogan ? '<p>' + esc(cafe.slogan) + '</p>' : '') + '</div>';
-    var qrBox = document.getElementById('qr');
-    if (params.get('qr') === '0') qrBox.innerHTML = '';
-    else {
-      try { qrBox.innerHTML = '<div class="code">' + C.qrSvg(C.baseUrl(menu)) + '</div><div><b>Menüyü telefonunuzda görün</b>Kameranızla okutun</div>'; }
-      catch (e) { qrBox.innerHTML = ''; }
+    $('brand').innerHTML = (cafe.logo ? '<img src="' + esc(cafe.logo) + '" alt="">' : '') +
+      '<div style="overflow:hidden"><h1 class="serif">' + esc(cafe.name || 'Menü') + '</h1>' + (cafe.slogan ? '<p>' + esc(cafe.slogan) + '</p>' : '') + '</div>';
+    var qrBox = $('qr');
+    qrBox.innerHTML = '';
+    if (param('qr') !== '0' && window.qrcode) {
+      try {
+        var q = window.qrcode(0, 'M'); q.addData(C.baseUrl(menu)); q.make();
+        qrBox.innerHTML = '<div class="code">' + q.createImgTag(4, 8) + '</div><div class="txt"><b>Menüyü telefonunuzda görün</b>Kameranızla okutun</div>';
+      } catch (e) { qrBox.innerHTML = ''; }
     }
-    var info = [];
-    if (cafe.wifiName) info.push('<span>Wi-Fi <b>' + esc(cafe.wifiName) + '</b>' + (cafe.wifiPassword ? ' · Şifre <b>' + esc(cafe.wifiPassword) + '</b>' : '') + '</span>');
-    if (cafe.instagram) info.push('<span>Instagram <b>@' + esc(cafe.instagram.replace(/^@/, '')) + '</b></span>');
-    document.getElementById('info').innerHTML = info.join('');
+    var info = '';
+    if (cafe.wifiName) info += '<span>Wi-Fi <b>' + esc(cafe.wifiName) + '</b>' + (cafe.wifiPassword ? ' · Şifre <b>' + esc(cafe.wifiPassword) + '</b>' : '') + '</span>';
+    if (cafe.instagram) info += '<span>Instagram <b>@' + esc(cafe.instagram.replace(/^@/, '')) + '</b></span>';
+    $('info').innerHTML = info;
   }
 
-  function render() { renderChrome(); build(); }
+  // ---------- veri (fetch/Promise olmayan tarayıcılar için XMLHttpRequest) ----------
+  function getJSON(url, ok, fail) {
+    var x = new XMLHttpRequest();
+    x.open('GET', url, true);
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4) return;
+      if (x.status >= 200 && x.status < 300) {
+        var data;
+        try { data = JSON.parse(x.responseText); } catch (e) { fail(e); return; }
+        ok(data);
+      } else fail(new Error('HTTP ' + x.status));
+    };
+    x.send();
+  }
 
   function load() {
-    return C.load().then(function (m) {
-      var j = JSON.stringify(m);
+    getJSON('menu.json?v=' + new Date().getTime(), function (raw) {
+      var j = JSON.stringify(raw);
       if (j === lastJson) return;
-      lastJson = j; menu = m;
-      var ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
-      return ready.then(render);
-    }).catch(function () { if (!menu) stage.innerHTML = '<div class="msg">Menü yüklenemedi, tekrar deneniyor…</div>'; });
+      lastJson = j; menu = C.normalize(raw);
+      applyColors(); renderChrome(); render();
+      // yazı tipi geç yüklenirse ölçüler değişir; bir kez daha diz
+      setTimeout(function () { if (menu) render(); }, 2500);
+    }, function () {
+      if (!menu) stage.innerHTML = '<div class="msg">Menü yüklenemedi, tekrar deneniyor…</div>';
+    });
   }
   load();
-  setInterval(load, 60000);                       // değişiklikleri dakikada bir kontrol et
-  setTimeout(function () { location.reload(); }, 6 * 3600 * 1000); // uzun süre açık kalan TV için tazele
-  var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (menu) build(); }, 300); });
+  setInterval(load, 60000);                                        // dakikada bir değişiklik kontrolü
+  setTimeout(function () { location.reload(); }, 6 * 3600 * 1000); // uzun açık kalan TV için tazele
+  var rz;
+  window.onresize = function () { clearTimeout(rz); rz = setTimeout(function () { scale(); if (menu) render(); }, 300); };
 })();
 </script>
 </body>
