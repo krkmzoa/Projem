@@ -40,7 +40,7 @@
   .pr span + span { margin-left: 1vw; }
   .pr small { color: var(--muted); font-weight: 500; font-size: 1.8vh; margin-right: .3vw; }
   .ds { color: var(--muted); font-size: 1.85vh; margin-top: .2vh; }
-  .tg { flex: none; align-self: center; font-size: 1.4vh; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--bg); background: var(--accent); padding: .15vh .5vw; border-radius: .5vh; margin-left: .6vw; vertical-align: .3vh; }
+  .tg { flex: none; align-self: center; font-size: 1.4vh; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--on-accent, #fff); background: var(--accent); padding: .15vh .5vw; border-radius: .5vh; margin-left: .6vw; vertical-align: .3vh; }
   .out .nm, .out .pr { color: var(--muted); text-decoration: line-through; }
   .out .tg.o { background: #8c2a22; color: #fff; text-decoration: none; }
 
@@ -181,7 +181,7 @@
 
   function renderChrome() {
     var cafe = menu.cafe;
-    C.applyAccent(menu);
+    C.applyTheme(menu, 'tv');
     document.title = (cafe.name || 'Menü') + ' — TV';
     document.getElementById('brand').innerHTML = (cafe.logo ? '<img src="' + esc(cafe.logo) + '" alt="">' : '') +
       '<div><h1 class="serif">' + esc(cafe.name || 'Menü') + '</h1>' + (cafe.slogan ? '<p>' + esc(cafe.slogan) + '</p>' : '') + '</div>';
