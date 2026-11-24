@@ -17,7 +17,7 @@
     "tvSeconds": 12,
     "tvColumns": 2,
     "mode": "custom",
-    "tvMode": "dark",
+    "tvMode": "same",
     "colors": {
       "bg": "#eef0e6",
       "surface": "#fbfcf7",
