@@ -29,7 +29,7 @@
       }
     },
     "tiktok": "atelierkoi",
-    "reviewUrl": "https://share.google/GgqEAsK7BwYCedGnH",
+    "reviewUrl": "https://g.page/r/CeVgxMIWBfp_EAE/review",
     "whatsapp": "05399553723"
   },
   "theme": {
@@ -80,7 +80,11 @@
               "name": "Турецкий кофе",
               "description": "Подаётся с рахат-лукумом"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "espresso",
@@ -108,7 +112,11 @@
             "ru": {
               "name": "Эспрессо"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "americano",
@@ -127,7 +135,11 @@
             "ru": {
               "name": "Американо"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "latte",
@@ -157,7 +169,11 @@
               "name": "Латте",
               "description": "Эспрессо с горячим молоком"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "cappuccino",
@@ -176,7 +192,11 @@
             "ru": {
               "name": "Капучино"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "flat-white",
@@ -199,7 +219,11 @@
               "name": "Флэт уайт",
               "description": "Двойной ристретто, шелковистое молоко"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "mocha",
@@ -220,7 +244,11 @@
               "name": "Мокко",
               "description": "Горький шоколад и эспрессо"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         }
       ],
       "image": "",
@@ -257,7 +285,11 @@
             "ru": {
               "name": "Айс латте"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "iced-americano",
@@ -276,7 +308,11 @@
             "ru": {
               "name": "Айс американо"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "cold-brew",
@@ -297,7 +333,11 @@
               "name": "Колд брю",
               "description": "Холодное заваривание 18 часов"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "frappe",
@@ -316,7 +356,11 @@
             "ru": {
               "name": "Карамельный фраппе"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         }
       ],
       "image": "",
@@ -366,7 +410,11 @@
             "ru": {
               "name": "Турецкий чай"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "bitki-cayi",
@@ -387,7 +435,11 @@
               "name": "Травяной чай",
               "description": "Липа, шалфей, шиповник"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "sicak-cikolata",
@@ -406,7 +458,11 @@
             "ru": {
               "name": "Горячий шоколад"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "salep",
@@ -429,7 +485,11 @@
               "name": "Салеп",
               "description": "Традиционный горячий молочный напиток с корицей"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         }
       ],
       "image": "",
@@ -468,7 +528,11 @@
               "name": "Домашний лимонад",
               "description": "Со свежей мятой"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "taze-portakal",
@@ -487,7 +551,11 @@
             "ru": {
               "name": "Свежевыжатый апельсиновый сок"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "soda",
@@ -506,7 +574,11 @@
             "ru": {
               "name": "Минеральная вода с газом"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "su",
@@ -525,7 +597,11 @@
             "ru": {
               "name": "Вода"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         }
       ],
       "image": "",
@@ -566,7 +642,11 @@
               "name": "Чизкейк Сан-Себастьян",
               "description": "Домашний, с нежной кремовой серединой"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "brownie",
@@ -587,7 +667,11 @@
               "name": "Брауни",
               "description": "Подаётся с мороженым"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "tiramisu",
@@ -606,7 +690,11 @@
             "ru": {
               "name": "Тирамису"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "kurabiye",
@@ -627,7 +715,11 @@
             "ru": {
               "name": "Шоколадное печенье"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         }
       ],
       "image": "",
@@ -664,7 +756,11 @@
             "ru": {
               "name": "Круассан со сливочным маслом"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "tost",
@@ -685,7 +781,11 @@
               "name": "Тост с сыром",
               "description": "Подаётся с картофельными чипсами"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         },
         {
           "id": "sandvic",
@@ -706,7 +806,11 @@
               "name": "Сэндвич с копчёной индейкой",
               "description": "Хлеб на закваске, чеддер, руккола"
             }
-          }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
         }
       ],
       "image": "",
