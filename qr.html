@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masa QR Kodları</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --accent: #b5651d; --bg: #f4f1ec; --surface: #fff; --text: #2a201a; --muted: #75665a; --line: #e3d9ce; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #16110e; --surface: #211a15; --text: #f3ebe3; --muted: #b3a294; --line: #342a22; }
+  }
+  :root[data-theme="dark"] { --bg: #16110e; --surface: #211a15; --text: #f3ebe3; --muted: #b3a294; --line: #342a22; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 'Inter', system-ui, sans-serif; }
+  .panel { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-family: 'Fraunces', Georgia, serif; margin: 0 0 4px; font-size: 28px; }
+  .lead { color: var(--muted); margin: 0 0 20px; }
+  .form { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); }
+  input, select { width: 100%; margin-top: 4px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: var(--text); font: inherit; }
+  .wide { grid-column: 1 / -1; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 24px; }
+  button { border: 0; border-radius: 10px; padding: 11px 18px; font: 600 15px 'Inter', sans-serif; cursor: pointer; background: var(--surface); color: var(--text); border: 1px solid var(--line); }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .hint { font-size: 13px; color: var(--muted); }
+
+  /* Basılacak kartlar her zaman açık renk */
+  .sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .card { background: #fff; color: #2a201a; border: 1px dashed #cbbfb2; border-radius: 14px; padding: 18px 16px 16px; text-align: center; break-inside: avoid; page-break-inside: avoid; }
+  .card .cafe { font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-weight: 600; margin: 0; }
+  .card .cta { margin: 2px 0 10px; color: #75665a; font-size: 13px; }
+  .card .code { width: 150px; height: 150px; margin: 0 auto; }
+  .card .code svg { width: 100%; height: 100%; display: block; }
+  .card .tbl { margin-top: 10px; display: inline-block; background: var(--accent); color: #fff; font-weight: 600; border-radius: 999px; padding: 3px 14px; font-size: 15px; }
+  .card .wifi { margin-top: 8px; font-size: 11.5px; color: #75665a; }
+
+  @media print {
+    @page { size: A4; margin: 10mm; }
+    body { background: #fff; }
+    .no-print { display: none !important; }
+    .panel { padding: 0; max-width: none; }
+    .sheet { grid-template-columns: repeat(3, 1fr); gap: 6mm; }
+    .card { border-color: #bbb; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card .tbl { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="no-print">
+    <h1>Masa QR Kodları</h1>
+    <p class="lead">Masa sayısını girin, yazdırın, kesip masalara yapıştırın. Kod okutulunca menü masa numarasıyla açılır.</p>
+    <div class="form">
+      <label class="wide">Menü adresi (QR'ın açacağı sayfa)
+        <input id="url" type="url">
+      </label>
+      <label>Kaç masa?
+        <input id="count" type="number" min="0" max="200" value="12">
+      </label>
+      <label>İlk masa no
+        <input id="start" type="number" min="0" value="1">
+      </label>
+      <label>Ek olarak genel kod
+        <select id="general"><option value="1">Masa numarasız 1 kart ekle</option><option value="0">Ekleme</option></select>
+      </label>
+      <label>Kart sayısı / sayfa
+        <select id="perPage"><option value="3">9 (orta boy)</option><option value="2">4 (büyük)</option><option value="4">16 (küçük)</option></select>
+      </label>
+    </div>
+    <div class="actions">
+      <button class="primary" onclick="window.print()">Yazdır / PDF kaydet</button>
+      <button id="png">Genel QR'ı PNG indir</button>
+      <a href="admin.html" style="align-self:center;color:var(--accent)">← Düzenleme paneli</a>
+    </div>
+    <p class="hint">İpucu: Yazdırma penceresinde "Arka plan grafikleri" seçeneğini açın. Kalıcı olması için laminasyon veya şeffaf bant önerilir.</p>
+  </div>
+  <div class="sheet" id="sheet"></div>
+</div>
+<style id="printCols"></style>
+
+<script src="assets/vendor/qrcode.js"></script>
+<script src="assets/core.js"></script>
+<script>
+(function () {
+  'use strict';
+  var C = window.MenuCore, esc = C.esc, menu = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function link(table) {
+    var base = $('url').value.trim();
+    if (!table) return base;
+    return base + (base.indexOf('?') === -1 ? '?' : '&') + 'masa=' + encodeURIComponent(table);
+  }
+  function card(table) {
+    var cafe = menu.cafe;
+    return '<div class="card"><p class="cafe">' + esc(cafe.name || 'Menü') + '</p><p class="cta">Menü için kameranızla okutun</p>' +
+      '<div class="code">' + C.qrSvg(link(table)) + '</div>' +
+      (table ? '<div class="tbl">Masa ' + esc(table) + '</div>' : '') +
+      (cafe.wifiName ? '<div class="wifi">Wi-Fi: ' + esc(cafe.wifiName) + (cafe.wifiPassword ? ' · ' + esc(cafe.wifiPassword) : '') + '</div>' : '') +
+      '</div>';
+  }
+  function render() {
+    var n = Math.min(200, Math.max(0, +$('count').value || 0)), s = +$('start').value || 0, h = '';
+    if ($('general').value === '1') h += card('');
+    for (var i = 0; i < n; i++) h += card(String(s + i));
+    $('sheet').innerHTML = h;
+    $('printCols').textContent = '@media print { .sheet { grid-template-columns: repeat(' + $('perPage').value + ', 1fr) !important; } .card .code { width: ' + ({ 2: 60, 3: 42, 4: 32 })[$('perPage').value] + 'mm; height: auto; } }';
+  }
+  ['url', 'count', 'start', 'general', 'perPage'].forEach(function (id) { $(id).addEventListener('input', render); });
+
+  $('png').addEventListener('click', function () {
+    var qr = window.qrcode(0, 'M'); qr.addData(link('')); qr.make();
+    var cell = 16, margin = 4 * cell, size = qr.getModuleCount() * cell + margin * 2;
+    var cv = document.createElement('canvas'); cv.width = cv.height = size;
+    var g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, size, size); g.fillStyle = '#000';
+    for (var r = 0; r < qr.getModuleCount(); r++) for (var c = 0; c < qr.getModuleCount(); c++) if (qr.isDark(r, c)) g.fillRect(margin + c * cell, margin + r * cell, cell, cell);
+    var a = document.createElement('a'); a.download = 'menu-qr.png'; a.href = cv.toDataURL('image/png'); a.click();
+  });
+
+  C.load().then(function (m) {
+    menu = m; C.applyAccent(m);
+    $('url').value = C.baseUrl(m);
+    render();
+  }).catch(function (e) { $('sheet').innerHTML = '<p>menu.json yüklenemedi: ' + esc(e.message) + '</p>'; });
+})();
+</script>
+</body>
+</html>
