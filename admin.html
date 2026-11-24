@@ -223,6 +223,7 @@
         <label class="f">Wi-Fi şifresi<input data-f="cafe.wifiPassword"></label>
         <label class="f">Instagram kullanıcı adı<input data-f="cafe.instagram" placeholder="@kafeadi"></label>
         <label class="f">Telefon<input data-f="cafe.phone" type="tel"></label>
+        <label class="f">TikTok (kullanıcı adı veya bağlantı)<input data-f="cafe.tiktok" placeholder="@kafeadi"></label>
         <label class="f">Facebook (sayfa adı veya bağlantı)<input data-f="cafe.facebook"></label>
         <label class="f">Web sitesi<input data-f="cafe.website" placeholder="ör. atelierkoi.com"></label>
         <label class="f full">Adres<input data-f="cafe.address"></label>
@@ -248,6 +249,15 @@
         <label class="f">Alt not (RU)<textarea rows="2" data-f="cafe.i18n.ru.note"></textarea></label>
       </div>
       <p class="hint">Boyut ve etiket adları (Küçük, Büyük, Yeni, Vegan…) kendiliğinden çevrilir. Ürün ve kategori çevirileri ürünün / kategorinin kendi penceresinde.</p>
+    </div>
+    <div class="card">
+      <h3>Müşteri değerlendirmesi</h3>
+      <p class="hint" style="margin-top:0">Menünün altında ve ☰ menüsünde "Deneyiminiz nasıldı?" yıldızları çıkar. 4-5 yıldız veren müşteriye Google yorum bağlantısı öne çıkarılır; 1-3 yıldız veren müşteri size doğrudan WhatsApp'tan yazabilir (Google yorum bağlantısı da her zaman görünür, Google'ın kuralı gereği). İkisi de boşsa bu bölüm menüde görünmez.</p>
+      <div class="grid">
+        <label class="f">Google yorum bağlantısı<input data-f="cafe.reviewUrl" type="url" placeholder="https://g.page/r/.../review"></label>
+        <label class="f">WhatsApp numarası<input data-f="cafe.whatsapp" type="tel" placeholder="05xx xxx xx xx"></label>
+      </div>
+      <p class="hint">WhatsApp numarası, mesaj bağlantısının içinde yer aldığı için müşteri tarafından görülebilir.</p>
     </div>
 </section>
 
@@ -475,7 +485,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 16;
+  var BUILD = 17;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -497,7 +507,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=16"></script>
+<script src="assets/core.js?v=17"></script>
 <script>
 (() => {
   'use strict';

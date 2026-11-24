@@ -20,7 +20,7 @@
     m.theme = m.theme || {};
     m.categories = Array.isArray(m.categories) ? m.categories : [];
     var c = m.cafe;
-    ['name', 'slogan', 'logo', 'phone', 'instagram', 'address', 'wifiName', 'wifiPassword', 'note', 'menuUrl', 'cover', 'website', 'facebook', 'hours', 'mapsUrl'].forEach(function (k) {
+    ['name', 'slogan', 'logo', 'phone', 'instagram', 'address', 'wifiName', 'wifiPassword', 'note', 'menuUrl', 'cover', 'website', 'facebook', 'hours', 'mapsUrl', 'tiktok', 'whatsapp', 'reviewUrl'].forEach(function (k) {
       if (typeof c[k] !== 'string') c[k] = '';
     });
     if (!c.currency) c.currency = '₺';
