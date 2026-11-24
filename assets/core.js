@@ -27,6 +27,10 @@
     if (!m.theme.accent) m.theme.accent = '#b5651d';
     if (!m.theme.tvSeconds) m.theme.tvSeconds = 12;
     if (!m.theme.tvColumns) m.theme.tvColumns = 3;
+    if (['auto', 'light', 'dark', 'custom'].indexOf(m.theme.mode) === -1) m.theme.mode = 'auto';
+    if (m.theme.tvMode !== 'same') m.theme.tvMode = 'dark';
+    var pc = m.theme.colors = m.theme.colors || {};
+    ['bg', 'surface', 'text', 'muted'].forEach(function (k) { if (!/^#[0-9a-fA-F]{6}$/.test(pc[k] || '')) pc[k] = MenuCore.PALETTES.light[k]; });
     m.categories.forEach(function (cat) {
       if (!cat.id) cat.id = MenuCore.uid();
       cat.name = cat.name || '';
@@ -84,11 +88,75 @@
     return u.replace(/[^/]*$/, '');
   };
 
+  // ---------- renkler ----------
+  MenuCore.PALETTES = {
+    light: { bg: '#f7f3ee', surface: '#ffffff', text: '#2a201a', muted: '#7a6a5e' },
+    dark: { bg: '#16110e', surface: '#211a15', text: '#f3ebe3', muted: '#b3a294' },
+    tv: { bg: '#14100d', surface: '#211a15', text: '#f5ede4', muted: '#a8988a' }
+  };
+  var COLOR_KEYS = ['bg', 'surface', 'text', 'muted'];
+  var isHex = function (c) { return /^#[0-9a-fA-F]{6}$/.test(c || ''); };
+
+  function rgb(h) { return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)]; }
+  /** İki rengi karıştırır (t=0 → a, t=1 → b). */
+  MenuCore.mix = function (a, b, t) {
+    var x = rgb(a), y = rgb(b), o = '#';
+    for (var i = 0; i < 3; i++) { var v = Math.round(x[i] + (y[i] - x[i]) * t); o += (v < 16 ? '0' : '') + v.toString(16); }
+    return o;
+  };
+  function lum(h) {
+    var c = rgb(h).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  /** WCAG kontrast oranı (1-21). 4.5 ve üstü rahat okunur. */
+  MenuCore.contrast = function (a, b) {
+    var l1 = lum(a), l2 = lum(b);
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  };
+  /** Vurgu renginin üstüne yazılacak yazı rengi (beyaz ya da koyu). */
+  MenuCore.onAccent = function (accent) {
+    return MenuCore.contrast(accent, '#ffffff') >= MenuCore.contrast(accent, '#1c1714') ? '#ffffff' : '#1c1714';
+  };
+
   MenuCore.applyAccent = function (m) {
     var a = (m && m.theme && m.theme.accent) || '#b5651d';
-    if (/^#[0-9a-fA-F]{6}$/.test(a)) {
-      document.documentElement.style.setProperty('--accent', a);
+    if (!isHex(a)) return;
+    var r = document.documentElement.style;
+    r.setProperty('--accent', a);
+    r.setProperty('--on-accent', MenuCore.onAccent(a));
+  };
+
+  function setPalette(p) {
+    var r = document.documentElement.style;
+    COLOR_KEYS.forEach(function (k) { if (isHex(p[k])) r.setProperty('--' + k, p[k]); });
+    if (isHex(p.bg) && isHex(p.text)) {
+      r.setProperty('--line', MenuCore.mix(p.bg, p.text, 0.13));
+      r.setProperty('--chip', MenuCore.mix(p.bg, p.text, 0.07));
+      r.setProperty('--surface2', MenuCore.mix(p.surface || p.bg, p.text, 0.04));
     }
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta && isHex(p.bg)) meta.setAttribute('content', p.bg);
+  }
+  function clearPalette() {
+    var r = document.documentElement.style;
+    COLOR_KEYS.concat(['line', 'chip', 'surface2']).forEach(function (k) { r.removeProperty('--' + k); });
+  }
+
+  /** Menü renklerini uygular. target: 'menu' (telefon/tablet) ya da 'tv'. */
+  MenuCore.applyTheme = function (m, target) {
+    var t = (m && m.theme) || {}, mode = t.mode || 'auto', root = document.documentElement;
+    MenuCore.applyAccent(m);
+    clearPalette();
+    if (target === 'tv') {
+      if (t.tvMode === 'same') {
+        if (mode === 'custom') setPalette(t.colors || {});
+        else if (mode === 'light') setPalette(MenuCore.PALETTES.light);
+      }
+      return; // aksi halde tv.html'in kendi koyu renkleri
+    }
+    root.removeAttribute('data-theme');
+    if (mode === 'custom') setPalette(t.colors || {});
+    else if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
   };
 
   MenuCore.qrSvg = function (text) {

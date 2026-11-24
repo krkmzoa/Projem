@@ -34,7 +34,7 @@
 
   button, .btn { font-family: inherit; font-weight: 600; font-size: 14px; line-height: 1; border-radius: 9px; padding: 9px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
   button:hover, .btn:hover { border-color: var(--muted); }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
   button.primary:disabled { opacity: .5; cursor: default; }
   button.ghost { border-color: transparent; background: none; padding: 7px 8px; }
   button.danger { color: var(--danger); }
@@ -100,6 +100,23 @@
   @media (max-width: 560px) { .hide-sm, .row .small[data-a="edit"] { display: none; } .row { gap: 6px; } .row button.ghost, .chead button.ghost { padding: 7px 5px; }
     .title { font-size: 15px; } .chead { flex-wrap: nowrap; gap: 4px; } .chead .cname { min-width: 0; font-size: 15px; } .chead .icon { width: 40px; padding: 8px 4px; }
     .row .thumb:not(img) { display: none; } }
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+  .preset { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; }
+  .preset i { display: inline-flex; width: 30px; height: 30px; border-radius: 50%; overflow: hidden; border: 1px solid var(--line); flex: none; }
+  .preset i b { flex: 1; }
+  label.color { display: flex; flex-direction: column; }
+  label.color input[type=color] { height: 44px; padding: 3px; cursor: pointer; margin-top: 6px; }
+  .warn { margin-top: 14px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--warn); color: var(--warn); font-size: 13.5px; font-weight: 500; }
+  .previews { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .pv { background: var(--pbg); color: var(--ptext); border-radius: 14px; padding: 14px; border: 1px solid var(--line); }
+  .pv .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--pmuted); font-weight: 600; }
+  .pv .nm { font-family: Georgia, serif; font-size: 22px; font-weight: 700; text-align: center; margin: 6px 0 2px; }
+  .pv .sl { text-align: center; color: var(--pmuted); font-size: 13px; }
+  .pv .ch { display: flex; gap: 6px; margin: 12px 0; }
+  .pv .ch span { padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--pchip); }
+  .pv .ch span.on { background: var(--accent); color: var(--on-accent, #fff); }
+  .pv .it { background: var(--psurf); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
+  .pv .it b { display: block; font-size: 14px; } .pv .it small { color: var(--pmuted); font-size: 12px; } .pv .it em { display: block; font-style: normal; font-weight: 700; color: var(--accent); margin-top: 4px; font-size: 14px; }
   .links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 </style>
 </head>
@@ -115,6 +132,7 @@
     <nav class="tabs">
       <button class="tab on" data-tab="menu">Menü</button>
       <button class="tab" data-tab="cafe">Kafe Bilgileri</button>
+      <button class="tab" data-tab="colors">Renkler</button>
       <button class="tab" data-tab="screens">Ekranlar & QR</button>
       <button class="tab" data-tab="settings">Ayarlar</button>
     </nav>
@@ -146,7 +164,6 @@
           </div>
         </label>
         <label class="f">Para birimi<input data-f="cafe.currency" maxlength="4"></label>
-        <label class="f">Tema rengi<input type="color" data-f="theme.accent" style="height:40px;padding:3px"></label>
       </div>
     </div>
     <div class="card">
@@ -159,6 +176,48 @@
         <label class="f full">Adres<input data-f="cafe.address"></label>
         <label class="f full">Alt not<textarea data-f="cafe.note" rows="2"></textarea></label>
       </div>
+    </div>
+  </section>
+
+  <!-- RENKLER -->
+  <section class="panel" id="p-colors" hidden>
+    <div class="card">
+      <h3>Hazır başlangıç</h3>
+      <p class="hint" style="margin-top:0">Birine dokunun, sonra aşağıdan istediğiniz rengi değiştirin.</p>
+      <div class="presets" id="presets"></div>
+    </div>
+    <div class="card">
+      <h3>Menü renkleri (telefon & tablet)</h3>
+      <div class="grid">
+        <label class="f full">Görünüm
+          <select data-f="theme.mode">
+            <option value="auto">Telefona göre otomatik (açık / koyu)</option>
+            <option value="light">Her zaman açık</option>
+            <option value="dark">Her zaman koyu</option>
+            <option value="custom">Kendi renklerim</option>
+          </select>
+        </label>
+        <label class="f color">Vurgu rengi<span class="hint">Fiyatlar, seçili kategori, masa no</span><input type="color" data-f="theme.accent"></label>
+        <label class="f color custom-only">Arka plan<span class="hint">Sayfanın zemini</span><input type="color" data-f="theme.colors.bg"></label>
+        <label class="f color custom-only">Ürün kartları<span class="hint">Ürünlerin durduğu kutular</span><input type="color" data-f="theme.colors.surface"></label>
+        <label class="f color custom-only">Yazı<span class="hint">Ürün adları, başlıklar</span><input type="color" data-f="theme.colors.text"></label>
+        <label class="f color custom-only">Açıklama yazısı<span class="hint">Ürün açıklamaları, slogan</span><input type="color" data-f="theme.colors.muted"></label>
+      </div>
+      <div class="warn" id="contrastWarn" hidden></div>
+    </div>
+    <div class="card">
+      <h3>TV ekranı renkleri</h3>
+      <label class="f">TV
+        <select data-f="theme.tvMode">
+          <option value="dark">Koyu (önerilen, uzaktan daha rahat okunur)</option>
+          <option value="same">Menüyle aynı renkler</option>
+        </select>
+      </label>
+    </div>
+    <div class="card">
+      <h3>Önizleme</h3>
+      <div class="previews" id="previews"></div>
+      <p class="hint">Gerçek görünüm için "Yayınla"dan sonra menüyü açın.</p>
     </div>
   </section>
 
@@ -392,7 +451,7 @@
   function updateStatus() {
     const st = $('#status');
     $('#connectNote').hidden = connected();
-    if (isDirty()) { st.className = 'status dirty'; st.textContent = '● Yayınlanmamış değişiklik'; }
+    if (isDirty()) { st.className = 'status dirty'; st.textContent = '● Yayınlanmadı'; }
     else if (connected()) { st.className = 'status ok'; st.textContent = '✓ Yayında'; }
     else { st.className = 'status off'; st.textContent = 'Bağlı değil'; }
     $('#publish').disabled = !isDirty();
@@ -597,13 +656,65 @@
     $$('[data-f]').forEach(el => { const v = getPath(el.dataset.f); el.value = v == null ? '' : v; });
     $('#logoPreview').src = menu.cafe.logo ? imgSrc(menu.cafe.logo) : 'assets/icon.svg';
     $('#logoRemove').hidden = !menu.cafe.logo;
+    renderColors();
   }
   $$('[data-f]').forEach(el => el.addEventListener('input', () => {
     setPath(el.dataset.f, el.dataset.num ? (+el.value || 0) : el.value);
     if (el.dataset.f === 'cafe.currency') renderCats();
-    if (el.dataset.f === 'theme.accent') C.applyAccent(menu);
+    if (el.dataset.f.indexOf('theme.') === 0) { C.applyAccent(menu); renderColors(); }
     changed();
   }));
+
+  // ---------- renkler ----------
+  const PRESETS = [
+    { name: 'Krem & Kahve', accent: '#b5651d', bg: '#f7f3ee', surface: '#ffffff', text: '#2a201a', muted: '#7a6a5e' },
+    { name: 'Gece & Altın', accent: '#d4a24c', bg: '#121110', surface: '#1e1c1a', text: '#f5f0e6', muted: '#a39e93' },
+    { name: 'Zeytin', accent: '#5b7a3a', bg: '#eef0e6', surface: '#fbfcf7', text: '#22261c', muted: '#66705a' },
+    { name: 'Siyah & Beyaz', accent: '#111111', bg: '#ffffff', surface: '#f3f3f3', text: '#111111', muted: '#666666' },
+    { name: 'Lacivert', accent: '#e0a96d', bg: '#0f1a2b', surface: '#18263c', text: '#eef2f8', muted: '#9fb0c8' },
+    { name: 'Pudra', accent: '#c0566e', bg: '#fbf1f0', surface: '#ffffff', text: '#3a2327', muted: '#8a6b70' }
+  ];
+  $('#presets').innerHTML = PRESETS.map((p, i) => `<button class="preset" data-p="${i}"><i><b style="background:${p.bg}"></b><b style="background:${p.surface}"></b><b style="background:${p.accent}"></b></i>${esc(p.name)}</button>`).join('');
+  $('#presets').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-p]'); if (!b) return;
+    const p = PRESETS[+b.dataset.p];
+    menu.theme.mode = 'custom'; menu.theme.accent = p.accent;
+    menu.theme.colors = { bg: p.bg, surface: p.surface, text: p.text, muted: p.muted };
+    C.applyAccent(menu); renderFields(); changed();
+    toast(p.name + ' uygulandı. Beğendiyseniz "Yayınla"ya basın.');
+  });
+  function palettes() {
+    const t = menu.theme, P = C.PALETTES;
+    if (t.mode === 'custom') return [['Menü', t.colors]];
+    if (t.mode === 'light') return [['Menü', P.light]];
+    if (t.mode === 'dark') return [['Menü', P.dark]];
+    return [['Menü (telefon açık modda)', P.light], ['Menü (telefon koyu modda)', P.dark]];
+  }
+  function renderColors() {
+    const t = menu.theme;
+    $$('.custom-only').forEach(el => el.hidden = t.mode !== 'custom');
+    const list = palettes();
+    const tv = t.tvMode === 'same' ? (t.mode === 'custom' ? t.colors : t.mode === 'light' ? C.PALETTES.light : C.PALETTES.tv) : C.PALETTES.tv;
+    list.push(['TV ekranı', tv]);
+    const cafe = menu.cafe;
+    $('#previews').innerHTML = list.map(([lbl, c]) => `
+      <div class="pv" style="--pbg:${c.bg};--psurf:${c.surface};--ptext:${c.text};--pmuted:${c.muted};--pchip:${C.mix(c.bg, c.text, 0.07)}">
+        <div class="lbl">${esc(lbl)}</div>
+        <div class="nm">${esc(cafe.name || 'Kafe Adı')}</div>
+        ${cafe.slogan ? `<div class="sl">${esc(cafe.slogan)}</div>` : ''}
+        <div class="ch"><span class="on">☕ Kahveler</span><span>Tatlılar</span></div>
+        <div class="it"><b>Latte</b><small>Espresso ve sıcak süt</small><em>${esc(C.price(120, cafe.currency))}</em></div>
+      </div>`).join('');
+    // okunabilirlik kontrolü
+    const w = [];
+    list.forEach(([lbl, c]) => {
+      if (C.contrast(c.text, c.bg) < 4.5 || C.contrast(c.text, c.surface) < 4.5) w.push(lbl + ': yazı rengi zemine çok yakın, okunması zor olabilir.');
+      if (C.contrast(c.muted, c.surface) < 3) w.push(lbl + ': açıklama yazısı kartın üstünde zor okunuyor.');
+      if (C.contrast(t.accent, c.surface) < 2.5) w.push(lbl + ': vurgu rengi (fiyatlar) kartın rengine çok yakın.');
+    });
+    $('#contrastWarn').hidden = !w.length;
+    $('#contrastWarn').innerHTML = '⚠️ ' + [...new Set(w)].map(esc).join('<br>⚠️ ');
+  }
   $('#logoUpload').onclick = () => pickImage((p) => { menu.cafe.logo = p; renderFields(); changed(); }, 'logo');
   $('#logoRemove').onclick = () => { menu.cafe.logo = ''; renderFields(); changed(); };
 
