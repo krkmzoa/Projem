@@ -13,7 +13,7 @@
     "menuUrl": ""
   },
   "theme": {
-    "accent": "#fdc700",
+    "accent": "#fefb41",
     "tvSeconds": 12,
     "tvColumns": 2,
     "mode": "custom",
@@ -22,7 +22,7 @@
       "bg": "#121110",
       "surface": "#1e1c1a",
       "text": "#f5f0e6",
-      "muted": "#a39e93"
+      "muted": "#ffffff"
     },
     "tvScale": 1.15
   },
