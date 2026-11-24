@@ -120,6 +120,9 @@
   .cthumb { width: 28px; height: 20px; object-fit: cover; border-radius: 4px; display: block; }
   .coverbox { width: 200px; height: 112px; border-radius: 10px; overflow: hidden; background: var(--surface2); border: 1px solid var(--line); display: grid; place-items: center; color: var(--muted); font-size: 13px; }
   .coverbox img, .coverbox video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .coverbox { position: relative; }
+  .coverbox img.spin { position: absolute; left: 50%; top: 50%; width: 240px; height: 240px; margin: -120px 0 0 -120px; animation: aspin 40s linear infinite; }
+  @keyframes aspin { to { transform: rotate(360deg); } }
   .links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 </style>
 </head>
@@ -180,6 +183,13 @@
           <button type="button" class="danger" id="coverRm">Kaldır</button>
         </div>
       </div>
+      <label class="f" style="margin-bottom:12px">Fotoğraf hareketi
+        <select data-f="theme.landingMotion">
+          <option value="zoom">Yavaş yakınlaşma</option>
+          <option value="spin">Yavaş dönme (dairesel resimler için)</option>
+          <option value="none">Hareketsiz</option>
+        </select>
+      </label>
       <label class="f">Ne zaman gösterilsin?
         <select data-f="theme.landing">
           <option value="always">Her zaman (menü ilk açıldığında)</option>
@@ -400,7 +410,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 10;
+  var BUILD = 11;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -422,7 +432,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=10"></script>
+<script src="assets/core.js?v=11"></script>
 <script>
 (() => {
   'use strict';
@@ -743,7 +753,7 @@
     const p = menu.cafe.cover, box = $('#coverPreview');
     if (!p) box.innerHTML = 'Yok';
     else if (C.isVideo(p)) box.innerHTML = `<video src="${esc(imgSrc(p))}" muted autoplay loop playsinline></video>`;
-    else box.innerHTML = `<img src="${esc(imgSrc(p))}" alt="">`;
+    else box.innerHTML = `<img src="${esc(imgSrc(p))}" alt="" class="${menu.theme.landingMotion === 'spin' ? 'spin' : ''}">`;
     $('#coverRm').hidden = !p;
   }
   $('#coverImg').onclick = () => pickImage((p) => { menu.cafe.cover = p; renderCover(); changed(); }, 'acilis', 1600);
@@ -849,7 +859,7 @@
   $$('[data-f]').forEach(el => el.addEventListener('input', () => {
     setPath(el.dataset.f, el.dataset.num ? (+el.value || 0) : el.value);
     if (el.dataset.f === 'cafe.currency') renderCats();
-    if (el.dataset.f.indexOf('theme.') === 0) { C.applyAccent(menu); renderColors(); }
+    if (el.dataset.f.indexOf('theme.') === 0) { C.applyAccent(menu); renderColors(); renderCover(); }
     changed();
   }));
 
