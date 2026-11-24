@@ -83,6 +83,9 @@
     var m = new RegExp('[?&]' + name + '=([^&#]*)').exec(location.search);
     return m ? decodeURIComponent(m[1]) : null;
   }
+  // Eski TV tarayıcılarında emoji yazı tipi yok (kutucuk görünür); simgeler ancak ?ikon=1 ile gösterilir.
+  var showIcons = param('ikon') === '1';
+
   function $(id) { return document.getElementById(id); }
 
   // 1rem = ekran yüksekliğinin %1'i
@@ -132,7 +135,7 @@
   function catEl(c, cont) {
     var d = document.createElement('div');
     d.className = 'cat serif';
-    d.innerHTML = (c.icon ? esc(c.icon) + ' ' : '') + esc(c.name) + (cont ? ' <small>(devam)</small>' : '');
+    d.innerHTML = (c.icon && showIcons ? esc(c.icon) + ' ' : '') + esc(c.name) + (cont ? ' <small>(devam)</small>' : '');
     return d;
   }
   function build(mk) { return mk.head ? catEl(mk.c, mk.cont) : itemEl(mk.it); }
