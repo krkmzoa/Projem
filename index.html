@@ -51,6 +51,9 @@
   .landing .bg.spin { inset: auto; left: 50%; top: 50%; width: 150vmax; height: 150vmax; margin: -75vmax 0 0 -75vmax; animation: spin 140s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .landing .bg.kb, .landing .bg.spin { animation: none; } }
+  /* iPhone'un video üstündeki ▶ düğmesini gizle (Düşük Güç Modu'nda otomatik oynatma kapalıdır) */
+  .landing video { pointer-events: none; }
+  .landing video::-webkit-media-controls, .landing video::-webkit-media-controls-panel, .landing video::-webkit-media-controls-start-playback-button, .landing video::-webkit-media-controls-overlay-play-button { display: none !important; -webkit-appearance: none; opacity: 0; }
   .landing canvas.bg { opacity: 0; transition: opacity 1s ease; }
   .landing canvas.bg.on { opacity: 1; }
   @keyframes kb { from { transform: scale(1); } to { transform: scale(1.12) translate(-1%, -2%); } }
@@ -204,7 +207,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 12;
+  var BUILD = 13;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -226,8 +229,8 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=12"></script>
-<script src="assets/ripple.js?v=12"></script>
+<script src="assets/core.js?v=13"></script>
+<script src="assets/ripple.js?v=13"></script>
 <script>
 (function () {
   'use strict';
@@ -286,7 +289,7 @@
   function renderLanding() {
     var cafe = menu.cafe, el = $('landing'), bg;
     stopRipple();
-    if (cafe.cover && C.isVideo(cafe.cover)) bg = '<video class="bg" src="' + esc(cafe.cover) + '" autoplay muted loop playsinline preload="auto"></video>';
+    if (cafe.cover && C.isVideo(cafe.cover)) bg = '<video class="bg" src="' + esc(cafe.cover) + '" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>';
     else if (cafe.cover && menu.theme.landingMotion === 'ripple') bg = '<div class="bg" id="ripBase" style="background-image:url(\'' + esc(cafe.cover) + '\')"></div><canvas class="bg" id="rip"></canvas>';
     else if (cafe.cover) bg = '<div class="bg' + ({ zoom: ' kb', spin: ' spin', none: '' })[menu.theme.landingMotion] + '" style="background-image:url(\'' + esc(cafe.cover) + '\')"></div>';
     else bg = '<div class="bg grad"></div>';
@@ -303,7 +306,34 @@
       ripStop = window.Ripple ? window.Ripple.start(cv, cafe.cover, { onReady: function () { cv.className = 'bg on'; } }) : false;
       if (!ripStop) { cv.parentNode.removeChild(cv); $('ripBase').className = 'bg kb'; }
     }
-    var v = el.querySelector('video'); if (v) { v.muted = true; var p = v.play && v.play(); if (p && p.catch) p.catch(function () {}); }
+    var v = el.querySelector('video');
+    if (v) startVideo(el, v);
+  }
+  // Video kendiliğinden başlamazsa (iPhone Düşük Güç Modu vb.): ilk kareyi su dalgasıyla oynat,
+  // ekrana dokunulunca videoyu yeniden başlatmayı dene.
+  function startVideo(el, v) {
+    v.muted = true; v.defaultMuted = true;
+    var fellBack = false;
+    function fallback() {
+      if (fellBack || !v.paused || !window.Ripple) return;
+      fellBack = true;
+      var cv = document.createElement('canvas'); cv.className = 'bg'; v.parentNode.insertBefore(cv, v.nextSibling);
+      function go() { ripStop = window.Ripple.start(cv, v, { onReady: function () { cv.className = 'bg on'; } }); if (!ripStop && cv.parentNode) cv.parentNode.removeChild(cv); }
+      if (v.readyState >= 2) go(); else v.addEventListener('loadeddata', go);
+    }
+    function tryPlay() {
+      var p; try { p = v.play(); } catch (e) { fallback(); return; }
+      if (p && p.then) p.then(null, fallback);
+    }
+    // video bir şekilde oynamaya başlarsa su dalgasını kaldır
+    v.addEventListener('playing', function () {
+      if (!fellBack) return;
+      stopRipple(); var c = el.querySelector('canvas.bg'); if (c) c.parentNode.removeChild(c); fellBack = false;
+    });
+    tryPlay();
+    setTimeout(function () { if (v.paused) fallback(); }, 1500);
+    el.addEventListener('touchstart', function () { if (v.paused) tryPlay(); }, { passive: true });
+    el.addEventListener('click', function () { if (v.paused) tryPlay(); });
   }
   var ripStop = null;
   function stopRipple() { if (ripStop) { ripStop(); ripStop = null; } }
