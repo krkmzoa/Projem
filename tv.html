@@ -28,18 +28,20 @@
   .col { position: absolute; top: 0; overflow: hidden; }
   #measure { position: absolute; left: -9999px; top: 0; visibility: hidden; }
 
-  .cat { margin: 0 0 1.2rem; padding-top: 1.4rem; font-size: 3.3rem; font-weight: 600; }
+  /* Menü yazıları em ile: #stage yazı boyutu (paneldeki "TV yazı boyutu") hepsini birlikte büyütür. */
+  #stage { font-size: 1rem; }
+  .cat { margin: 0 0 .364em; padding-top: .424em; font-size: 3.3em; font-weight: 600; }
   .cat.first { padding-top: 0; }
-  .cat small { font-size: 1.8rem; font-weight: 400; font-family: 'Inter', Arial, sans-serif; }
-  .it { padding: .7rem 0 1rem; }
+  .cat small { font-size: .545em; font-weight: 400; font-family: 'Inter', Arial, sans-serif; }
+  .it { padding: .7em 0 1em; }
   .row { overflow: hidden; }
-  .pr { float: right; font-size: 2.5rem; font-weight: 600; white-space: nowrap; margin-left: 1.5rem; }
-  .pr span { margin-left: 1.4rem; }
+  .pr { float: right; font-size: 2.5em; font-weight: 600; white-space: nowrap; margin-left: .6em; }
+  .pr span { margin-left: .56em; }
   .pr span.f { margin-left: 0; }
-  .pr small { font-weight: 500; font-size: 1.8rem; margin-right: .4rem; }
-  .nm { font-size: 2.5rem; font-weight: 600; }
-  .ds { font-size: 1.85rem; margin-top: .2rem; }
-  .tg { display: inline-block; font-size: 1.4rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: .15rem .6rem; border-radius: .5rem; margin-left: .8rem; vertical-align: middle; position: relative; top: -.2rem; }
+  .pr small { font-weight: 500; font-size: .72em; margin-right: .22em; }
+  .nm { font-size: 2.5em; font-weight: 600; }
+  .ds { font-size: 1.85em; margin-top: .108em; }
+  .tg { display: inline-block; font-size: 1.4em; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: .107em .43em; border-radius: .36em; margin-left: .57em; vertical-align: middle; position: relative; top: -.14em; }
   .out .nm, .out .pr { text-decoration: line-through; }
   .tg.o { background: #8c2a22; color: #fff; }
 
@@ -148,7 +150,7 @@
 
     var meas = document.createElement('div');
     meas.id = 'measure'; meas.style.width = colW + 'px';
-    document.body.appendChild(meas);
+    stage.appendChild(meas);
 
     var result = [], page = [], col = [];
     function add(mk) {
@@ -183,7 +185,7 @@
     if (col.length && col[col.length - 1].head) col.pop();
     if (col.length) page.push(col);
     if (page.length) result.push(page);
-    document.body.removeChild(meas);
+    stage.removeChild(meas);
     return { pages: result, colW: colW, gap: gap };
   }
 
@@ -270,6 +272,7 @@
       var j = JSON.stringify(raw);
       if (j === lastJson) return;
       lastJson = j; menu = C.normalize(raw);
+      stage.style.fontSize = menu.theme.tvScale + 'rem';
       applyColors(); renderChrome(); render();
       // yazı tipi geç yüklenirse ölçüler değişir; bir kez daha diz
       setTimeout(function () { if (menu) render(); }, 2500);
