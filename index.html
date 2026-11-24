@@ -190,6 +190,23 @@
   .fact { display: flex; gap: 10px; }
   .fact button { flex: 1; border-radius: 12px; padding: 13px; font: 600 15px var(--sans); cursor: pointer; border: 1.4px solid var(--line); background: var(--surface); color: var(--text); }
   .fact .fgo { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
+  /* değerlendirme */
+  .ratecard { text-align: center; padding-top: 30px; padding-bottom: 30px; }
+  .ratecard b { display: block; font-family: var(--serif); font-size: 21px; font-weight: 600; margin-bottom: 10px; }
+  .stars { display: flex; justify-content: center; gap: 6px; }
+  .stars button { border: 0; background: none; color: var(--muted); padding: 4px; cursor: pointer; }
+  .stars .ico { width: 34px; height: 34px; }
+  .stars.big .ico { width: 42px; height: 42px; }
+  .stars button.on { color: var(--accent); }
+  .stars button.on .ico { fill: currentColor; }
+  .rq { text-align: center; color: var(--muted); margin: 14px 0 6px; }
+  .rt { margin: 18px 0 14px; text-align: center; }
+  .rt b { display: block; font-size: 18px; margin-bottom: 4px; }
+  #rsheet textarea { width: 100%; border: 1.4px solid var(--line); background: var(--surface); color: var(--text); border-radius: 12px; padding: 12px; font: 16px var(--sans); resize: vertical; margin-bottom: 12px; }
+  .rbtn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border-radius: 12px; padding: 14px; font: 600 16px var(--sans); text-decoration: none; cursor: pointer; border: 1.4px solid var(--line); background: var(--surface); color: var(--text); box-sizing: border-box; }
+  .rbtn.main { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
+  .ror { text-align: center; color: var(--muted); font-size: 14px; margin: 14px 0 8px; }
+  .rrowbtn { border: 0; background: none; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
   /* dil seçici */
   .langs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--chip); }
   .langs button { border: 0; background: none; color: var(--muted); font: 600 13px var(--sans); letter-spacing: .04em; padding: 6px 11px; border-radius: 999px; cursor: pointer; }
@@ -262,13 +279,14 @@
 <aside class="drawer" id="drawer" aria-label="Kafe bilgileri"></aside>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
 <div class="fsheet" id="fsheet" role="dialog" aria-modal="true"></div>
+<div class="fsheet" id="rsheet" role="dialog" aria-modal="true"></div>
 <div class="toast" id="toast"></div>
 
 <script>
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 16;
+  var BUILD = 17;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -290,8 +308,8 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=16"></script>
-<script src="assets/ripple.js?v=16"></script>
+<script src="assets/core.js?v=17"></script>
+<script src="assets/ripple.js?v=17"></script>
 <script>
 (function () {
   'use strict';
@@ -312,18 +330,27 @@
       price: 'Fiyat', wifi: 'Wi-Fi', password: 'Şifre', noPassword: 'Şifresiz', copy: 'Kopyala', wifiCopied: 'Wi-Fi şifresi kopyalandı', hours: 'Çalışma saatleri',
       tapCall: 'Aramak için dokunun', address: 'Adres', phone: 'Telefon', linkCopied: 'Bağlantı kopyalandı', language: 'Dil', loading: 'Menü yükleniyor…',
       loadErr: 'Menü şu an yüklenemedi. Lütfen sayfayı yenileyin.', back: 'Geri', share: 'Paylaş', close: 'Kapat', info: 'Bilgiler', top: 'Başa dön', searchBtn: 'Ara',
+      rate: 'Bizi değerlendirin', rateQ: 'Deneyiminiz nasıldı?', thanks: 'Teşekkür ederiz!', goodText: 'Google\'da birkaç kelimeyle anlatırsanız bize çok yardımcı olur.',
+      googleBtn: 'Google\'da yorum yaz', badText: 'Üzgünüz. Neyi daha iyi yapabileceğimizi bize doğrudan yazar mısınız?', msgPh: 'Mesajınız (isteğe bağlı)',
+      waBtn: 'WhatsApp ile gönder', orGoogle: 'veya Google\'da yorum yazın', stars: 'yıldız',
       recs: 'Önerilenler', contains: 'İçerir', pairs: 'Yanında iyi gider', filter: 'Filtrele', diet: 'Beslenme', freeFrom: 'İçermesin', clear: 'Temizle', show: 'Ürünleri göster',
       allergenNote: 'Alerjen bilgileri işletmemiz tarafından girilmiştir. Ciddi bir alerjiniz varsa lütfen personelimize danışın.' },
     en: { menu: 'Menu', search: 'Search the menu…', noResult: 'No items match your search.', empty: 'The menu is not ready yet.', table: 'Table', soldOut: 'Sold out',
       price: 'Price', wifi: 'Wi-Fi', password: 'Password', noPassword: 'No password', copy: 'Copy', wifiCopied: 'Wi-Fi password copied', hours: 'Opening hours',
       tapCall: 'Tap to call', address: 'Address', phone: 'Phone', linkCopied: 'Link copied', language: 'Language', loading: 'Loading the menu…',
       loadErr: 'The menu could not be loaded. Please refresh the page.', back: 'Back', share: 'Share', close: 'Close', info: 'Info', top: 'Back to top', searchBtn: 'Search',
+      rate: 'Rate your visit', rateQ: 'How was your visit?', thanks: 'Thank you!', goodText: 'A short Google review would help us a lot.',
+      googleBtn: 'Write a Google review', badText: 'We are sorry. Could you tell us directly what we can do better?', msgPh: 'Your message (optional)',
+      waBtn: 'Send via WhatsApp', orGoogle: 'or write a Google review', stars: 'stars',
       recs: 'Recommended', contains: 'Contains', pairs: 'Goes well with', filter: 'Filter', diet: 'Diet', freeFrom: 'Free from', clear: 'Clear', show: 'Show items',
       allergenNote: 'Allergen information is provided by the café. If you have a serious allergy, please ask our staff.' },
     ru: { menu: 'Меню', search: 'Поиск по меню…', noResult: 'Ничего не найдено.', empty: 'Меню пока не готово.', table: 'Стол', soldOut: 'Нет в наличии',
       price: 'Цена', wifi: 'Wi-Fi', password: 'Пароль', noPassword: 'Без пароля', copy: 'Копировать', wifiCopied: 'Пароль Wi-Fi скопирован', hours: 'Часы работы',
       tapCall: 'Нажмите, чтобы позвонить', address: 'Адрес', phone: 'Телефон', linkCopied: 'Ссылка скопирована', language: 'Язык', loading: 'Загрузка меню…',
       loadErr: 'Не удалось загрузить меню. Обновите страницу.', back: 'Назад', share: 'Поделиться', close: 'Закрыть', info: 'Информация', top: 'Наверх', searchBtn: 'Поиск',
+      rate: 'Оцените нас', rateQ: 'Как вам у нас?', thanks: 'Спасибо!', goodText: 'Короткий отзыв в Google очень нам поможет.',
+      googleBtn: 'Написать отзыв в Google', badText: 'Нам жаль. Напишите нам, пожалуйста, что мы можем улучшить.', msgPh: 'Ваше сообщение (необязательно)',
+      waBtn: 'Отправить в WhatsApp', orGoogle: 'или оставьте отзыв в Google', stars: 'звёзд',
       recs: 'Рекомендуем', contains: 'Содержит', pairs: 'Хорошо сочетается с', filter: 'Фильтр', diet: 'Питание', freeFrom: 'Без', clear: 'Сбросить', show: 'Показать',
       allergenNote: 'Информация об аллергенах предоставлена кафе. При серьёзной аллергии, пожалуйста, уточните у персонала.' }
   };
@@ -381,6 +408,9 @@
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     ig: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/>',
     fb: '<path d="M15 3h-2.5A4.5 4.5 0 0 0 8 7.5V10H5.5v3.5H8V21h3.5v-7.5H14l.5-3.5h-3V8a1 1 0 0 1 1-1H15z"/>',
+    tt: '<path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.6 2.4 4.6 5 4.8"/>',
+    star: '<path d="M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z"/>',
+    wa: '<path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8c-1-.4-1.8-1.2-2.2-2.2l.8-1-1-2z"/>',
     sliders: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
     globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
     web: '<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'
@@ -394,9 +424,16 @@
     var s = '';
     if (cafe.facebook) s += '<a href="' + esc(linkify(cafe.facebook, 'https://facebook.com/')) + '" target="_blank" rel="noopener" aria-label="Facebook">' + ico('fb') + '</a>';
     if (cafe.instagram) s += '<a href="https://instagram.com/' + encodeURIComponent(cafe.instagram.replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/$/, '')) + '" target="_blank" rel="noopener" aria-label="Instagram">' + ico('ig') + '</a>';
-    if (cafe.website) s += '<a href="' + esc(linkify(cafe.website, 'https://')) + '" target="_blank" rel="noopener" aria-label="Web sitesi">' + ico('web') + '</a>';
+    if (cafe.tiktok) s += '<a href="' + esc(tiktokUrl(cafe.tiktok)) + '" target="_blank" rel="noopener" aria-label="TikTok">' + ico('tt') + '</a>';
+    if (cafe.website) s += '<a href="' + esc(linkify(cafe.website, 'https://')) + '" target="_blank" rel="noopener" aria-label="Web">' + ico('web') + '</a>';
     return s ? '<div class="socials">' + s + '</div>' : '';
   }
+  function tiktokUrl(v) {
+    v = String(v).trim();
+    if (/tiktok\.com/i.test(v)) return /^https?:\/\//i.test(v) ? v : 'https://' + v.replace(/^\/+/, '');
+    return 'https://www.tiktok.com/@' + encodeURIComponent(v.replace(/^@/, ''));
+  }
+  function waNumber(v) { var d = String(v || '').replace(/\D/g, ''); if (d.charAt(0) === '0') d = '90' + d.slice(1); else if (d.length === 10) d = '90' + d; return d; }
   function linkify(v, prefix) { return /^https?:\/\//i.test(v) ? v : prefix + v.replace(/^@/, ''); }
   function mapsLink(cafe) { return cafe.mapsUrl || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((cafe.name ? cafe.name + ' ' : '') + cafe.address)); }
 
@@ -570,6 +607,7 @@
     if (tx(cafe, 'hours')) info.push('<div><b>' + esc(T('hours')) + '</b><span style="white-space:pre-line">' + esc(tx(cafe, 'hours')) + '</span></div>');
     if (cafe.phone) info.push('<div><b>' + esc(T('phone')) + '</b><a href="tel:' + esc(cafe.phone.replace(/\s/g, '')) + '">' + esc(cafe.phone) + '</a></div>');
     if (cafe.address) info.push('<div><b>' + esc(T('address')) + '</b><a href="' + esc(mapsLink(cafe)) + '" target="_blank" rel="noopener">' + esc(cafe.address) + '</a></div>');
+    if (canRate()) h += '<section class="ratecard wrap"><b>' + esc(T('rateQ')) + '</b><div class="stars">' + [1, 2, 3, 4, 5].map(function (n) { return '<button data-rate="' + n + '" aria-label="' + n + ' ' + esc(T('stars')) + '">' + ico('star') + '</button>'; }).join('') + '</div></section>';
     h += '<footer><div class="wrap">' + (info.length ? '<div class="info">' + info.join('') + '</div>' : '') +
       (tx(cafe, 'note') ? '<p class="note">' + esc(tx(cafe, 'note')) + '</p>' : '') + '</div></footer>';
 
@@ -687,11 +725,48 @@
     var first = document.querySelector('section.cat:not([style*="none"])'); if (first && (fDiet.length || fFree.length)) goTo(first.id);
   }
 
+  // ---------- değerlendirme ----------
+  // Google'ın kuralı gereği yorum bağlantısı her puanda gösterilir; düşük puanda ayrıca doğrudan WhatsApp ile yazma seçeneği öne çıkar.
+  function canRate() { return !!(menu.cafe.reviewUrl || menu.cafe.whatsapp); }
+  var rating = 0;
+  function openRate(n) {
+    rating = n || 0;
+    var cafe = menu.cafe, rs = $('rsheet');
+    var h = '<div class="fhead"><b>' + esc(T('rate')) + '</b><button class="icon-btn" id="rx" aria-label="' + esc(T('close')) + '">' + ico('close') + '</button></div>';
+    h += '<p class="rq">' + esc(T('rateQ')) + '</p><div class="stars big">' + [1, 2, 3, 4, 5].map(function (i) { return '<button data-star="' + i + '" class="' + (i <= rating ? 'on' : '') + '" aria-label="' + i + ' ' + esc(T('stars')) + '">' + ico('star') + '</button>'; }).join('') + '</div>';
+    var google = cafe.reviewUrl ? '<a class="rbtn' + (rating >= 4 || !cafe.whatsapp ? ' main' : '') + '" href="' + esc(cafe.reviewUrl) + '" target="_blank" rel="noopener">' + ico('star') + esc(T('googleBtn')) + '</a>' : '';
+    if (rating >= 4) h += '<p class="rt"><b>' + esc(T('thanks')) + '</b> ' + esc(T('goodText')) + '</p>' + google;
+    else if (rating > 0) {
+      h += '<p class="rt">' + esc(T('badText')) + '</p>';
+      if (cafe.whatsapp) h += '<textarea id="rmsg" rows="3" placeholder="' + esc(T('msgPh')) + '"></textarea><button class="rbtn main" id="rwa">' + ico('wa') + esc(T('waBtn')) + '</button>';
+      if (google) h += '<p class="ror">' + esc(T('orGoogle')) + '</p>' + google;
+    }
+    rs.innerHTML = h; rs.className = 'fsheet on'; $('dim').className = 'dim on'; document.body.classList.add('lock');
+  }
+  function closeRate() {
+    $('rsheet').className = 'fsheet';
+    if (!sheetOpen && !$('drawer').className.match(/\bon\b/)) { $('dim').className = 'dim'; document.body.classList.remove('lock'); }
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-rate]');
+    if (b) { closeDrawer(); openRate(+b.getAttribute('data-rate')); return; }
+    if (!e.target.closest('#rsheet')) return;
+    var st = e.target.closest('[data-star]');
+    if (st) { var keep = $('rmsg') ? $('rmsg').value : ''; openRate(+st.getAttribute('data-star')); if (keep && $('rmsg')) $('rmsg').value = keep; return; }
+    if (e.target.closest('#rx')) closeRate();
+    if (e.target.closest('#rwa')) {
+      var txt = 'Menü geri bildirimi: ' + rating + '/5 ' + '★★★★★'.slice(0, rating) + '☆☆☆☆☆'.slice(0, 5 - rating) + (table ? ' · Masa ' + table : '') + ' · ' + lang.toUpperCase() + ($('rmsg').value.trim() ? '\n\n' + $('rmsg').value.trim() : '');
+      window.open('https://wa.me/' + waNumber(menu.cafe.whatsapp) + '?text=' + encodeURIComponent(txt), '_blank');
+      closeRate();
+    }
+  });
+
   // ---------- yan menü ----------
   function renderDrawer() {
     var cafe = menu.cafe, h = '<button class="icon-btn x" id="dx" aria-label="' + esc(T('close')) + '">' + ico('close') + '</button>';
     h += '<div class="brand">' + (cafe.logo ? '<img src="' + esc(cafe.logo) + '" alt="">' : '') + '<b>' + esc(cafe.name || T('menu')) + '</b>' + (tx(cafe, 'slogan') ? '<small>' + esc(tx(cafe, 'slogan')) + '</small>' : '') + '</div>';
     if (menu.theme.languages.length > 1) h += '<div class="drow lrow">' + ico('globe') + '<div><b>' + esc(T('language')) + '</b>' + langSwitch() + '</div></div>';
+    if (canRate()) h += '<button class="drow rrowbtn" data-rate="0">' + ico('star') + '<div><b>' + esc(T('rate')) + '</b><span>' + esc(T('rateQ')) + '</span></div></button>';
     if (cafe.wifiName) h += '<div class="drow">' + ico('wifi') + '<div><b>' + esc(cafe.wifiName) + '</b>' + (cafe.wifiPassword ? '<span>' + esc(T('password')) + ': ' + esc(cafe.wifiPassword) + '</span>' : '<span>' + esc(T('noPassword')) + '</span>') + '</div>' +
       (cafe.wifiPassword ? '<button class="copy" id="copyWifi">' + esc(T('copy')) + '</button>' : '') + '</div>';
     if (tx(cafe, 'hours')) h += '<div class="drow">' + ico('clock') + '<div><b>' + esc(T('hours')) + '</b><span>' + esc(tx(cafe, 'hours')) + '</span></div></div>';
@@ -705,7 +780,7 @@
   function openDrawer() { $('drawer').className = 'drawer on'; $('dim').className = 'dim on'; document.body.classList.add('lock'); }
   function closeDrawer() { $('drawer').className = 'drawer'; if (!sheetOpen) { $('dim').className = 'dim'; document.body.classList.remove('lock'); } }
   document.addEventListener('click', function (e) { if (e.target.closest('[data-open-drawer]')) openDrawer(); });
-  $('dim').onclick = function () { closeDrawer(); if ($('fsheet').className.indexOf('on') !== -1) closeFilter(); if (sheetOpen) closeSheet(); };
+  $('dim').onclick = function () { if ($('rsheet').className.indexOf('on') !== -1) closeRate(); closeDrawer(); if ($('fsheet').className.indexOf('on') !== -1) closeFilter(); if (sheetOpen) closeSheet(); };
 
   function copyText(t, msg) {
     function fallback() { var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); toast(msg); }
