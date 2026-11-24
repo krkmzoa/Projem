@@ -140,6 +140,56 @@
   .info a { color: var(--accent); text-decoration: none; }
   .note { text-align: center; }
 
+  /* simgeler ve rozetler */
+  .mks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .mk { width: 28px; height: 28px; border-radius: 50%; border: 1.4px solid var(--muted); color: var(--text); display: inline-grid; place-items: center; flex: none; }
+  .mk svg { width: 17px; height: 17px; }
+  .mk.badge { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
+  .mk.lab { width: auto; height: auto; border: 0; border-radius: 0; display: inline-flex; gap: 7px; align-items: center; background: none; color: var(--text); }
+  .mk.lab svg { width: 30px; height: 30px; padding: 6px; border-radius: 50%; border: 1.4px solid var(--muted); box-sizing: border-box; }
+  .mk.lab.badge svg { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
+  .mk.lab em { font-style: normal; font-size: 14px; }
+  .dmarks { display: flex; flex-wrap: wrap; gap: 10px 16px; margin: 0 0 14px; align-items: center; }
+  .dmarks.al b { width: 100%; font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  /* önerilenler */
+  .recs .cat-head h2 { color: var(--text); }
+  .rrow { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 8px; margin: 0 -2px; scroll-snap-type: x proximity; }
+  .rrow::-webkit-scrollbar { display: none; }
+  .rcard { flex: none; width: 150px; border: 0; padding: 0 0 10px; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); text-align: left; cursor: pointer; overflow: hidden; scroll-snap-align: start; color: inherit; }
+  .rcard .ph { display: grid; place-items: center; height: 120px; background: var(--chip) center/cover no-repeat; color: var(--muted); }
+  .rcard .ph svg { width: 34px; height: 34px; }
+  .rcard .rn { display: block; font-weight: 600; padding: 8px 10px 0; font-size: 14.5px; line-height: 1.3; }
+  .rcard .rp { display: block; padding: 3px 10px 0; color: var(--accent); font-weight: 600; font-size: 14px; }
+  .tile .ph.rec { color: var(--accent); }
+  .tile .ph.rec svg { width: 38px; height: 38px; }
+  /* yanında iyi gider */
+  .pairs { margin-top: 22px; }
+  .pairs h4 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin: 0 0 10px; }
+  .pair { display: flex; gap: 12px; align-items: center; width: 100%; border: 0; background: var(--surface); border-radius: 12px; padding: 0; margin-bottom: 10px; text-align: left; overflow: hidden; cursor: pointer; color: inherit; box-shadow: var(--shadow); }
+  .pair img, .pair .pimg { width: 84px; height: 84px; object-fit: cover; flex: none; display: grid; place-items: center; background: var(--chip); color: var(--muted); }
+  .pair .pimg svg { width: 28px; height: 28px; }
+  .pair b { display: block; font-weight: 600; }
+  .pair em { font-style: normal; color: var(--accent); font-weight: 600; }
+  /* filtre */
+  .searchrow { display: flex; gap: 8px; align-items: center; }
+  .searchrow .search { flex: 1; min-width: 0; }
+  .fbtn { position: relative; width: 46px; height: 46px; }
+  .fbtn.on { background: var(--accent); color: var(--on-accent, #fff); }
+  .fbtn b { position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; border-radius: 10px; background: var(--text); color: var(--bg); font-size: 12px; display: grid; place-items: center; padding: 0 5px; }
+  .fsheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 46; background: var(--bg); border-radius: 20px 20px 0 0; max-height: 86vh; overflow-y: auto; padding: 16px 18px calc(18px + env(safe-area-inset-bottom)); transform: translateY(105%); transition: transform .25s ease; }
+  .fsheet.on { transform: none; }
+  @media (min-width: 720px) { .fsheet { left: 50%; right: auto; width: 520px; margin-left: -260px; } }
+  .fhead { display: flex; justify-content: space-between; align-items: center; }
+  .fhead b { font-family: var(--serif); font-size: 22px; }
+  .fsheet h4 { margin: 16px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .fchips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fchip { display: inline-flex; align-items: center; gap: 7px; border: 1.4px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; padding: 7px 13px 7px 9px; font: 500 14px var(--sans); cursor: pointer; }
+  .fchip svg { width: 18px; height: 18px; }
+  .fchip.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
+  .fnote { font-size: 12.5px; color: var(--muted); margin: 16px 0 12px; }
+  .fact { display: flex; gap: 10px; }
+  .fact button { flex: 1; border-radius: 12px; padding: 13px; font: 600 15px var(--sans); cursor: pointer; border: 1.4px solid var(--line); background: var(--surface); color: var(--text); }
+  .fact .fgo { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
   /* dil seçici */
   .langs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--chip); }
   .langs button { border: 0; background: none; color: var(--muted); font: 600 13px var(--sans); letter-spacing: .04em; padding: 6px 11px; border-radius: 999px; cursor: pointer; }
@@ -211,13 +261,14 @@
 <div class="dim" id="dim"></div>
 <aside class="drawer" id="drawer" aria-label="Kafe bilgileri"></aside>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="fsheet" id="fsheet" role="dialog" aria-modal="true"></div>
 <div class="toast" id="toast"></div>
 
 <script>
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 15;
+  var BUILD = 16;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -239,8 +290,8 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=15"></script>
-<script src="assets/ripple.js?v=15"></script>
+<script src="assets/core.js?v=16"></script>
+<script src="assets/ripple.js?v=16"></script>
 <script>
 (function () {
   'use strict';
@@ -260,15 +311,21 @@
     tr: { menu: 'Menü', search: 'Menüde ara…', noResult: 'Aramanızla eşleşen ürün yok.', empty: 'Menü henüz hazır değil.', table: 'Masa', soldOut: 'Tükendi',
       price: 'Fiyat', wifi: 'Wi-Fi', password: 'Şifre', noPassword: 'Şifresiz', copy: 'Kopyala', wifiCopied: 'Wi-Fi şifresi kopyalandı', hours: 'Çalışma saatleri',
       tapCall: 'Aramak için dokunun', address: 'Adres', phone: 'Telefon', linkCopied: 'Bağlantı kopyalandı', language: 'Dil', loading: 'Menü yükleniyor…',
-      loadErr: 'Menü şu an yüklenemedi. Lütfen sayfayı yenileyin.', back: 'Geri', share: 'Paylaş', close: 'Kapat', info: 'Bilgiler', top: 'Başa dön', searchBtn: 'Ara' },
+      loadErr: 'Menü şu an yüklenemedi. Lütfen sayfayı yenileyin.', back: 'Geri', share: 'Paylaş', close: 'Kapat', info: 'Bilgiler', top: 'Başa dön', searchBtn: 'Ara',
+      recs: 'Önerilenler', contains: 'İçerir', pairs: 'Yanında iyi gider', filter: 'Filtrele', diet: 'Beslenme', freeFrom: 'İçermesin', clear: 'Temizle', show: 'Ürünleri göster',
+      allergenNote: 'Alerjen bilgileri işletmemiz tarafından girilmiştir. Ciddi bir alerjiniz varsa lütfen personelimize danışın.' },
     en: { menu: 'Menu', search: 'Search the menu…', noResult: 'No items match your search.', empty: 'The menu is not ready yet.', table: 'Table', soldOut: 'Sold out',
       price: 'Price', wifi: 'Wi-Fi', password: 'Password', noPassword: 'No password', copy: 'Copy', wifiCopied: 'Wi-Fi password copied', hours: 'Opening hours',
       tapCall: 'Tap to call', address: 'Address', phone: 'Phone', linkCopied: 'Link copied', language: 'Language', loading: 'Loading the menu…',
-      loadErr: 'The menu could not be loaded. Please refresh the page.', back: 'Back', share: 'Share', close: 'Close', info: 'Info', top: 'Back to top', searchBtn: 'Search' },
+      loadErr: 'The menu could not be loaded. Please refresh the page.', back: 'Back', share: 'Share', close: 'Close', info: 'Info', top: 'Back to top', searchBtn: 'Search',
+      recs: 'Recommended', contains: 'Contains', pairs: 'Goes well with', filter: 'Filter', diet: 'Diet', freeFrom: 'Free from', clear: 'Clear', show: 'Show items',
+      allergenNote: 'Allergen information is provided by the café. If you have a serious allergy, please ask our staff.' },
     ru: { menu: 'Меню', search: 'Поиск по меню…', noResult: 'Ничего не найдено.', empty: 'Меню пока не готово.', table: 'Стол', soldOut: 'Нет в наличии',
       price: 'Цена', wifi: 'Wi-Fi', password: 'Пароль', noPassword: 'Без пароля', copy: 'Копировать', wifiCopied: 'Пароль Wi-Fi скопирован', hours: 'Часы работы',
       tapCall: 'Нажмите, чтобы позвонить', address: 'Адрес', phone: 'Телефон', linkCopied: 'Ссылка скопирована', language: 'Язык', loading: 'Загрузка меню…',
-      loadErr: 'Не удалось загрузить меню. Обновите страницу.', back: 'Назад', share: 'Поделиться', close: 'Закрыть', info: 'Информация', top: 'Наверх', searchBtn: 'Поиск' }
+      loadErr: 'Не удалось загрузить меню. Обновите страницу.', back: 'Назад', share: 'Поделиться', close: 'Закрыть', info: 'Информация', top: 'Наверх', searchBtn: 'Поиск',
+      recs: 'Рекомендуем', contains: 'Содержит', pairs: 'Хорошо сочетается с', filter: 'Фильтр', diet: 'Питание', freeFrom: 'Без', clear: 'Сбросить', show: 'Показать',
+      allergenNote: 'Информация об аллергенах предоставлена кафе. При серьёзной аллергии, пожалуйста, уточните у персонала.' }
   };
   var lang = 'tr';
   function T(k) { return (UI[lang] && UI[lang][k]) || UI.tr[k]; }
@@ -324,6 +381,7 @@
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     ig: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/>',
     fb: '<path d="M15 3h-2.5A4.5 4.5 0 0 0 8 7.5V10H5.5v3.5H8V21h3.5v-7.5H14l.5-3.5h-3V8a1 1 0 0 1 1-1H15z"/>',
+    sliders: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
     globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
     web: '<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'
   };
@@ -442,6 +500,14 @@
     var parts = [it.name, it.description, it.tags.join(' '), tx(it, 'name'), tx(it, 'description'), it.tags.map(function (t) { return C.word(t, lang); }).join(' ')];
     return parts.join(' ').toLocaleLowerCase(lang === 'tr' ? 'tr' : lang);
   }
+  // Ürünün simgeleri: önce rozetler (dolu), sonra beslenme, sonra alerjenler
+  function marksOf(it) { return it.badges.concat(it.diet, it.allergens).filter(function (k) { return C.MARK_ICONS[k]; }); }
+  function markHtml(k, withLabel) {
+    var lab = C.markLabel(k, lang), cls = 'mk' + (it_isBadge(k) ? ' badge' : '') + (withLabel ? ' lab' : '');
+    return '<span class="' + cls + '" title="' + esc(lab) + '">' + C.markSvg(k) + (withLabel ? '<em>' + esc(lab) + '</em>' : '') + '</span>';
+  }
+  function it_isBadge(k) { return C.MARKS.badges.indexOf(k) !== -1; }
+  function allItems() { var a = []; menu.categories.forEach(function (c, ci) { if (c.hidden) return; c.items.forEach(function (it, ii) { a.push({ it: it, ci: ci, ii: ii }); }); }); return a; }
   function itemHtml(it, ci, ii) {
     var tags = tagsHtml(it);
     if (!it.available) tags += '<span class="tag out">' + esc(T('soldOut')) + '</span>';
@@ -449,9 +515,16 @@
     return '<button class="item' + (it.available ? '' : ' soldout') + '" data-c="' + ci + '" data-i="' + ii + '" data-q="' + esc(searchText(it)) + '">' +
       '<div class="body"><p class="name">' + esc(tx(it, 'name')) + tags + '</p>' +
       (d ? '<p class="desc">' + esc(d) + '</p>' : '') +
-      '<div class="price">' + priceHtml(it) + '</div></div>' +
+      '<div class="price">' + priceHtml(it) + '</div>' +
+      (marksOf(it).length ? '<div class="mks">' + marksOf(it).map(function (k) { return markHtml(k); }).join('') + '</div>' : '') + '</div>' +
       (it.image ? '<img loading="lazy" src="' + esc(it.image) + '" alt="">' : '') +
       '</button>';
+  }
+  function cardHtml(o) {
+    var it = o.it, p = C.prices(it)[0];
+    return '<button class="rcard" data-c="' + o.ci + '" data-i="' + o.ii + '">' +
+      '<span class="ph"' + (it.image ? ' style="background-image:url(\'' + esc(it.image) + '\')"' : '') + '>' + (it.image ? '' : C.markSvg('signature')) + '</span>' +
+      '<span class="rn">' + esc(tx(it, 'name')) + '</span>' + (p ? '<span class="rp">' + esc(C.price(p.price, menu.cafe.currency)) + '</span>' : '') + '</button>';
   }
 
   function render() {
@@ -461,21 +534,26 @@
     C.applyTheme(menu, 'menu');
     if (params.get('tema')) document.documentElement.setAttribute('data-theme', params.get('tema'));
 
-    var chipsHtml = cats.map(function (c) { return '<button class="chip" data-target="c-' + esc(c.id) + '">' + (c.icon ? esc(c.icon) + ' ' : '') + esc(tx(c, 'name')) + '</button>'; }).join('');
+    var recs = allItems().filter(function (o) { return o.it.badges.indexOf('recommended') !== -1; });
+    var recChip = recs.length ? '<button class="chip" data-target="c-rec">★ ' + esc(T('recs')) + '</button>' : '';
+    var chipsHtml = recChip + cats.map(function (c) { return '<button class="chip" data-target="c-' + esc(c.id) + '">' + (c.icon ? esc(c.icon) + ' ' : '') + esc(tx(c, 'name')) + '</button>'; }).join('');
     var h = '<header class="hero wrap">' + langSwitch('hero-langs') + '<button class="icon-btn menu-btn" data-open-drawer aria-label="' + esc(T('info')) + '">' + ico('menu') + '</button>' +
       (cafe.logo ? '<img class="logo" src="' + esc(cafe.logo) + '" alt="">' : '') +
       '<h1>' + esc(cafe.name || T('menu')) + '</h1>' +
       (tx(cafe, 'slogan') ? '<p>' + esc(tx(cafe, 'slogan')) + '</p>' : '') +
       (table ? '<span class="table-badge">' + esc(T('table')) + ' ' + esc(table) + '</span>' : '') + '</header>';
-    h += '<div class="searchrow wrap"><label class="search">' + ico('search') + '<input id="q" type="search" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('searchBtn')) + '" autocomplete="off" enterkeyhint="search"></label></div>';
+    var canFilter = allItems().some(function (o) { return o.it.diet.length || o.it.allergens.length; });
+    h += '<div class="searchrow wrap"><label class="search">' + ico('search') + '<input id="q" type="search" placeholder="' + esc(T('search')) + '" aria-label="' + esc(T('searchBtn')) + '" autocomplete="off" enterkeyhint="search"></label>' +
+      (canFilter ? '<button class="icon-btn fbtn" id="fbtn" aria-label="' + esc(T('filter')) + '">' + ico('sliders') + '<b id="fcount" hidden></b></button>' : '') + '</div>';
     if (useTiles) {
-      h += '<nav class="tiles" id="nav">' + cats.map(function (c) {
+      h += '<nav class="tiles" id="nav">' + (recs.length ? '<button class="tile" data-target="c-rec"><span class="ph rec">' + C.markSvg('recommended') + '</span><span class="nm">' + esc(T('recs')) + '</span></button>' : '') + cats.map(function (c) {
         return '<button class="tile" data-target="c-' + esc(c.id) + '"><span class="ph"' + (c.image ? ' style="background-image:url(\'' + esc(c.image) + '\')"' : '') + '>' + (c.image ? '' : esc(c.icon || '')) + '</span><span class="nm">' + esc(tx(c, 'name')) + '</span></button>';
       }).join('') + '</nav>';
     } else {
       h += '<nav class="chips inline-chips" id="nav">' + chipsHtml + '</nav>';
     }
     h += '<main class="wrap" id="list">';
+    if (recs.length) h += '<section class="cat recs" id="c-rec"><div class="cat-head"><h2>★ ' + esc(T('recs')) + '</h2></div><div class="rrow">' + recs.map(cardHtml).join('') + '</div></section>';
     cats.forEach(function (c) {
       var ci = menu.categories.indexOf(c);
       h += '<section class="cat" id="c-' + esc(c.id) + '">' +
@@ -501,7 +579,8 @@
     window.scrollTo(0, y);
     renderDrawer();
     bind();
-    if (q) { $('q').value = q; filter(q); }
+    if (q) $('q').value = q;
+    if (q || fDiet.length || fFree.length) filter();
   }
 
   function goTo(id) {
@@ -516,8 +595,9 @@
       var b = e.target.closest('[data-target]'); if (b) goTo(b.getAttribute('data-target'));
     };
     $('q').addEventListener('input', function (e) { filter(e.target.value); });
+    if ($('fbtn')) $('fbtn').onclick = openFilter;
     $('list').addEventListener('click', function (e) {
-      var b = e.target.closest('.item'); if (!b) return;
+      var b = e.target.closest('.item, .rcard'); if (!b) return;
       openSheet(menu.categories[+b.getAttribute('data-c')].items[+b.getAttribute('data-i')]);
     });
     // Aktif kategoriyi işaretle
@@ -552,18 +632,59 @@
   $('totop').onclick = function () { window.scrollTo({ top: 0, behavior: 'smooth' }); };
   $('barSearch').onclick = function () { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(function () { $('q').focus(); }, 350); };
 
+  // ---------- arama + filtre ----------
+  var fDiet = [], fFree = [];
+  function passes(it) {
+    for (var i = 0; i < fDiet.length; i++) if (it.diet.indexOf(fDiet[i]) === -1) return false;
+    for (var j = 0; j < fFree.length; j++) if (it.allergens.indexOf(fFree[j]) !== -1 || it.diet.indexOf(fFree[j]) !== -1) return false;
+    return true;
+  }
   function filter(q) {
-    q = q.trim().toLocaleLowerCase('tr');
-    var any = false;
+    q = (q == null ? ($('q') ? $('q').value : '') : q).trim().toLocaleLowerCase(lang === 'tr' ? 'tr' : lang);
+    var any = false, active = q || fDiet.length || fFree.length;
     document.querySelectorAll('section.cat').forEach(function (sec) {
+      if (sec.id === 'c-rec') { sec.style.display = active ? 'none' : ''; return; }
       var vis = 0;
-      sec.querySelectorAll('.item').forEach(function (it) {
-        var ok = !q || it.getAttribute('data-q').indexOf(q) !== -1;
-        it.style.display = ok ? '' : 'none'; if (ok) vis++;
+      sec.querySelectorAll('.item').forEach(function (el) {
+        var it = menu.categories[+el.getAttribute('data-c')].items[+el.getAttribute('data-i')];
+        var ok = (!q || el.getAttribute('data-q').indexOf(q) !== -1) && passes(it);
+        el.style.display = ok ? '' : 'none'; if (ok) vis++;
       });
       sec.style.display = vis ? '' : 'none'; if (vis) any = true;
     });
     $('noResult').hidden = any;
+    var n = fDiet.length + fFree.length;
+    if ($('fcount')) { $('fcount').hidden = !n; $('fcount').textContent = n; $('fbtn').classList.toggle('on', !!n); }
+  }
+  function openFilter() {
+    var used = {};
+    allItems().forEach(function (o) { o.it.diet.concat(o.it.allergens).forEach(function (k) { used[k] = 1; }); });
+    var diet = C.MARKS.diet.filter(function (k) { return used[k] && k !== 'caffeine'; });
+    var alls = C.MARKS.allergens.filter(function (k) { return used[k]; });
+    if (used.caffeine) alls.unshift('caffeine'); // "İçermesin: kafein" → kafeinli ürünler gizlenir
+    var CAF = { tr: 'Kafein', en: 'Caffeine', ru: 'Кофеин' };
+    function chip(k, group, on) { var lab = group === 'a' && k === 'caffeine' ? CAF[lang] : C.markLabel(k, lang); return '<button class="fchip' + (on ? ' on' : '') + '" data-f="' + group + ':' + k + '" aria-pressed="' + !!on + '">' + C.markSvg(k) + '<span>' + esc(lab) + '</span></button>'; }
+    var h = '<div class="fhead"><b>' + esc(T('filter')) + '</b><button class="icon-btn" id="fx" aria-label="' + esc(T('close')) + '">' + ico('close') + '</button></div>';
+    if (diet.length) h += '<h4>' + esc(T('diet')) + '</h4><div class="fchips">' + diet.map(function (k) { return chip(k, 'd', fDiet.indexOf(k) !== -1); }).join('') + '</div>';
+    if (alls.length) h += '<h4>' + esc(T('freeFrom')) + '</h4><div class="fchips">' + alls.map(function (k) { return chip(k, 'a', fFree.indexOf(k) !== -1); }).join('') + '</div>';
+    h += '<p class="fnote">' + esc(T('allergenNote')) + '</p><div class="fact"><button class="fclear" id="fclear">' + esc(T('clear')) + '</button><button class="fgo" id="fgo">' + esc(T('show')) + '</button></div>';
+    var fs = $('fsheet'); fs.innerHTML = h; fs.className = 'fsheet on'; $('dim').className = 'dim on'; document.body.classList.add('lock');
+    fs.onclick = function (e) {
+      var b = e.target.closest('[data-f]');
+      if (b) {
+        var parts = b.getAttribute('data-f').split(':'), arr = parts[0] === 'd' ? fDiet : fFree, i = arr.indexOf(parts[1]);
+        if (i === -1) arr.push(parts[1]); else arr.splice(i, 1);
+        b.classList.toggle('on', i === -1); b.setAttribute('aria-pressed', i === -1);
+        filter();
+      }
+      if (e.target.closest('#fclear')) { fDiet.length = 0; fFree.length = 0; filter(); openFilter(); }
+      if (e.target.closest('#fgo') || e.target.closest('#fx')) closeFilter();
+    };
+  }
+  function closeFilter() {
+    $('fsheet').className = 'fsheet';
+    if (!sheetOpen && !$('drawer').className.match(/\bon\b/)) { $('dim').className = 'dim'; document.body.classList.remove('lock'); }
+    var first = document.querySelector('section.cat:not([style*="none"])'); if (first && (fDiet.length || fFree.length)) goTo(first.id);
   }
 
   // ---------- yan menü ----------
@@ -584,7 +705,7 @@
   function openDrawer() { $('drawer').className = 'drawer on'; $('dim').className = 'dim on'; document.body.classList.add('lock'); }
   function closeDrawer() { $('drawer').className = 'drawer'; if (!sheetOpen) { $('dim').className = 'dim'; document.body.classList.remove('lock'); } }
   document.addEventListener('click', function (e) { if (e.target.closest('[data-open-drawer]')) openDrawer(); });
-  $('dim').onclick = function () { closeDrawer(); if (sheetOpen) closeSheet(); };
+  $('dim').onclick = function () { closeDrawer(); if ($('fsheet').className.indexOf('on') !== -1) closeFilter(); if (sheetOpen) closeSheet(); };
 
   function copyText(t, msg) {
     function fallback() { var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); toast(msg); }
@@ -606,7 +727,8 @@
       '<div class="content">' + (!it.image ? kcal : '') + '<h3>' + esc(tx(it, 'name')) + (it.available ? '' : ' <span class="tag out">' + esc(T('soldOut')) + '</span>') + '</h3>' +
       (tx(it, 'description') ? '<p class="d">' + esc(tx(it, 'description')) + '</p>' : '') +
       (it.tags.length ? '<p>' + tagsHtml(it, ' style="margin:0 6px 0 0"') + '</p>' : '') +
-      '<div class="rows">' + rows + '</div></div>';
+      detailMarks(it) +
+      '<div class="rows">' + rows + '</div>' + pairsHtml(it) + '</div>';
     sheet.scrollTop = 0;
     sheet.className = 'sheet on'; $('dim').className = 'dim on'; document.body.classList.add('lock');
     sheetOpen = true;
@@ -614,6 +736,29 @@
     $('sShare').onclick = function () { shareItem(it); };
     if (!fromHistory && history.pushState) history.pushState({ sheet: it.id }, '', '#u-' + it.id);
   }
+  function detailMarks(it) {
+    var h = '';
+    var top = it.badges.concat(it.diet).filter(function (k) { return C.MARK_ICONS[k]; });
+    if (top.length) h += '<div class="dmarks">' + top.map(function (k) { return markHtml(k, true); }).join('') + '</div>';
+    if (it.allergens.length) h += '<div class="dmarks al"><b>' + esc(T('contains')) + ':</b>' + it.allergens.map(function (k) { return markHtml(k, true); }).join('') + '</div>';
+    return h;
+  }
+  function pairsHtml(it) {
+    var list = it.pairs.map(function (id) {
+      for (var ci = 0; ci < menu.categories.length; ci++) { var c = menu.categories[ci]; if (c.hidden) continue; for (var ii = 0; ii < c.items.length; ii++) if (c.items[ii].id === id) return { it: c.items[ii], ci: ci, ii: ii }; }
+      return null;
+    }).filter(Boolean);
+    if (!list.length) return '';
+    return '<div class="pairs"><h4>' + esc(T('pairs')) + '</h4>' + list.map(function (o) {
+      var p = C.prices(o.it)[0];
+      return '<button class="pair" data-c="' + o.ci + '" data-i="' + o.ii + '">' + (o.it.image ? '<img src="' + esc(o.it.image) + '" alt="">' : '<span class="pimg">' + C.markSvg('signature') + '</span>') +
+        '<span><b>' + esc(tx(o.it, 'name')) + '</b>' + (p ? '<em>' + esc(C.price(p.price, menu.cafe.currency)) + '</em>' : '') + '</span></button>';
+    }).join('') + '</div>';
+  }
+  sheet.addEventListener('click', function (e) {
+    var b = e.target.closest('.pair'); if (!b) return;
+    openSheet(menu.categories[+b.getAttribute('data-c')].items[+b.getAttribute('data-i')]);
+  });
   function hideSheet() {
     sheet.className = 'sheet'; sheetOpen = false;
     if (!$('drawer').className.match(/\bon\b/)) { $('dim').className = 'dim'; document.body.classList.remove('lock'); }

@@ -59,6 +59,7 @@
         it.image = it.image || '';
         it.available = it.available !== false;
         it.calories = Math.max(0, Math.round(Number(it.calories) || 0));
+        ['badges', 'diet', 'allergens', 'pairs'].forEach(function (k) { it[k] = Array.isArray(it[k]) ? it[k].filter(Boolean) : []; });
       });
     });
     return m;
@@ -100,6 +101,65 @@
     if (!s || !s.name) return '';
     if (lang && lang !== 'tr' && s.i18n && s.i18n[lang]) return s.i18n[lang];
     return MenuCore.word(s.name, lang);
+  };
+
+  // ---------- simgeler: rozetler, beslenme, alerjenler (AB'nin 14 alerjeni) ----------
+  MenuCore.MARKS = {
+    badges: ['recommended', 'signature'],
+    diet: ['caffeine', 'decaf', 'vegan', 'vegetarian'],
+    allergens: ['gluten', 'milk', 'eggs', 'nuts', 'peanuts', 'soy', 'sesame', 'fish', 'crustaceans', 'molluscs', 'celery', 'mustard', 'sulphites', 'lupin']
+  };
+  MenuCore.MARK_LABELS = {
+    recommended: ['Önerilen', 'Recommended', 'Рекомендуем'],
+    signature: ['Kafenin imzası', 'House signature', 'Фирменное'],
+    caffeine: ['Kafein içerir', 'Contains caffeine', 'Содержит кофеин'],
+    decaf: ['Kafeinsiz', 'Decaf', 'Без кофеина'],
+    vegan: ['Vegan', 'Vegan', 'Веганское'],
+    vegetarian: ['Vejetaryen', 'Vegetarian', 'Вегетарианское'],
+    gluten: ['Gluten', 'Gluten', 'Глютен'],
+    milk: ['Süt', 'Milk', 'Молоко'],
+    eggs: ['Yumurta', 'Eggs', 'Яйца'],
+    nuts: ['Sert kabuklu yemiş', 'Tree nuts', 'Орехи'],
+    peanuts: ['Yer fıstığı', 'Peanuts', 'Арахис'],
+    soy: ['Soya', 'Soy', 'Соя'],
+    sesame: ['Susam', 'Sesame', 'Кунжут'],
+    fish: ['Balık', 'Fish', 'Рыба'],
+    crustaceans: ['Kabuklu deniz ürünleri', 'Crustaceans', 'Ракообразные'],
+    molluscs: ['Yumuşakçalar', 'Molluscs', 'Моллюски'],
+    celery: ['Kereviz', 'Celery', 'Сельдерей'],
+    mustard: ['Hardal', 'Mustard', 'Горчица'],
+    sulphites: ['Sülfit', 'Sulphites', 'Сульфиты'],
+    lupin: ['Acı bakla (lupin)', 'Lupin', 'Люпин']
+  };
+  MenuCore.markLabel = function (k, lang) {
+    var l = MenuCore.MARK_LABELS[k]; if (!l) return k;
+    return l[{ tr: 0, en: 1, ru: 2 }[lang] || 0];
+  };
+  // 24x24 çizgi simgeler (stroke = currentColor)
+  MenuCore.MARK_ICONS = {
+    recommended: '<path d="M7 10v10H4V10z"/><path d="M7 10l4-7c1.6 0 2.6 1.2 2.1 3l-1 4h5.7a2 2 0 0 1 2 2.4l-1.2 6A2 2 0 0 1 16.6 20H7"/>',
+    signature: '<path d="M12 3.5l2.5 5.3 5.8.7-4.3 4 1.2 5.8L12 16.4l-5.2 2.9L8 13.5l-4.3-4 5.8-.7z"/>',
+    caffeine: '<ellipse cx="12" cy="12" rx="6.5" ry="9" transform="rotate(35 12 12)"/><path d="M8.3 17.3c1.8-1.4 1.2-3.6 3-5.2s3.9-1.5 4.4-4.4"/>',
+    decaf: '<ellipse cx="12" cy="12" rx="6.5" ry="9" transform="rotate(35 12 12)"/><path d="M8.3 17.3c1.8-1.4 1.2-3.6 3-5.2s3.9-1.5 4.4-4.4"/><path d="M4 4l16 16"/>',
+    vegan: '<path d="M12 21v-8"/><path d="M12 13c0-4.5-3-7.5-7.5-7.5 0 4.5 3 7.5 7.5 7.5z"/><path d="M12 11c0-4.5 3-7.5 7.5-7.5 0 4.5-3 7.5-7.5 7.5z"/>',
+    vegetarian: '<path d="M5 19C5 10 10 5 19 5c0 9-5 14-14 14z"/><path d="M5 19l8-8"/>',
+    gluten: '<path d="M12 21V6"/><path d="M12 9c-2.2-.7-3.3-2.6-3.3-5 2.2.6 3.3 2.4 3.3 5zm0 0c2.2-.7 3.3-2.6 3.3-5-2.2.6-3.3 2.4-3.3 5z"/><path d="M12 13.5c-2.4-.7-3.6-2.8-3.6-5.2 2.4.6 3.6 2.6 3.6 5.2zm0 0c2.4-.7 3.6-2.8 3.6-5.2-2.4.6-3.6 2.6-3.6 5.2z"/><path d="M12 18c-2.4-.7-3.6-2.8-3.6-5.2 2.4.6 3.6 2.6 3.6 5.2zm0 0c2.4-.7 3.6-2.8 3.6-5.2-2.4.6-3.6 2.6-3.6 5.2z"/>',
+    milk: '<path d="M10 3h4v3l2 3v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9l2-3z"/><path d="M8 13h8"/>',
+    eggs: '<path d="M12 3c3.4 0 6 5.8 6 10a6 6 0 0 1-12 0c0-4.2 2.6-10 6-10z"/>',
+    nuts: '<path d="M5.5 10h13"/><path d="M6.5 10a5.5 4 0 0 1 11 0"/><path d="M7.5 10c0 6 2.2 10 4.5 10s4.5-4 4.5-10"/><path d="M12 6V3.5"/>',
+    peanuts: '<path d="M12 3a4 4 0 0 1 3.2 6.4 4.4 4.4 0 1 1-6.4 0A4 4 0 0 1 12 3z"/><path d="M10.5 6.5h.01M13.5 15h.01M11 17h.01"/>',
+    soy: '<path d="M5 19c-1-6.5 4-14 14-14 1 6.5-4 14-14 14z"/><circle cx="9.5" cy="14.5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="14.5" cy="9.5" r="1.3"/>',
+    sesame: '<ellipse cx="8" cy="9" rx="1.7" ry="2.8" transform="rotate(-25 8 9)"/><ellipse cx="15.5" cy="8" rx="1.7" ry="2.8" transform="rotate(20 15.5 8)"/><ellipse cx="11.5" cy="16" rx="1.7" ry="2.8" transform="rotate(10 11.5 16)"/>',
+    fish: '<path d="M3 12c3-4.2 8-5.2 12.2-3L19.5 6v12l-4.3-3C11 17.2 6 16.2 3 12z"/><path d="M8 11.3h.01"/>',
+    crustaceans: '<path d="M6.5 6C13 4 19 8 19 13c0 3-2.3 5-5.2 5H9"/><path d="M6.5 6C5 8 6 10.5 8.5 10.5"/><path d="M19 13l2.5.8M13.5 18l.8 3M10 18l-.8 3M9.5 10.5c1 2.2 3.3 3.4 6 3"/>',
+    molluscs: '<path d="M4 14a8 8 0 0 1 16 0l-3 5.5H7z"/><path d="M12 6v13.5M8.3 7.2l1.8 12.3M15.7 7.2l-1.8 12.3"/>',
+    celery: '<path d="M9 21c0-6 .8-12 1-16M13 21V5M16 21c0-5.5-.6-11-1-15"/><path d="M8 5.5c1-2.2 3-2.2 4 0 1-2.2 3-2.2 4 0"/>',
+    mustard: '<path d="M9 8.5h6l1 12.5H8z"/><path d="M10 8.5V5.5h4v3M11 3.5h2"/>',
+    sulphites: '<path d="M8 3h8c0 5-1.2 8-4 8s-4-3-4-8z"/><path d="M12 11v8M9 21h6M8.4 6.5h7.2"/>',
+    lupin: '<path d="M12 21V6"/><path d="M12 3.5v2.5M9 7.5c1.5 0 3 1 3 3M15 7.5c-1.5 0-3 1-3 3M8.5 12c1.8 0 3.5 1.2 3.5 3.4M15.5 12c-1.8 0-3.5 1.2-3.5 3.4"/>'
+  };
+  MenuCore.markSvg = function (k) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (MenuCore.MARK_ICONS[k] || '') + '</svg>';
   };
 
   MenuCore.uid = function () {
