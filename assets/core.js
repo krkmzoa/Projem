@@ -20,7 +20,7 @@
     m.theme = m.theme || {};
     m.categories = Array.isArray(m.categories) ? m.categories : [];
     var c = m.cafe;
-    ['name', 'slogan', 'logo', 'phone', 'instagram', 'address', 'wifiName', 'wifiPassword', 'note', 'menuUrl'].forEach(function (k) {
+    ['name', 'slogan', 'logo', 'phone', 'instagram', 'address', 'wifiName', 'wifiPassword', 'note', 'menuUrl', 'cover', 'website', 'facebook', 'hours', 'mapsUrl'].forEach(function (k) {
       if (typeof c[k] !== 'string') c[k] = '';
     });
     if (!c.currency) c.currency = '₺';
@@ -32,6 +32,7 @@
     m.tvSlides = (Array.isArray(m.tvSlides) ? m.tvSlides : []).filter(function (s) { return s && s.image; });
     m.tvSlides.forEach(function (s) { if (!s.id) s.id = MenuCore.uid(); s.active = s.active !== false; });
     if (['auto', 'light', 'dark', 'custom'].indexOf(m.theme.mode) === -1) m.theme.mode = 'auto';
+    if (['always', 'noqr', 'never'].indexOf(m.theme.landing) === -1) m.theme.landing = 'always';
     if (m.theme.tvMode !== 'same') m.theme.tvMode = 'dark';
     var pc = m.theme.colors = m.theme.colors || {};
     ['bg', 'surface', 'text', 'muted'].forEach(function (k) { if (!/^#[0-9a-fA-F]{6}$/.test(pc[k] || '')) pc[k] = MenuCore.PALETTES.light[k]; });
@@ -40,6 +41,8 @@
       cat.name = cat.name || '';
       cat.icon = cat.icon || '';
       cat.hidden = !!cat.hidden;
+      cat.image = cat.image || '';
+      cat.description = cat.description || '';
       cat.items = Array.isArray(cat.items) ? cat.items : [];
       cat.items.forEach(function (it) {
         if (!it.id) it.id = MenuCore.uid();
@@ -50,6 +53,7 @@
         it.tags = Array.isArray(it.tags) ? it.tags : [];
         it.image = it.image || '';
         it.available = it.available !== false;
+        it.calories = Math.max(0, Math.round(Number(it.calories) || 0));
       });
     });
     return m;
@@ -162,6 +166,9 @@
     if (mode === 'custom') setPalette(t.colors || {});
     else if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
   };
+
+  /** Dosya yolu video mu? */
+  MenuCore.isVideo = function (p) { return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(p || ''); };
 
   MenuCore.qrSvg = function (text) {
     var qr = global.qrcode(0, 'M');

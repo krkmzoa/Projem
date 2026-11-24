@@ -9,7 +9,7 @@
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --accent: #b5651d;
@@ -34,42 +34,91 @@
     --line: #342a22; --chip: #2c231c; --shadow: 0 1px 2px rgba(0,0,0,.3);
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; }
   body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+  body.lock { overflow: hidden; }
   .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  button { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+  .ico { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: block; }
 
-  header.hero { padding: 28px 0 18px; text-align: center; }
-  .logo { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 12px; box-shadow: var(--shadow); background: var(--surface); }
-  .hero h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(28px, 7vw, 40px); margin: 0; letter-spacing: -.01em; }
-  .hero p { margin: 6px 0 0; color: var(--muted); }
-  .table-badge { display: inline-block; margin-top: 12px; padding: 4px 12px; border-radius: 999px; background: var(--accent); color: var(--on-accent, #fff); font-size: 14px; font-weight: 600; }
+  /* ---------- açılış ekranı ---------- */
+  .landing { position: fixed; inset: 0; z-index: 60; background: #1a1410; color: #fff; overflow: hidden; transition: opacity .5s ease, visibility .5s; }
+  .landing.gone { opacity: 0; visibility: hidden; }
+  .landing .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background-size: cover; background-position: center; }
+  .landing .bg.kb { animation: kb 24s ease-in-out infinite alternate; }
+  @keyframes kb { from { transform: scale(1); } to { transform: scale(1.12) translate(-1%, -2%); } }
+  .landing .bg.grad { background: radial-gradient(120% 80% at 30% 20%, color-mix(in srgb, var(--accent) 70%, #000) 0%, #120d0a 70%); }
+  .landing .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.15) 40%, rgba(0,0,0,.6) 100%); }
+  .landing .center { position: absolute; left: 0; right: 0; top: 30%; text-align: center; padding: 0 24px; }
+  .landing .lg { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin: 0 auto 22px; display: block; background: #fff; box-shadow: 0 6px 30px rgba(0,0,0,.35); }
+  .landing h1 { margin: 0; font-weight: 300; font-size: clamp(30px, 9vw, 64px); letter-spacing: .32em; text-indent: .32em; line-height: 1.15; text-shadow: 0 2px 20px rgba(0,0,0,.35); }
+  .landing.long h1 { font-size: clamp(24px, 7.2vw, 52px); letter-spacing: .2em; text-indent: .2em; }
+  .landing p { margin: 14px 0 0; font-weight: 300; font-size: clamp(12px, 3.4vw, 16px); letter-spacing: .3em; text-indent: .3em; opacity: .92; }
+  .landing .bottom { position: absolute; left: 0; right: 0; bottom: calc(40px + env(safe-area-inset-bottom)); text-align: center; }
+  .landing .go { background: none; border: 0; color: #fff; font-size: 24px; font-weight: 600; letter-spacing: .04em; padding: 12px 34px; cursor: pointer; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+  .landing .go span { display: block; width: 26px; height: 2px; background: #fff; margin: 8px auto 0; border-radius: 2px; animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 50% { width: 46px; } }
+  .landing .table { display: inline-block; margin-top: 18px; padding: 4px 14px; border: 1px solid rgba(255,255,255,.6); border-radius: 999px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+  .socials { display: flex; justify-content: center; gap: 16px; margin-top: 26px; }
+  .socials a { width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; color: inherit; text-decoration: none; }
+  .socials .ico { width: 21px; height: 21px; }
 
-  .bar { position: sticky; top: 0; z-index: 10; background: var(--bg); background: color-mix(in srgb, var(--bg) 92%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-  .bar .wrap { display: flex; align-items: center; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
+  /* ---------- üst kısım ---------- */
+  header.hero { padding: 26px 0 14px; text-align: center; position: relative; }
+  .hero .menu-btn { position: absolute; right: 12px; top: 14px; }
+  .logo { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 10px; box-shadow: var(--shadow); background: var(--surface); }
+  .hero h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(24px, 6.4vw, 38px); margin: 0 auto; padding: 0 40px; letter-spacing: -.01em; line-height: 1.15; max-width: 900px; }
+  .hero p { margin: 4px 0 0; color: var(--muted); }
+  .table-badge { display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 999px; background: var(--accent); color: var(--on-accent, #fff); font-size: 14px; font-weight: 600; }
+  .icon-btn { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--chip); color: var(--text); display: grid; place-items: center; cursor: pointer; }
+
+  .searchrow { padding: 6px 16px 4px; }
+  .search { position: relative; }
+  .search .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); width: 18px; height: 18px; }
+  .search input { width: 100%; padding: 12px 14px 12px 42px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 16px var(--sans); outline: none; -webkit-appearance: none; }
+  .search input:focus { border-color: var(--accent); }
+
+  /* fotoğraflı kategori kutuları */
+  .tiles { display: flex; gap: 12px; overflow-x: auto; padding: 14px 16px 6px; scrollbar-width: none; scroll-snap-type: x proximity; max-width: 1100px; margin: 0 auto; }
+  .tiles::-webkit-scrollbar { display: none; }
+  .tile { flex: none; width: 116px; border: 0; background: none; padding: 0; cursor: pointer; text-align: center; scroll-snap-align: start; }
+  .tile .ph { width: 116px; height: 92px; border-radius: 12px; background: var(--chip) center/cover no-repeat; display: grid; place-items: center; font-size: 34px; border: 2px solid transparent; box-shadow: var(--shadow); }
+  .tile.active .ph { border-color: var(--accent); }
+  .tile .nm { display: block; margin-top: 7px; font-size: 14px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile.active .nm { color: var(--text); font-weight: 600; }
+  @media (min-width: 720px) { .tile, .tile .ph { width: 140px; } .tile .ph { height: 108px; } }
+
+  /* sabit kategori şeridi */
   .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex: 1; scroll-behavior: smooth; }
   .chips::-webkit-scrollbar { display: none; }
   .chip { flex: none; border: 0; background: var(--chip); color: var(--text); padding: 8px 14px; border-radius: 999px; font: 500 14px var(--sans); cursor: pointer; white-space: nowrap; }
   .chip.active { background: var(--accent); color: var(--on-accent, #fff); }
-  .icon-btn { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--chip); color: var(--text); display: grid; place-items: center; cursor: pointer; }
-  .bar .search { display: none; padding-bottom: 10px; }
-  .bar .search.open { display: block; }
-  .search input { width: 100%; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 16px var(--sans); outline: none; }
-  .search input:focus { border-color: var(--accent); }
+  .inline-chips { padding: 12px 16px 4px; max-width: 1100px; margin: 0 auto; }
+  .bar { position: fixed; top: 0; left: 0; right: 0; z-index: 20; background: var(--bg); background: color-mix(in srgb, var(--bg) 94%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); transform: translateY(-105%); transition: transform .25s ease; }
+  .bar.on { transform: none; }
+  .bar .wrap { display: flex; align-items: center; gap: 8px; padding-top: 9px; padding-bottom: 9px; }
 
-  main { padding: 8px 0 40px; }
-  section.cat { padding-top: 22px; scroll-margin-top: 70px; }
-  section.cat h2 { font-family: var(--serif); font-weight: 600; font-size: 24px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  /* ---------- liste ---------- */
+  main { padding: 4px 0 40px; }
+  section.cat { padding-top: 26px; scroll-margin-top: 66px; }
+  .cat-head h2 { font-family: var(--serif); font-weight: 600; font-size: 24px; margin: 0; display: flex; align-items: center; gap: 8px; }
+  .cat-head .cdesc { color: var(--muted); margin: 4px 0 0; }
+  .cat-head { margin-bottom: 14px; }
+  .cat-head.has-img { text-align: center; }
+  .cat-head.has-img h2 { justify-content: center; }
+  .cover { width: 100%; aspect-ratio: 16 / 7; border-radius: 14px; object-fit: cover; display: block; margin-bottom: 14px; background: var(--chip); }
   .items { display: grid; grid-template-columns: 1fr; gap: 10px; }
-  @media (min-width: 720px) { .items { grid-template-columns: 1fr 1fr; gap: 12px; } }
+  @media (min-width: 720px) { .items { grid-template-columns: 1fr 1fr; gap: 12px; } .cover { aspect-ratio: 16 / 5; } }
   @media (min-width: 1024px) { body { font-size: 17px; } }
 
   .item { display: flex; gap: 12px; background: var(--surface); border-radius: 14px; padding: 14px; box-shadow: var(--shadow); cursor: pointer; text-align: left; border: 0; color: inherit; font: inherit; width: 100%; align-items: flex-start; }
   .item .body { flex: 1; min-width: 0; }
   .item .name { font-weight: 600; margin: 0; }
-  .item .desc { color: var(--muted); font-size: .9em; margin: 3px 0 0; }
+  .item .desc { color: var(--muted); font-size: .9em; margin: 3px 0 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .item .price { margin-top: 8px; font-weight: 600; color: var(--accent); display: flex; flex-wrap: wrap; gap: 4px 14px; }
   .item .price small { color: var(--muted); font-weight: 500; margin-right: 4px; }
-  .item img { width: 88px; height: 88px; border-radius: 10px; object-fit: cover; flex: none; background: var(--chip); }
+  .item img { width: 96px; height: 96px; border-radius: 10px; object-fit: cover; flex: none; background: var(--chip); }
   .item.soldout { opacity: .55; }
   .tag { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding: 2px 7px; border-radius: 6px; background: var(--chip); color: var(--accent); margin-left: 6px; vertical-align: 2px; }
   .tag.out { background: #b3261e; color: #fff; }
@@ -82,32 +131,74 @@
   .info a { color: var(--accent); text-decoration: none; }
   .note { text-align: center; }
 
-  .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 30; display: none; }
-  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; background: var(--surface); border-radius: 20px 20px 0 0; max-height: 88vh; overflow: auto; transform: translateY(100%); transition: transform .25s ease; padding-bottom: env(safe-area-inset-bottom); }
-  .sheet.open { transform: none; }
-  .sheet-bg.open { display: block; }
-  @media (min-width: 720px) { .sheet { left: 50%; right: auto; width: 520px; bottom: auto; top: 50%; border-radius: 20px; transform: translate(-50%, -40%); opacity: 0; pointer-events: none; transition: .2s; } .sheet.open { transform: translate(-50%, -50%); opacity: 1; pointer-events: auto; } }
-  .sheet img { width: 100%; max-height: 50vh; object-fit: cover; display: block; }
-  .sheet .content { padding: 18px 20px 24px; }
-  .sheet h3 { font-family: var(--serif); font-size: 26px; margin: 0 0 6px; }
-  .sheet p { color: var(--muted); margin: 0 0 14px; }
-  .sheet .rows div { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--line); font-weight: 600; }
-  .sheet .rows div span:last-child { color: var(--accent); }
-  .sheet .close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 20px; cursor: pointer; }
+  /* başa dön */
+  .totop { position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 25; width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--text); color: var(--bg); box-shadow: 0 6px 20px rgba(0,0,0,.25); display: grid; place-items: center; cursor: pointer; opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; }
+  .totop.on { opacity: .9; transform: none; pointer-events: auto; }
+
+  /* ---------- yan menü ---------- */
+  .dim { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 40; opacity: 0; visibility: hidden; transition: .25s; }
+  .dim.on { opacity: 1; visibility: visible; }
+  .drawer { position: fixed; top: 0; bottom: 0; right: 0; width: min(360px, 86vw); z-index: 41; background: var(--bg); transform: translateX(102%); transition: transform .28s ease; overflow-y: auto; padding: 18px 22px calc(28px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; }
+  .drawer.on { transform: none; }
+  .drawer .x { align-self: flex-end; }
+  .drawer .brand { text-align: center; margin: 10px 0 24px; }
+  .drawer .brand img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 10px; }
+  .drawer .brand b { font-family: var(--serif); font-size: 22px; font-weight: 600; display: block; }
+  .drawer .brand small { color: var(--muted); }
+  .drow { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
+  .drow .ico { flex: none; margin-top: 2px; color: var(--muted); }
+  .drow b { display: block; font-weight: 600; }
+  .drow span { color: var(--muted); white-space: pre-line; }
+  .copy { margin-left: auto; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; cursor: pointer; flex: none; }
+  .drawer .socials { margin-top: auto; padding-top: 22px; color: var(--text); }
+  .drawer .socials a { width: 44px; height: 44px; }
+
+  /* ---------- ürün detayı ---------- */
+  .sheet { position: fixed; left: 0; right: 0; top: 0; bottom: 0; z-index: 45; background: var(--bg); overflow-y: auto; transform: translateY(102%); transition: transform .28s ease; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior: contain; }
+  .sheet.on { transform: none; }
+  @media (min-width: 720px) {
+    .sheet { left: 50%; right: auto; bottom: auto; top: 50%; width: 540px; max-height: 90vh; box-shadow: 0 20px 60px rgba(0,0,0,.35); border-radius: 20px; transform: translate(-50%, -46%); opacity: 0; visibility: hidden; transition: .22s; }
+    .sheet.on { transform: translate(-50%, -50%); opacity: 1; visibility: visible; }
+  }
+  .sheet .media { position: relative; }
+  .sheet .media img { width: 100%; aspect-ratio: 1 / 1; max-height: 58vh; object-fit: cover; display: block; }
+  .sheet .tools { position: absolute; left: 14px; right: 14px; top: calc(14px + env(safe-area-inset-top)); display: flex; justify-content: space-between; }
+  .sheet .noimg .tools { position: static; padding: 14px 14px 0; }
+  .round { width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: #1c1714; display: grid; place-items: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.2); }
+  .noimg .round { background: var(--chip); color: var(--text); box-shadow: none; }
+  .kcal { position: absolute; left: 14px; bottom: 34px; background: rgba(255,255,255,.9); color: #1c1714; border-radius: 999px; padding: 5px 12px; font-size: 14px; font-weight: 500; display: flex; gap: 6px; align-items: center; }
+  .kcal .ico { width: 16px; height: 16px; }
+  .noimg .kcal { position: static; display: inline-flex; background: var(--chip); color: var(--text); margin: 0 0 12px; }
+  .sheet .content { position: relative; background: var(--bg); border-radius: 20px 20px 0 0; margin-top: -22px; padding: 22px 20px 26px; }
+  .noimg + .content { margin-top: 0; }
+  .sheet h3 { font-family: var(--serif); font-size: 28px; font-weight: 600; margin: 0 0 8px; line-height: 1.15; }
+  .sheet .d { color: var(--muted); margin: 0 0 14px; font-size: 16.5px; }
+  .sheet .rows { margin-top: 10px; }
+  .sheet .rows div { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); font-size: 17px; }
+  .sheet .rows div span:last-child { color: var(--accent); font-weight: 600; }
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 120px); background: #1c1714; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 500; z-index: 70; transition: transform .25s; }
+  .toast.on { transform: translate(-50%, 0); }
   .loading { text-align: center; padding: 80px 16px; color: var(--muted); }
 </style>
 </head>
 <body>
+<div id="landing" class="landing" hidden></div>
 <div id="app"><div class="loading">Menü yükleniyor…</div></div>
-
-<div class="sheet-bg" id="sheetBg"></div>
+<div class="bar" id="bar"><div class="wrap"><nav class="chips" id="barChips"></nav>
+  <button class="icon-btn" id="barSearch" aria-label="Ara"><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+  <button class="icon-btn" data-open-drawer aria-label="Bilgiler"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</div></div>
+<button class="totop" id="totop" aria-label="Başa dön"><svg class="ico" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+<div class="dim" id="dim"></div>
+<aside class="drawer" id="drawer" aria-label="Kafe bilgileri"></aside>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast"></div>
 
 <script>
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 9;
+  var BUILD = 10;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -129,25 +220,88 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=9"></script>
+<script src="assets/core.js?v=10"></script>
 <script>
 (function () {
   'use strict';
   var C = window.MenuCore, esc = C.esc;
+  var $ = function (id) { return document.getElementById(id); };
   var params = new URLSearchParams(location.search);
   var table = params.get('masa');
   var kiosk = params.get('kiosk') === '1';
+  var fromQr = !!table;
   if (table) try { sessionStorage.setItem('masa', table); } catch (e) {}
   if (!table) try { table = sessionStorage.getItem('masa'); } catch (e) {}
 
-  var menu = null, lastJson = '', app = document.getElementById('app');
+  var menu = null, lastJson = '', app = $('app');
 
+  // ---------- simgeler ----------
+  var I = {
+    back: '<path d="M19 12H5M12 19l-7-7 7-7"/>',
+    share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+    close: '<path d="M18 6 6 18M6 6l12 12"/>',
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+    fire: '<path d="M12 22c4 0 7-2.7 7-7 0-4-3-6-4-9-1 2-2 3-3.5 3.5C11 7 11 4 9 2 9 6 5 9 5 15c0 4.3 3 7 7 7z"/><path d="M12 22c-1.7 0-3-1.2-3-3 0-2 1.5-2.5 2-4 1 1 2 1.5 2.5 2.5.6 1.3.5 4.5-1.5 4.5z"/>',
+    wifi: '<path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a15 15 0 0 1 20 0"/><circle cx="12" cy="19.5" r=".8"/>',
+    phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
+    pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    ig: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/>',
+    fb: '<path d="M15 3h-2.5A4.5 4.5 0 0 0 8 7.5V10H5.5v3.5H8V21h3.5v-7.5H14l.5-3.5h-3V8a1 1 0 0 1 1-1H15z"/>',
+    web: '<path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'
+  };
+  function ico(n) { return '<svg class="ico" viewBox="0 0 24 24">' + I[n] + '</svg>'; }
+
+  var toastT;
+  function toast(t) { var el = $('toast'); el.textContent = t; el.className = 'toast on'; clearTimeout(toastT); toastT = setTimeout(function () { el.className = 'toast'; }, 2200); }
+
+  function socialsHtml(cafe) {
+    var s = '';
+    if (cafe.facebook) s += '<a href="' + esc(linkify(cafe.facebook, 'https://facebook.com/')) + '" target="_blank" rel="noopener" aria-label="Facebook">' + ico('fb') + '</a>';
+    if (cafe.instagram) s += '<a href="https://instagram.com/' + encodeURIComponent(cafe.instagram.replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/$/, '')) + '" target="_blank" rel="noopener" aria-label="Instagram">' + ico('ig') + '</a>';
+    if (cafe.website) s += '<a href="' + esc(linkify(cafe.website, 'https://')) + '" target="_blank" rel="noopener" aria-label="Web sitesi">' + ico('web') + '</a>';
+    return s ? '<div class="socials">' + s + '</div>' : '';
+  }
+  function linkify(v, prefix) { return /^https?:\/\//i.test(v) ? v : prefix + v.replace(/^@/, ''); }
+  function mapsLink(cafe) { return cafe.mapsUrl || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((cafe.name ? cafe.name + ' ' : '') + cafe.address)); }
+
+  // ---------- açılış ekranı ----------
+  var landingWanted = false;
+  function shouldShowLanding() {
+    var mode = menu.theme.landing;
+    if (mode === 'never') return false;
+    if (mode === 'noqr' && fromQr) return false;
+    if (kiosk) return true;
+    try { if (sessionStorage.getItem('landed')) return false; } catch (e) {}
+    return true;
+  }
+  function renderLanding() {
+    var cafe = menu.cafe, el = $('landing'), bg;
+    if (cafe.cover && C.isVideo(cafe.cover)) bg = '<video class="bg" src="' + esc(cafe.cover) + '" autoplay muted loop playsinline preload="auto"></video>';
+    else if (cafe.cover) bg = '<div class="bg kb" style="background-image:url(\'' + esc(cafe.cover) + '\')"></div>';
+    else bg = '<div class="bg grad"></div>';
+    el.innerHTML = bg + '<div class="shade"></div>' +
+      '<div class="center">' + (cafe.logo && !cafe.cover ? '<img class="lg" src="' + esc(cafe.logo) + '" alt="">' : '') +
+      '<h1>' + esc(cafe.name || 'Menü') + '</h1>' + (cafe.slogan ? '<p>' + esc(cafe.slogan) + '</p>' : '') +
+      (table ? '<div class="table">Masa ' + esc(table) + '</div>' : '') + '</div>' +
+      '<div class="bottom"><button class="go" id="go">Menü<span></span></button>' + socialsHtml(cafe) + '</div>';
+    $('go').onclick = hideLanding;
+    var v = el.querySelector('video'); if (v) { v.muted = true; var p = v.play && v.play(); if (p && p.catch) p.catch(function () {}); }
+  }
+  function showLanding() { renderLanding(); var el = $('landing'); el.hidden = false; el.className = 'landing' + ((menu.cafe.name || '').length > 12 ? ' long' : ''); document.body.classList.add('lock'); }
+  function hideLanding() {
+    try { sessionStorage.setItem('landed', '1'); } catch (e) {}
+    var el = $('landing'); el.className = 'landing gone'; document.body.classList.remove('lock');
+    setTimeout(function () { if (el.className.indexOf('gone') !== -1) { el.hidden = true; el.innerHTML = ''; } }, 600);
+  }
+
+  // ---------- menü ----------
   function priceHtml(it) {
     return C.prices(it).map(function (p) {
       return '<span>' + (p.name ? '<small>' + esc(p.name) + '</small>' : '') + esc(C.price(p.price, menu.cafe.currency)) + '</span>';
     }).join('');
   }
-
   function itemHtml(it, ci, ii) {
     var tags = (it.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
     if (!it.available) tags += '<span class="tag out">Tükendi</span>';
@@ -161,75 +315,101 @@
 
   function render() {
     var cafe = menu.cafe, cats = C.visibleCategories(menu);
+    var useTiles = cats.some(function (c) { return c.image; });
     document.title = (cafe.name || 'Menü') + ' — Menü';
     C.applyTheme(menu, 'menu');
     if (params.get('tema')) document.documentElement.setAttribute('data-theme', params.get('tema'));
-    var h = '';
-    h += '<header class="hero wrap">' +
+
+    var chipsHtml = cats.map(function (c) { return '<button class="chip" data-target="c-' + esc(c.id) + '">' + (c.icon ? esc(c.icon) + ' ' : '') + esc(c.name) + '</button>'; }).join('');
+    var h = '<header class="hero wrap"><button class="icon-btn menu-btn" data-open-drawer aria-label="Bilgiler">' + ico('menu') + '</button>' +
       (cafe.logo ? '<img class="logo" src="' + esc(cafe.logo) + '" alt="">' : '') +
       '<h1>' + esc(cafe.name || 'Menü') + '</h1>' +
       (cafe.slogan ? '<p>' + esc(cafe.slogan) + '</p>' : '') +
-      (table ? '<span class="table-badge">Masa ' + esc(table) + '</span>' : '') +
-      '</header>';
-    h += '<div class="bar"><div class="wrap"><nav class="chips" id="chips">' +
-      cats.map(function (c) { return '<button class="chip" data-target="c-' + esc(c.id) + '">' + (c.icon ? esc(c.icon) + ' ' : '') + esc(c.name) + '</button>'; }).join('') +
-      '</nav><button class="icon-btn" id="searchBtn" aria-label="Ara"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button></div>' +
-      '<div class="wrap search" id="search"><input id="q" type="search" placeholder="Menüde ara…" autocomplete="off"></div></div>';
+      (table ? '<span class="table-badge">Masa ' + esc(table) + '</span>' : '') + '</header>';
+    h += '<div class="searchrow wrap"><label class="search">' + ico('search') + '<input id="q" type="search" placeholder="Menüde ara…" autocomplete="off" enterkeyhint="search"></label></div>';
+    if (useTiles) {
+      h += '<nav class="tiles" id="nav">' + cats.map(function (c) {
+        return '<button class="tile" data-target="c-' + esc(c.id) + '"><span class="ph"' + (c.image ? ' style="background-image:url(\'' + esc(c.image) + '\')"' : '') + '>' + (c.image ? '' : esc(c.icon || '')) + '</span><span class="nm">' + esc(c.name) + '</span></button>';
+      }).join('') + '</nav>';
+    } else {
+      h += '<nav class="chips inline-chips" id="nav">' + chipsHtml + '</nav>';
+    }
     h += '<main class="wrap" id="list">';
     cats.forEach(function (c) {
       var ci = menu.categories.indexOf(c);
-      h += '<section class="cat" id="c-' + esc(c.id) + '"><h2>' + (c.icon ? '<span>' + esc(c.icon) + '</span>' : '') + esc(c.name) + '</h2><div class="items">' +
-        c.items.map(function (it, ii) { return itemHtml(it, ci, ii); }).join('') + '</div></section>';
+      h += '<section class="cat" id="c-' + esc(c.id) + '">' +
+        (c.image ? '<img class="cover" loading="lazy" src="' + esc(c.image) + '" alt="">' : '') +
+        '<div class="cat-head' + (c.image ? ' has-img' : '') + '"><h2>' + (c.icon && !c.image ? '<span>' + esc(c.icon) + '</span>' : '') + esc(c.name) + '</h2>' +
+        (c.description ? '<p class="cdesc">' + esc(c.description) + '</p>' : '') + '</div>' +
+        '<div class="items">' + c.items.map(function (it, ii) { return itemHtml(it, ci, ii); }).join('') + '</div></section>';
     });
     if (!cats.length) h += '<p class="empty">Menü henüz hazır değil.</p>';
     h += '<p class="empty" id="noResult" hidden>Aramanızla eşleşen ürün yok.</p></main>';
 
     var info = [];
     if (cafe.wifiName) info.push('<div><b>Wi-Fi</b>' + esc(cafe.wifiName) + (cafe.wifiPassword ? ' · Şifre: <span style="user-select:all">' + esc(cafe.wifiPassword) + '</span>' : '') + '</div>');
-    if (cafe.instagram) { var ig = cafe.instagram.replace(/^@/, ''); info.push('<div><b>Instagram</b><a href="https://instagram.com/' + encodeURIComponent(ig) + '" target="_blank" rel="noopener">@' + esc(ig) + '</a></div>'); }
+    if (cafe.hours) info.push('<div><b>Çalışma saatleri</b><span style="white-space:pre-line">' + esc(cafe.hours) + '</span></div>');
     if (cafe.phone) info.push('<div><b>Telefon</b><a href="tel:' + esc(cafe.phone.replace(/\s/g, '')) + '">' + esc(cafe.phone) + '</a></div>');
-    if (cafe.address) info.push('<div><b>Adres</b>' + esc(cafe.address) + '</div>');
+    if (cafe.address) info.push('<div><b>Adres</b><a href="' + esc(mapsLink(cafe)) + '" target="_blank" rel="noopener">' + esc(cafe.address) + '</a></div>');
     h += '<footer><div class="wrap">' + (info.length ? '<div class="info">' + info.join('') + '</div>' : '') +
       (cafe.note ? '<p class="note">' + esc(cafe.note) + '</p>' : '') + '</div></footer>';
 
-    var y = window.scrollY;
+    var y = window.scrollY, q = $('q') ? $('q').value : '';
     app.innerHTML = h;
+    $('barChips').innerHTML = chipsHtml;
     window.scrollTo(0, y);
+    renderDrawer();
     bind();
+    if (q) { $('q').value = q; filter(q); }
   }
 
+  function goTo(id) {
+    var s = $(id); if (!s) return;
+    var top = s.getBoundingClientRect().top + window.scrollY - 62;
+    window.scrollTo({ top: top, behavior: 'smooth' });
+  }
+
+  var spy = null;
   function bind() {
-    var chips = document.getElementById('chips');
-    chips.addEventListener('click', function (e) {
-      var b = e.target.closest('.chip'); if (!b) return;
-      var s = document.getElementById(b.getAttribute('data-target'));
-      if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-    document.getElementById('searchBtn').addEventListener('click', function () {
-      var s = document.getElementById('search'); s.classList.toggle('open');
-      if (s.classList.contains('open')) document.getElementById('q').focus(); else { document.getElementById('q').value = ''; filter(''); }
-    });
-    document.getElementById('q').addEventListener('input', function (e) { filter(e.target.value); });
-    document.getElementById('list').addEventListener('click', function (e) {
+    $('nav').onclick = $('barChips').onclick = function (e) {
+      var b = e.target.closest('[data-target]'); if (b) goTo(b.getAttribute('data-target'));
+    };
+    $('q').addEventListener('input', function (e) { filter(e.target.value); });
+    $('list').addEventListener('click', function (e) {
       var b = e.target.closest('.item'); if (!b) return;
       openSheet(menu.categories[+b.getAttribute('data-c')].items[+b.getAttribute('data-i')]);
     });
     // Aktif kategoriyi işaretle
+    if (spy) spy.disconnect();
     if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
+      spy = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) {
           if (!en.isIntersecting) return;
-          var btns = chips.querySelectorAll('.chip');
-          for (var i = 0; i < btns.length; i++) {
-            var on = btns[i].getAttribute('data-target') === en.target.id;
-            btns[i].classList.toggle('active', on);
-            if (on) chips.scrollTo({ left: btns[i].offsetLeft - 16, behavior: 'smooth' });
-          }
+          [$('nav'), $('barChips')].forEach(function (box) {
+            var btns = box.querySelectorAll('[data-target]');
+            for (var i = 0; i < btns.length; i++) {
+              var on = btns[i].getAttribute('data-target') === en.target.id;
+              btns[i].classList.toggle('active', on);
+              if (on && box.scrollWidth > box.clientWidth) box.scrollTo({ left: btns[i].offsetLeft - 16, behavior: 'smooth' });
+            }
+          });
         });
-      }, { rootMargin: '-80px 0px -70% 0px' });
-      document.querySelectorAll('section.cat').forEach(function (s) { io.observe(s); });
+      }, { rootMargin: '-70px 0px -70% 0px' });
+      document.querySelectorAll('section.cat').forEach(function (s) { spy.observe(s); });
     }
+    onScroll();
   }
+
+  // sabit şerit ve başa dön düğmesi
+  function onScroll() {
+    var nav = $('nav'); if (!nav) return;
+    var past = nav.getBoundingClientRect().bottom < 0;
+    $('bar').className = 'bar' + (past ? ' on' : '');
+    $('totop').className = 'totop' + (window.scrollY > 900 ? ' on' : '');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  $('totop').onclick = function () { window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  $('barSearch').onclick = function () { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(function () { $('q').focus(); }, 350); };
 
   function filter(q) {
     q = q.trim().toLocaleLowerCase('tr');
@@ -242,45 +422,105 @@
       });
       sec.style.display = vis ? '' : 'none'; if (vis) any = true;
     });
-    document.getElementById('noResult').hidden = any;
+    $('noResult').hidden = any;
   }
 
-  var sheet = document.getElementById('sheet'), sheetBg = document.getElementById('sheetBg');
-  function openSheet(it) {
+  // ---------- yan menü ----------
+  function renderDrawer() {
+    var cafe = menu.cafe, h = '<button class="icon-btn x" id="dx" aria-label="Kapat">' + ico('close') + '</button>';
+    h += '<div class="brand">' + (cafe.logo ? '<img src="' + esc(cafe.logo) + '" alt="">' : '') + '<b>' + esc(cafe.name || 'Menü') + '</b>' + (cafe.slogan ? '<small>' + esc(cafe.slogan) + '</small>' : '') + '</div>';
+    if (cafe.wifiName) h += '<div class="drow">' + ico('wifi') + '<div><b>' + esc(cafe.wifiName) + '</b>' + (cafe.wifiPassword ? '<span>Şifre: ' + esc(cafe.wifiPassword) + '</span>' : '<span>Şifresiz</span>') + '</div>' +
+      (cafe.wifiPassword ? '<button class="copy" id="copyWifi">Kopyala</button>' : '') + '</div>';
+    if (cafe.hours) h += '<div class="drow">' + ico('clock') + '<div><b>Çalışma saatleri</b><span>' + esc(cafe.hours) + '</span></div></div>';
+    if (cafe.phone) h += '<a class="drow" href="tel:' + esc(cafe.phone.replace(/\s/g, '')) + '">' + ico('phone') + '<div><b>' + esc(cafe.phone) + '</b><span>Aramak için dokunun</span></div></a>';
+    if (cafe.address) h += '<a class="drow" href="' + esc(mapsLink(cafe)) + '" target="_blank" rel="noopener">' + ico('pin') + '<div><b>Adres</b><span>' + esc(cafe.address) + '</span></div></a>';
+    h += socialsHtml(cafe);
+    $('drawer').innerHTML = h;
+    $('dx').onclick = closeDrawer;
+    if ($('copyWifi')) $('copyWifi').onclick = function () { copyText(cafe.wifiPassword, 'Wi-Fi şifresi kopyalandı'); };
+  }
+  function openDrawer() { $('drawer').className = 'drawer on'; $('dim').className = 'dim on'; document.body.classList.add('lock'); }
+  function closeDrawer() { $('drawer').className = 'drawer'; if (!sheetOpen) { $('dim').className = 'dim'; document.body.classList.remove('lock'); } }
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-open-drawer]')) openDrawer(); });
+  $('dim').onclick = function () { closeDrawer(); if (sheetOpen) closeSheet(); };
+
+  function copyText(t, msg) {
+    function fallback() { var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); toast(msg); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { toast(msg); }, fallback); else fallback();
+  }
+
+  // ---------- ürün detayı ----------
+  var sheet = $('sheet'), sheetOpen = false, sheetItem = null;
+  function findItem(id) {
+    for (var i = 0; i < menu.categories.length; i++) for (var j = 0; j < menu.categories[i].items.length; j++) if (menu.categories[i].items[j].id === id) return menu.categories[i].items[j];
+    return null;
+  }
+  function openSheet(it, fromHistory) {
+    sheetItem = it;
     var rows = C.prices(it).map(function (p) { return '<div><span>' + esc(p.name || 'Fiyat') + '</span><span>' + esc(C.price(p.price, menu.cafe.currency)) + '</span></div>'; }).join('');
-    sheet.innerHTML = '<button class="close" aria-label="Kapat">×</button>' +
-      (it.image ? '<img src="' + esc(it.image) + '" alt="">' : '<div style="height:44px"></div>') +
-      '<div class="content"><h3>' + esc(it.name) + (it.available ? '' : ' <span class="tag out">Tükendi</span>') + '</h3>' +
-      (it.description ? '<p>' + esc(it.description) + '</p>' : '') +
+    var tools = '<div class="tools"><button class="round" id="sBack" aria-label="Geri">' + ico('back') + '</button><button class="round" id="sShare" aria-label="Paylaş">' + ico('share') + '</button></div>';
+    var kcal = it.calories ? '<div class="kcal">' + ico('fire') + it.calories + ' kcal</div>' : '';
+    sheet.innerHTML = (it.image ? '<div class="media"><img src="' + esc(it.image) + '" alt="">' + tools + kcal + '</div>' : '<div class="media noimg">' + tools + '</div>') +
+      '<div class="content">' + (!it.image ? kcal : '') + '<h3>' + esc(it.name) + (it.available ? '' : ' <span class="tag out">Tükendi</span>') + '</h3>' +
+      (it.description ? '<p class="d">' + esc(it.description) + '</p>' : '') +
       (it.tags.length ? '<p>' + it.tags.map(function (t) { return '<span class="tag" style="margin:0 6px 0 0">' + esc(t) + '</span>'; }).join('') + '</p>' : '') +
       '<div class="rows">' + rows + '</div></div>';
-    sheet.classList.add('open'); sheetBg.classList.add('open');
-    sheet.querySelector('.close').onclick = closeSheet;
+    sheet.scrollTop = 0;
+    sheet.className = 'sheet on'; $('dim').className = 'dim on'; document.body.classList.add('lock');
+    sheetOpen = true;
+    $('sBack').onclick = closeSheet;
+    $('sShare').onclick = function () { shareItem(it); };
+    if (!fromHistory && history.pushState) history.pushState({ sheet: it.id }, '', '#u-' + it.id);
   }
-  function closeSheet() { sheet.classList.remove('open'); sheetBg.classList.remove('open'); }
-  sheetBg.onclick = closeSheet;
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+  function hideSheet() {
+    sheet.className = 'sheet'; sheetOpen = false;
+    if (!$('drawer').className.match(/\bon\b/)) { $('dim').className = 'dim'; document.body.classList.remove('lock'); }
+  }
+  function closeSheet() {
+    if (history.state && history.state.sheet) history.back();   // popstate kapatır
+    else { hideSheet(); if (location.hash.indexOf('#u-') === 0 && history.replaceState) history.replaceState(null, '', location.pathname + location.search); }
+  }
+  window.addEventListener('popstate', function () {
+    var m = location.hash.match(/^#u-(.+)$/), it = m && menu ? findItem(m[1]) : null;
+    if (it) openSheet(it, true); else if (sheetOpen) hideSheet();
+  });
+  function shareItem(it) {
+    var url = C.baseUrl(menu) + '#u-' + it.id, title = it.name + ' — ' + (menu.cafe.name || 'Menü');
+    if (navigator.share) navigator.share({ title: title, text: title, url: url }).catch(function () {});
+    else copyText(url, 'Bağlantı kopyalandı');
+  }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (sheetOpen) closeSheet(); else closeDrawer(); } });
 
+  // ---------- yükleme ----------
   function load(first) {
     return C.load().then(function (m) {
       var j = JSON.stringify(m);
       if (j === lastJson) return;
       lastJson = j; menu = m; render();
+      if (first) {
+        var hm = location.hash.match(/^#u-(.+)$/), it = hm ? findItem(hm[1]) : null;
+        if (it) { if (history.replaceState) history.replaceState(null, '', location.pathname + location.search); openSheet(it); }
+        else if (shouldShowLanding()) showLanding();
+      }
     }).catch(function (err) {
       if (first) app.innerHTML = '<div class="loading">Menü şu an yüklenemedi. Lütfen sayfayı yenileyin.<br><small>' + esc(err.message) + '</small></div>';
     });
   }
   load(true);
+  window.qrBusy = function () { return sheetOpen; };
 
-  // Tablet / kiosk modu: hareketsiz kalınca başa dön, menüyü düzenli yenile
+  // Tablet / kiosk modu: hareketsiz kalınca başa (ve açılış ekranına) dön, menüyü düzenli yenile
   if (kiosk) {
     var idle;
     var reset = function () {
       clearTimeout(idle);
       idle = setTimeout(function () {
-        closeSheet();
-        var q = document.getElementById('q'); if (q && q.value) { q.value = ''; filter(''); document.getElementById('search').classList.remove('open'); }
+        if (sheetOpen) hideSheet();
+        closeDrawer();
+        if (history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+        var q = $('q'); if (q && q.value) { q.value = ''; filter(''); }
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (menu && menu.theme.landing !== 'never') showLanding();
       }, 90000);
     };
     ['touchstart', 'click', 'scroll', 'keydown'].forEach(function (ev) { window.addEventListener(ev, reset, { passive: true }); });
