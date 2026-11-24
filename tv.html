@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menü Ekranı</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* TV ekranı: koyu, uzaktan okunur, dokunmasız. Eski TV tarayıcıları için sade CSS. */
+  :root { --accent: #b5651d; --bg: #14100d; --text: #f5ede4; --muted: #a8988a; --line: #3a2f27; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); cursor: none; }
+  body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 2.05vh; }
+  .serif { font-family: 'Fraunces', Georgia, 'Times New Roman', serif; }
+
+  .screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; padding: 3.2vh 3.4vw 2.6vh; }
+  .top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 1.8vh; border-bottom: 2px solid var(--line); }
+  .brand { display: flex; align-items: center; }
+  .brand img { height: 7vh; width: 7vh; border-radius: 50%; object-fit: cover; margin-right: 1.4vw; }
+  .brand h1 { margin: 0; font-size: 5vh; font-weight: 600; line-height: 1.05; }
+  .brand p { margin: .4vh 0 0; color: var(--muted); font-size: 2.1vh; }
+  .clock { font-size: 4.2vh; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .stage { flex: 1; position: relative; margin: 2.4vh 0 1.6vh; }
+  .page { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; transition: opacity .8s ease; }
+  .page.show { opacity: 1; }
+  .cols { height: 100%; overflow: hidden; column-fill: auto; -webkit-column-fill: auto; column-gap: 4vw; -webkit-column-gap: 4vw; }
+
+  .cat { margin: 0 0 1.2vh; padding-top: 1.2vh; font-size: 3.3vh; font-weight: 600; color: var(--accent); break-after: avoid; -webkit-column-break-after: avoid; page-break-after: avoid; }
+  .cat:first-child { padding-top: 0; }
+  .cat small { color: var(--muted); font-size: 1.8vh; font-weight: 400; font-family: 'Inter', sans-serif; }
+  .it { padding: .7vh 0 1vh; break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid; display: block; }
+  .row { display: flex; align-items: baseline; }
+  .nm { font-size: 2.5vh; font-weight: 600; }
+  .dots { flex: 1; border-bottom: .25vh dotted var(--line); margin: 0 .8vw; transform: translateY(-.5vh); min-width: 2vw; }
+  .pr { font-size: 2.5vh; font-weight: 600; white-space: nowrap; }
+  .pr span + span { margin-left: 1vw; }
+  .pr small { color: var(--muted); font-weight: 500; font-size: 1.8vh; margin-right: .3vw; }
+  .ds { color: var(--muted); font-size: 1.85vh; margin-top: .2vh; }
+  .tg { flex: none; align-self: center; font-size: 1.4vh; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--bg); background: var(--accent); padding: .15vh .5vw; border-radius: .5vh; margin-left: .6vw; vertical-align: .3vh; }
+  .out .nm, .out .pr { color: var(--muted); text-decoration: line-through; }
+  .out .tg.o { background: #8c2a22; color: #fff; text-decoration: none; }
+
+  .bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 1.6vh; border-top: 2px solid var(--line); color: var(--muted); font-size: 2vh; }
+  .qr { display: flex; align-items: center; }
+  .qr .code { width: 10vh; height: 10vh; background: #fff; border-radius: .8vh; overflow: hidden; margin-right: 1.2vw; }
+  .qr .code svg { width: 100%; height: 100%; display: block; }
+  .qr b { color: var(--text); display: block; font-size: 2.3vh; }
+  .dotsnav span { display: inline-block; width: 1.1vh; height: 1.1vh; border-radius: 50%; background: var(--line); margin-left: .7vh; }
+  .dotsnav span.on { background: var(--accent); }
+  .info span { margin-left: 2.2vw; }
+  .info b { color: var(--text); font-weight: 600; }
+  #measure { position: absolute; visibility: hidden; pointer-events: none; }
+  .msg { position: absolute; top: 40%; left: 0; right: 0; text-align: center; color: var(--muted); font-size: 3vh; }
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="top">
+    <div class="brand" id="brand"></div>
+    <div class="clock" id="clock"></div>
+  </div>
+  <div class="stage" id="stage"><div class="msg">Menü yükleniyor…</div></div>
+  <div class="bottom">
+    <div class="qr" id="qr"></div>
+    <div class="dotsnav" id="dots"></div>
+    <div class="info" id="info"></div>
+  </div>
+</div>
+
+<script src="assets/vendor/qrcode.js"></script>
+<script src="assets/core.js"></script>
+<script>
+(function () {
+  'use strict';
+  var C = window.MenuCore, esc = C.esc;
+  var params = new URLSearchParams(location.search);
+  var menu = null, lastJson = '', pages = [], pageIdx = 0, timer = null;
+  var stage = document.getElementById('stage');
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function tick() { var d = new Date(); document.getElementById('clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  tick(); setInterval(tick, 10000);
+
+  function itemEl(it) {
+    var cur = menu.cafe.currency;
+    var prices = C.prices(it).map(function (p) {
+      return '<span>' + (p.name ? '<small>' + esc(p.name) + '</small>' : '') + esc(C.price(p.price, cur)) + '</span>';
+    }).join('');
+    var tags = it.tags.map(function (t) { return '<span class="tg">' + esc(t) + '</span>'; }).join('');
+    if (!it.available) tags += '<span class="tg o">Tükendi</span>';
+    var d = document.createElement('div');
+    d.className = 'it' + (it.available ? '' : ' out');
+    d.innerHTML = '<div class="row"><span class="nm">' + esc(it.name) + '</span>' + tags + '<span class="dots"></span><span class="pr">' + prices + '</span></div>' +
+      (it.description ? '<div class="ds">' + esc(it.description) + '</div>' : '');
+    return d;
+  }
+  function catEl(c, cont) {
+    var d = document.createElement('div');
+    d.className = 'cat serif';
+    d.innerHTML = (c.icon ? esc(c.icon) + ' ' : '') + esc(c.name) + (cont ? ' <small>(devam)</small>' : '');
+    return d;
+  }
+
+  /* Kategorileri ekrana sığan sayfalara böler: öğeleri tek tek ekleyip taşma olunca yeni sayfaya geçer. */
+  function paginate() {
+    var cols = Math.max(1, Math.min(5, +menu.theme.tvColumns || 3));
+    var box = document.createElement('div');
+    box.className = 'cols'; box.id = 'measure';
+    box.style.width = stage.clientWidth + 'px';
+    box.style.height = stage.clientHeight + 'px';
+    box.style.columnCount = cols; box.style.webkitColumnCount = cols;
+    stage.appendChild(box);
+    var result = [], current = [];
+    function overflow() { return box.scrollWidth > box.clientWidth + 2; }
+    function flush() { if (current.length) result.push(current); current = []; box.innerHTML = ''; }
+    function add(el, mk) {
+      box.appendChild(el); current.push(mk);
+    }
+    C.visibleCategories(menu).forEach(function (c) {
+      var headCont = false;
+      function head() { add(catEl(c, headCont), { c: c, head: true, cont: headCont }); headCont = true; }
+      head();
+      if (overflow() && current.length > 1) { box.removeChild(box.lastChild); current.pop(); flush(); headCont = false; head(); }
+      c.items.forEach(function (it) {
+        add(itemEl(it), { c: c, it: it });
+        if (!overflow()) return;
+        // sığmadı: ürünü (ve sayfanın dibinde yalnız kalan başlığı) yeni sayfaya taşı
+        box.removeChild(box.lastChild); current.pop();
+        var last = current[current.length - 1];
+        var carried = null;
+        if (last && last.head) { box.removeChild(box.lastChild); current.pop(); carried = last; }
+        if (current.length) flush();
+        if (carried) { add(catEl(c, carried.cont), carried); } else { head(); }
+        add(itemEl(it), { c: c, it: it });
+      });
+    });
+    // sayfanın sonunda yalnız kalan başlığı at
+    if (current.length && current[current.length - 1].head) current.pop();
+    flush();
+    stage.removeChild(box);
+    return result;
+  }
+
+  function build() {
+    var specs = paginate();
+    var cols = Math.max(1, Math.min(5, +menu.theme.tvColumns || 3));
+    stage.innerHTML = '';
+    pages = specs.map(function (spec, i) {
+      var p = document.createElement('div');
+      p.className = 'page' + (i === 0 ? ' show' : '');
+      var box = document.createElement('div');
+      box.className = 'cols'; box.style.columnCount = cols; box.style.webkitColumnCount = cols;
+      spec.forEach(function (mk) { box.appendChild(mk.head ? catEl(mk.c, mk.cont) : itemEl(mk.it)); });
+      p.appendChild(box); stage.appendChild(p);
+      return p;
+    });
+    if (!pages.length) stage.innerHTML = '<div class="msg">Menü boş.</div>';
+    pageIdx = 0; dots(); schedule();
+  }
+
+  function dots() {
+    var h = '';
+    if (pages.length > 1) for (var i = 0; i < pages.length; i++) h += '<span' + (i === pageIdx ? ' class="on"' : '') + '></span>';
+    document.getElementById('dots').innerHTML = h;
+  }
+  function schedule() {
+    clearInterval(timer);
+    if (pages.length < 2) return;
+    var secs = Math.max(4, +menu.theme.tvSeconds || 12);
+    timer = setInterval(function () {
+      pages[pageIdx].className = 'page';
+      pageIdx = (pageIdx + 1) % pages.length;
+      pages[pageIdx].className = 'page show';
+      dots();
+    }, secs * 1000);
+  }
+
+  function renderChrome() {
+    var cafe = menu.cafe;
+    C.applyAccent(menu);
+    document.title = (cafe.name || 'Menü') + ' — TV';
+    document.getElementById('brand').innerHTML = (cafe.logo ? '<img src="' + esc(cafe.logo) + '" alt="">' : '') +
+      '<div><h1 class="serif">' + esc(cafe.name || 'Menü') + '</h1>' + (cafe.slogan ? '<p>' + esc(cafe.slogan) + '</p>' : '') + '</div>';
+    var qrBox = document.getElementById('qr');
+    if (params.get('qr') === '0') qrBox.innerHTML = '';
+    else {
+      try { qrBox.innerHTML = '<div class="code">' + C.qrSvg(C.baseUrl(menu)) + '</div><div><b>Menüyü telefonunuzda görün</b>Kameranızla okutun</div>'; }
+      catch (e) { qrBox.innerHTML = ''; }
+    }
+    var info = [];
+    if (cafe.wifiName) info.push('<span>Wi-Fi <b>' + esc(cafe.wifiName) + '</b>' + (cafe.wifiPassword ? ' · Şifre <b>' + esc(cafe.wifiPassword) + '</b>' : '') + '</span>');
+    if (cafe.instagram) info.push('<span>Instagram <b>@' + esc(cafe.instagram.replace(/^@/, '')) + '</b></span>');
+    document.getElementById('info').innerHTML = info.join('');
+  }
+
+  function render() { renderChrome(); build(); }
+
+  function load() {
+    return C.load().then(function (m) {
+      var j = JSON.stringify(m);
+      if (j === lastJson) return;
+      lastJson = j; menu = m;
+      var ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+      return ready.then(render);
+    }).catch(function () { if (!menu) stage.innerHTML = '<div class="msg">Menü yüklenemedi, tekrar deneniyor…</div>'; });
+  }
+  load();
+  setInterval(load, 60000);                       // değişiklikleri dakikada bir kontrol et
+  setTimeout(function () { location.reload(); }, 6 * 3600 * 1000); // uzun süre açık kalan TV için tazele
+  var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (menu) build(); }, 300); });
+})();
+</script>
+</body>
+</html>

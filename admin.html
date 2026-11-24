@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menü Paneli</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #b5651d; --bg: #f4f1ec; --surface: #ffffff; --surface2: #faf7f3; --text: #2a201a; --muted: #75665a;
+    --line: #e3d9ce; --ok: #2e7d4f; --warn: #b26a00; --danger: #b3261e; --shadow: 0 1px 3px rgba(60,40,20,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #14100d; --surface: #201914; --surface2: #261e18; --text: #f3ebe3; --muted: #b3a294; --line: #3a2f27; --ok: #5cc28a; --warn: #f0a640; --danger: #ef6b62; --shadow: none; }
+  }
+  :root[data-theme="dark"] { --bg: #14100d; --surface: #201914; --surface2: #261e18; --text: #f3ebe3; --muted: #b3a294; --line: #3a2f27; --ok: #5cc28a; --warn: #f0a640; --danger: #ef6b62; --shadow: none; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 16px; }
+
+  header { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .hrow { display: flex; align-items: center; gap: 10px; padding: 10px 0; flex-wrap: wrap; }
+  .title { font-weight: 700; font-size: 17px; margin-right: auto; }
+  .status { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--line); white-space: nowrap; }
+  .status.ok { color: var(--ok); } .status.dirty { color: var(--warn); } .status.off { color: var(--muted); }
+  .tabs { display: flex; gap: 4px; overflow-x: auto; }
+  .tab { border: 0; background: none; color: var(--muted); font-family: inherit; font-weight: 600; font-size: 14px; padding: 10px 12px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+  .tab.on { color: var(--text); border-color: var(--accent); }
+
+  button, .btn { font-family: inherit; font-weight: 600; font-size: 14px; line-height: 1; border-radius: 9px; padding: 9px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  button:hover, .btn:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary:disabled { opacity: .5; cursor: default; }
+  button.ghost { border-color: transparent; background: none; padding: 7px 8px; }
+  button.danger { color: var(--danger); }
+  button.small { padding: 6px 10px; font-size: 13px; }
+
+  main { padding: 18px 0 80px; }
+  .panel[hidden] { display: none; }
+  .note { background: var(--surface2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .note b { color: var(--text); }
+  .note.warn { border-color: var(--warn); }
+
+  .cat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 14px; box-shadow: var(--shadow); }
+  .cat.hidden-cat { opacity: .6; }
+  .chead { display: flex; align-items: center; gap: 6px; padding: 10px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .chead .icon { width: 48px; text-align: center; font-size: 18px; }
+  .chead .cname { flex: 1; min-width: 140px; font-weight: 700; font-size: 16px; }
+  input, textarea, select { font: inherit; color: var(--text); background: var(--surface2); border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; width: 100%; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+  .chead input { width: auto; }
+  .rows { padding: 4px 10px; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: var(--surface2); flex: none; border: 1px solid var(--line); }
+  .rmain { flex: 1; min-width: 0; cursor: pointer; }
+  .rname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rprice { color: var(--muted); font-size: 13px; }
+  .row.out .rname { text-decoration: line-through; color: var(--muted); }
+  .cfoot { padding: 8px 10px 12px; }
+  .switch { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; }
+  .switch input { appearance: none; -webkit-appearance: none; width: 36px; height: 20px; border-radius: 999px; background: var(--line); position: relative; padding: 0; border: 0; cursor: pointer; flex: none; transition: .15s; }
+  .switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: .15s; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+  .switch input:checked { background: var(--ok); }
+  .switch input:checked::after { left: 18px; }
+  .empty { color: var(--muted); padding: 12px 0; font-size: 14px; }
+
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow); }
+  .card h3 { margin: 0 0 12px; font-size: 16px; }
+  label.f { display: block; font-size: 13px; font-weight: 600; color: var(--muted); }
+  label.f > input, label.f > textarea, label.f > select { margin-top: 4px; font-weight: 400; font-size: 15px; }
+  [hidden] { display: none !important; }
+  .size input { font-size: 15px; }
+  .full { grid-column: 1 / -1; }
+  .hint { font-size: 12.5px; color: var(--muted); font-weight: 400; margin-top: 4px; }
+  ol.steps { padding-left: 20px; margin: 8px 0 0; } ol.steps li { margin-bottom: 6px; }
+  code { background: var(--surface2); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; font-size: 13px; }
+
+  dialog { border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 24px)); max-height: calc(100vh - 24px); background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+  dialog::backdrop { background: rgba(0,0,0,.45); }
+  .dhead { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--surface); z-index: 1; }
+  .dhead h2 { margin: 0; font-size: 17px; }
+  .dbody { padding: 16px; display: grid; gap: 14px; }
+  .dfoot { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line); position: sticky; bottom: 0; background: var(--surface); }
+  .dfoot .sp { flex: 1; }
+  .imgbox { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .imgbox img { width: 96px; height: 96px; border-radius: 10px; object-fit: cover; border: 1px solid var(--line); background: var(--surface2); }
+  .size { display: flex; gap: 6px; margin-top: 6px; } .size input:first-child { flex: 2; } .size input:nth-child(2) { flex: 1; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(120px); background: #2a201a; color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 600; z-index: 100; transition: transform .25s; max-width: calc(100vw - 32px); box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.err { background: var(--danger); }
+  @media (max-width: 560px) { .hide-sm, .row .small[data-a="edit"] { display: none; } .row { gap: 6px; } .row button.ghost, .chead button.ghost { padding: 7px 5px; }
+    .title { font-size: 15px; } .chead { flex-wrap: nowrap; gap: 4px; } .chead .cname { min-width: 0; font-size: 15px; } .chead .icon { width: 40px; padding: 8px 4px; }
+    .row .thumb:not(img) { display: none; } }
+  .links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <div class="title">☕ Menü Paneli</div>
+      <span class="status off" id="status">Yükleniyor…</span>
+      <a class="btn hide-sm" href="./" target="_blank" rel="noopener">Önizle ↗</a>
+      <button class="primary" id="publish">Yayınla</button>
+    </div>
+    <nav class="tabs">
+      <button class="tab on" data-tab="menu">Menü</button>
+      <button class="tab" data-tab="cafe">Kafe Bilgileri</button>
+      <button class="tab" data-tab="screens">Ekranlar & QR</button>
+      <button class="tab" data-tab="settings">Ayarlar</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- MENÜ -->
+  <section class="panel" id="p-menu">
+    <div class="note warn" id="connectNote" hidden>
+      <b>Henüz bağlanmadınız.</b> Değişiklik yapabilirsiniz ama yayınlamak için önce <a href="#" data-goto="settings">Ayarlar</a> sekmesinden bir kerelik GitHub bağlantısını kurun.
+    </div>
+    <div id="cats"></div>
+    <button id="addCat">+ Kategori ekle</button>
+  </section>
+
+  <!-- KAFE -->
+  <section class="panel" id="p-cafe" hidden>
+    <div class="card">
+      <h3>Genel</h3>
+      <div class="grid">
+        <label class="f">Kafe adı<input data-f="cafe.name"></label>
+        <label class="f">Slogan / alt başlık<input data-f="cafe.slogan"></label>
+        <label class="f full">Logo
+          <div class="imgbox" style="margin-top:6px">
+            <img id="logoPreview" alt="">
+            <button type="button" id="logoUpload">Logo yükle</button>
+            <button type="button" class="danger" id="logoRemove">Kaldır</button>
+          </div>
+        </label>
+        <label class="f">Para birimi<input data-f="cafe.currency" maxlength="4"></label>
+        <label class="f">Tema rengi<input type="color" data-f="theme.accent" style="height:40px;padding:3px"></label>
+      </div>
+    </div>
+    <div class="card">
+      <h3>İletişim & Wi-Fi (menünün altında görünür)</h3>
+      <div class="grid">
+        <label class="f">Wi-Fi adı<input data-f="cafe.wifiName"></label>
+        <label class="f">Wi-Fi şifresi<input data-f="cafe.wifiPassword"></label>
+        <label class="f">Instagram kullanıcı adı<input data-f="cafe.instagram" placeholder="@kafeadi"></label>
+        <label class="f">Telefon<input data-f="cafe.phone" type="tel"></label>
+        <label class="f full">Adres<input data-f="cafe.address"></label>
+        <label class="f full">Alt not<textarea data-f="cafe.note" rows="2"></textarea></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- EKRANLAR -->
+  <section class="panel" id="p-screens" hidden>
+    <div class="card">
+      <h3>Bağlantılar</h3>
+      <div class="links">
+        <a class="btn" id="lnkMenu" href="./" target="_blank">📱 Müşteri menüsü</a>
+        <a class="btn" href="tv.html" target="_blank">📺 TV ekranı</a>
+        <a class="btn" href="./?kiosk=1" target="_blank">📋 Tablet (kiosk) modu</a>
+        <a class="btn" href="qr.html" target="_blank">🔳 Masa QR kodları</a>
+      </div>
+      <p class="hint">TV adresi: <code id="tvUrl"></code><br>Tablet adresi: <code id="tabUrl"></code></p>
+    </div>
+    <div class="card">
+      <h3>TV ekranı</h3>
+      <div class="grid">
+        <label class="f">Sayfa değişim süresi (saniye)<input type="number" min="4" max="120" data-f="theme.tvSeconds" data-num="1"></label>
+        <label class="f">Sütun sayısı
+          <select data-f="theme.tvColumns" data-num="1"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+        </label>
+      </div>
+      <p class="hint">Menü TV ekranına sığmazsa otomatik olarak sayfalara bölünür ve sırayla gösterilir. TV, yayınladığınız değişiklikleri birkaç dakika içinde kendiliğinden alır.</p>
+    </div>
+    <div class="card">
+      <h3>QR kodun açacağı adres</h3>
+      <label class="f">Menü adresi (boş bırakılırsa bu sitenin adresi kullanılır)<input data-f="cafe.menuUrl" type="url" placeholder="https://..."></label>
+      <p class="hint">Kendi alan adınızı (ör. menu.kafeadi.com) bağlarsanız buraya yazın. QR kodları bastıktan sonra bu adresi değiştirmeyin.</p>
+    </div>
+  </section>
+
+  <!-- AYARLAR -->
+  <section class="panel" id="p-settings" hidden>
+    <div class="card">
+      <h3>GitHub bağlantısı (bir kerelik)</h3>
+      <p class="hint" style="margin-top:0">Menünüz GitHub'daki deponuzda <code>menu.json</code> dosyası olarak durur. "Yayınla" dediğinizde bu panel dosyayı günceller; site 1-2 dakika içinde yenilenir. Anahtar sadece bu cihazın tarayıcısında saklanır.</p>
+      <div class="grid">
+        <label class="f">Kullanıcı adı<input id="ghOwner" autocomplete="off"></label>
+        <label class="f">Depo (repo) adı<input id="ghRepo" autocomplete="off"></label>
+        <label class="f">Dal (branch)<input id="ghBranch" autocomplete="off" placeholder="main"></label>
+        <label class="f">Erişim anahtarı (token)<input id="ghToken" type="password" autocomplete="off" placeholder="github_pat_..."></label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="primary" id="ghSave">Kaydet ve bağlan</button>
+        <button class="danger" id="ghForget">Bu cihazdan çıkış yap</button>
+      </div>
+      <details style="margin-top:14px">
+        <summary style="cursor:pointer;font-weight:600">Anahtar (token) nasıl alınır?</summary>
+        <ol class="steps hint">
+          <li>GitHub'a girin → sağ üstte profil resmi → <b>Settings</b> → en altta <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
+          <li>Ad: <code>Menü paneli</code>. Süre (Expiration): en uzun seçeneği seçin; süresi dolunca aynı adımlarla yenisini alırsınız.</li>
+          <li><b>Repository access</b> → <b>Only select repositories</b> → menü deponuzu seçin.</li>
+          <li><b>Permissions</b> → <b>Contents</b> → <b>Read and write</b>.</li>
+          <li><b>Generate token</b>'a basın, çıkan <code>github_pat_…</code> ile başlayan anahtarı kopyalayıp yukarıya yapıştırın.</li>
+        </ol>
+      </details>
+    </div>
+    <div class="card">
+      <h3>Yedek</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="backupDl">Menü yedeğini indir</button>
+        <button id="backupUl">Yedekten geri yükle</button>
+        <button id="reload" class="danger">Yayınlanmamış değişiklikleri at</button>
+      </div>
+      <p class="hint">Tüm eski sürümler GitHub'da da saklanır (depo → <code>menu.json</code> → History).</p>
+    </div>
+  </section>
+</main>
+
+<!-- Ürün düzenleme penceresi -->
+<dialog id="itemDlg">
+  <form method="dialog" id="itemForm">
+    <div class="dhead"><h2 id="dlgTitle">Ürün</h2><button type="button" class="ghost" data-close aria-label="Kapat">✕</button></div>
+    <div class="dbody">
+      <label class="f">Ürün adı<input id="fName" required></label>
+      <label class="f">Açıklama<textarea id="fDesc" rows="2" placeholder="İsteğe bağlı"></textarea></label>
+      <div class="two">
+        <label class="f">Fiyat<input id="fPrice" inputmode="decimal" placeholder="ör. 120"></label>
+        <label class="f">Kategori<select id="fCat"></select></label>
+      </div>
+      <div>
+        <label class="f">Boyut / porsiyon seçenekleri <span class="hint">(eklerseniz tek fiyat yerine bunlar gösterilir)</span></label>
+        <div id="fSizes"></div>
+        <button type="button" class="small" id="addSize" style="margin-top:6px">+ Seçenek ekle</button>
+      </div>
+      <label class="f">Etiketler<input id="fTags" placeholder="ör. Yeni, Vegan, Glutensiz"><div class="hint">Virgülle ayırın.</div></label>
+      <div>
+        <label class="f">Fotoğraf</label>
+        <div class="imgbox" style="margin-top:6px">
+          <img id="fImgPrev" alt="" hidden>
+          <button type="button" id="fImgUp">Fotoğraf yükle</button>
+          <button type="button" class="danger" id="fImgRm" hidden>Kaldır</button>
+        </div>
+      </div>
+      <label class="switch"><input type="checkbox" id="fAvail"> Satışta (kapalıysa "Tükendi" görünür)</label>
+    </div>
+    <div class="dfoot">
+      <button type="button" class="danger" id="fDelete">Sil</button>
+      <span class="sp"></span>
+      <button type="button" data-close>Vazgeç</button>
+      <button type="submit" class="primary" id="fSave">Tamam</button>
+    </div>
+  </form>
+</dialog>
+
+<input type="file" id="filePick" accept="image/*" hidden>
+<input type="file" id="jsonPick" accept="application/json,.json" hidden>
+<div class="toast" id="toast"></div>
+
+<script src="assets/core.js"></script>
+<script>
+(() => {
+  'use strict';
+  const C = window.MenuCore, esc = C.esc;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+  const LS_GH = 'qrmenu.gh', LS_DRAFT = 'qrmenu.draft';
+
+  let menu = null;          // düzenlenen menü
+  let published = '';       // yayındaki menünün JSON hali (değişiklik takibi için)
+  let remoteSha = null;     // GitHub'daki menu.json sürümü
+  let gh = readGh();
+  const imgCache = {};      // yeni yüklenen görsellerin önizlemesi (site güncellenene kadar)
+
+  // ---------- yardımcılar ----------
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function lsSet(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function readGh() {
+    const s = lsGet(LS_GH) || {};
+    if (!s.owner || !s.repo) {
+      const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+      if (m) {
+        s.owner = s.owner || m[1];
+        const seg = location.pathname.split('/').filter(Boolean)[0];
+        s.repo = s.repo || (seg && !/\.html?$/.test(seg) ? seg : m[1] + '.github.io');
+      }
+    }
+    s.branch = s.branch || 'main';
+    return s;
+  }
+  const connected = () => !!(gh.owner && gh.repo && gh.token);
+  const imgSrc = (p) => imgCache[p] || p;
+
+  let toastT;
+  function toast(msg, err) {
+    const t = $('#toast'); t.textContent = msg; t.className = 'toast show' + (err ? ' err' : '');
+    clearTimeout(toastT); toastT = setTimeout(() => t.className = 'toast', err ? 6000 : 3500);
+  }
+
+  function parsePrice(v) {
+    let s = String(v || '').replace(/[^\d.,]/g, '');
+    if (!s) return 0;
+    if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, '');
+    s = s.replace(',', '.');
+    const n = parseFloat(s);
+    return isFinite(n) ? Math.round(n * 100) / 100 : 0;
+  }
+  const priceInput = (n) => n ? String(n).replace('.', ',') : '';
+  const slug = (s) => (s || '').toLocaleLowerCase('tr').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+
+  function b64encode(str) {
+    const bytes = typeof str === 'string' ? new TextEncoder().encode(str) : str;
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  function b64decode(b64) {
+    const bin = atob(b64.replace(/\s/g, ''));
+    return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+  }
+
+  // ---------- GitHub ----------
+  async function api(method, path, body) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(gh.owner)}/${encodeURIComponent(gh.repo)}/contents/${path}` +
+      (method === 'GET' ? `?ref=${encodeURIComponent(gh.branch)}&t=${Date.now()}` : '');
+    const r = await fetch(url, {
+      method, cache: 'no-store',
+      headers: { Authorization: 'Bearer ' + gh.token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (!r.ok) {
+      const e = new Error(apiError(r.status)); e.status = r.status; throw e;
+    }
+    return r.json();
+  }
+  function apiError(st) {
+    if (st === 401) return 'Erişim anahtarı geçersiz veya süresi dolmuş. Ayarlar\'dan yeni anahtar girin.';
+    if (st === 403) return 'Anahtarın bu depoya yazma izni yok (Contents: Read and write olmalı).';
+    if (st === 404) return 'Depo, dal veya dosya bulunamadı. Kullanıcı adı / depo / dal bilgilerini kontrol edin.';
+    if (st === 409) return 'Çakışma oldu, tekrar deneyin.';
+    if (st === 422) return 'GitHub isteği kabul etmedi (dal adı doğru mu?).';
+    return 'GitHub hatası (' + st + ').';
+  }
+
+  // ---------- yükleme ----------
+  async function loadMenu() {
+    let data, sha = null;
+    if (connected()) {
+      try {
+        const f = await api('GET', 'menu.json');
+        data = JSON.parse(b64decode(f.content)); sha = f.sha;
+      } catch (e) {
+        if (e.status !== 404) toast(e.message, true);
+      }
+    }
+    if (!data) {
+      try { data = await (await fetch('menu.json?v=' + Date.now(), { cache: 'no-store' })).json(); }
+      catch (e) { data = {}; }
+    }
+    menu = C.normalize(data);
+    published = JSON.stringify(menu);
+    remoteSha = sha;
+
+    const draft = lsGet(LS_DRAFT);
+    if (draft && draft.menu && JSON.stringify(C.normalize(draft.menu)) !== published) {
+      const when = draft.at ? new Date(draft.at).toLocaleString('tr-TR') : '';
+      if (confirm(`Yayınlanmamış değişiklikleriniz var${when ? ' (' + when + ')' : ''}.\n\nKaldığınız yerden devam edilsin mi?\n(İptal: yayındaki menüyü açar)`)) {
+        menu = C.normalize(draft.menu);
+      } else lsSet(LS_DRAFT, null);
+    }
+    renderAll();
+  }
+
+  // ---------- değişiklik takibi ----------
+  const isDirty = () => JSON.stringify(menu) !== published;
+  function changed() {
+    if (isDirty()) lsSet(LS_DRAFT, { menu, at: Date.now() }); else lsSet(LS_DRAFT, null);
+    updateStatus();
+  }
+  function updateStatus() {
+    const st = $('#status');
+    $('#connectNote').hidden = connected();
+    if (isDirty()) { st.className = 'status dirty'; st.textContent = '● Yayınlanmamış değişiklik'; }
+    else if (connected()) { st.className = 'status ok'; st.textContent = '✓ Yayında'; }
+    else { st.className = 'status off'; st.textContent = 'Bağlı değil'; }
+    $('#publish').disabled = !isDirty();
+  }
+  window.addEventListener('beforeunload', (e) => { if (menu && isDirty()) { e.preventDefault(); e.returnValue = ''; } });
+
+  // ---------- yayınla ----------
+  $('#publish').addEventListener('click', async () => {
+    if (!connected()) { showTab('settings'); toast('Önce GitHub bağlantısını kurun.', true); return; }
+    const btn = $('#publish'); btn.disabled = true; btn.textContent = 'Yayınlanıyor…';
+    try {
+      let curSha = null;
+      try { curSha = (await api('GET', 'menu.json')).sha; } catch (e) { if (e.status !== 404) throw e; }
+      if (remoteSha && curSha && curSha !== remoteSha &&
+        !confirm('Menü bu panel açıldıktan sonra başka bir yerden değiştirilmiş.\nSizin sürümünüz onun üzerine yazılsın mı?')) return;
+      const body = { message: 'Menü güncellendi', content: b64encode(JSON.stringify(menu, null, 2) + '\n'), branch: gh.branch };
+      if (curSha) body.sha = curSha;
+      const res = await api('PUT', 'menu.json', body);
+      remoteSha = res.content.sha;
+      published = JSON.stringify(menu);
+      changed();
+      toast('Yayınlandı ✓ Menü 1-2 dakika içinde her yerde güncellenir.');
+    } catch (e) {
+      toast(e.message, true);
+    } finally {
+      btn.textContent = 'Yayınla'; updateStatus();
+    }
+  });
+
+  // ---------- sekmeler ----------
+  function showTab(name) {
+    $$('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === name));
+    $$('.panel').forEach(p => p.hidden = p.id !== 'p-' + name);
+    window.scrollTo(0, 0);
+  }
+  $$('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
+  document.addEventListener('click', (e) => { const g = e.target.closest('[data-goto]'); if (g) { e.preventDefault(); showTab(g.dataset.goto); } });
+
+  // ---------- menü listesi ----------
+  function priceSummary(it) {
+    const p = C.prices(it);
+    if (!p.length) return 'Fiyat yok';
+    return p.map(x => (x.name ? x.name + ' ' : '') + C.price(x.price, menu.cafe.currency)).join(' · ');
+  }
+  function renderCats() {
+    const h = menu.categories.map((c, ci) => `
+      <div class="cat${c.hidden ? ' hidden-cat' : ''}" data-ci="${ci}">
+        <div class="chead">
+          <input class="icon" data-cf="icon" value="${esc(c.icon)}" maxlength="4" aria-label="Simge" placeholder="☕">
+          <input class="cname" data-cf="name" value="${esc(c.name)}" placeholder="Kategori adı" aria-label="Kategori adı">
+          <label class="switch" title="Menüde göster"><input type="checkbox" data-a="catShow" ${c.hidden ? '' : 'checked'}><span class="hide-sm">Göster</span></label>
+          <button class="ghost" data-a="catUp" title="Yukarı" ${ci === 0 ? 'disabled' : ''}>↑</button>
+          <button class="ghost" data-a="catDown" title="Aşağı" ${ci === menu.categories.length - 1 ? 'disabled' : ''}>↓</button>
+          <button class="ghost danger" data-a="catDel" title="Kategoriyi sil">🗑</button>
+        </div>
+        <div class="rows">
+          ${c.items.length ? c.items.map((it, ii) => `
+            <div class="row${it.available ? '' : ' out'}" data-ii="${ii}">
+              ${it.image ? `<img class="thumb" src="${esc(imgSrc(it.image))}" alt="">` : '<div class="thumb"></div>'}
+              <div class="rmain" data-a="edit"><div class="rname">${esc(it.name || '(adsız)')}</div><div class="rprice">${esc(priceSummary(it))}</div></div>
+              <label class="switch" title="Satışta mı?"><input type="checkbox" data-a="avail" ${it.available ? 'checked' : ''}><span class="hide-sm">Satışta</span></label>
+              <button class="ghost" data-a="up" title="Yukarı" ${ii === 0 ? 'disabled' : ''}>↑</button>
+              <button class="ghost" data-a="down" title="Aşağı" ${ii === c.items.length - 1 ? 'disabled' : ''}>↓</button>
+              <button class="small" data-a="edit">Düzenle</button>
+            </div>`).join('') : '<div class="empty">Bu kategoride ürün yok.</div>'}
+        </div>
+        <div class="cfoot"><button class="small" data-a="addItem">+ Ürün ekle</button></div>
+      </div>`).join('');
+    $('#cats').innerHTML = h || '<div class="note">Henüz kategori yok. Aşağıdan ilk kategorinizi ekleyin.</div>';
+  }
+
+  const swap = (arr, i, j) => { const t = arr[i]; arr[i] = arr[j]; arr[j] = t; };
+  $('#cats').addEventListener('click', (e) => {
+    const el = e.target.closest('[data-a]'); if (!el || el.type === 'checkbox') return;
+    const catEl = el.closest('.cat'); const ci = +catEl.dataset.ci; const cat = menu.categories[ci];
+    const rowEl = el.closest('.row'); const ii = rowEl ? +rowEl.dataset.ii : -1;
+    switch (el.dataset.a) {
+      case 'catUp': swap(menu.categories, ci, ci - 1); break;
+      case 'catDown': swap(menu.categories, ci, ci + 1); break;
+      case 'catDel':
+        if (!confirm(`"${cat.name || 'Adsız'}" kategorisi ve içindeki ${cat.items.length} ürün silinsin mi?`)) return;
+        menu.categories.splice(ci, 1); break;
+      case 'up': swap(cat.items, ii, ii - 1); break;
+      case 'down': swap(cat.items, ii, ii + 1); break;
+      case 'edit': openItem(ci, ii); return;
+      case 'addItem': openItem(ci, -1); return;
+      default: return;
+    }
+    renderCats(); changed();
+  });
+  $('#cats').addEventListener('change', (e) => {
+    const el = e.target; if (el.type !== 'checkbox') return;
+    const ci = +el.closest('.cat').dataset.ci; const cat = menu.categories[ci];
+    if (el.dataset.a === 'catShow') { cat.hidden = !el.checked; el.closest('.cat').classList.toggle('hidden-cat', cat.hidden); }
+    if (el.dataset.a === 'avail') { const ii = +el.closest('.row').dataset.ii; cat.items[ii].available = el.checked; el.closest('.row').classList.toggle('out', !el.checked); }
+    changed();
+  });
+  $('#cats').addEventListener('input', (e) => {
+    const el = e.target; if (!el.dataset.cf) return;
+    menu.categories[+el.closest('.cat').dataset.ci][el.dataset.cf] = el.value; changed();
+  });
+  $('#addCat').addEventListener('click', () => {
+    menu.categories.push({ id: C.uid(), name: '', icon: '', hidden: false, items: [] });
+    renderCats(); changed();
+    const inputs = $$('.cname'); inputs[inputs.length - 1].focus();
+  });
+
+  // ---------- ürün penceresi ----------
+  const dlg = $('#itemDlg');
+  let editing = null; // { ci, ii, item (çalışma kopyası) }
+  function sizeRow(s) {
+    const d = document.createElement('div'); d.className = 'size';
+    d.innerHTML = `<input placeholder="ör. Büyük" value="${esc(s.name)}"><input inputmode="decimal" placeholder="Fiyat" value="${esc(priceInput(s.price))}"><button type="button" class="ghost danger" aria-label="Sil">✕</button>`;
+    d.lastChild.onclick = () => d.remove();
+    return d;
+  }
+  function setImgPreview(path) {
+    $('#fImgPrev').hidden = !path; $('#fImgRm').hidden = !path;
+    if (path) $('#fImgPrev').src = imgSrc(path);
+    $('#fImgUp').textContent = path ? 'Değiştir' : 'Fotoğraf yükle';
+  }
+  function openItem(ci, ii) {
+    const it = ii >= 0 ? JSON.parse(JSON.stringify(menu.categories[ci].items[ii]))
+      : { id: C.uid(), name: '', description: '', price: 0, sizes: [], tags: [], image: '', available: true };
+    editing = { ci, ii, item: it };
+    $('#dlgTitle').textContent = ii >= 0 ? 'Ürünü düzenle' : 'Yeni ürün';
+    $('#fName').value = it.name; $('#fDesc').value = it.description; $('#fPrice').value = priceInput(it.price);
+    $('#fTags').value = it.tags.join(', '); $('#fAvail').checked = it.available;
+    $('#fCat').innerHTML = menu.categories.map((c, i) => `<option value="${i}" ${i === ci ? 'selected' : ''}>${esc((c.icon ? c.icon + ' ' : '') + (c.name || 'Adsız'))}</option>`).join('');
+    const sz = $('#fSizes'); sz.innerHTML = ''; it.sizes.forEach(s => sz.appendChild(sizeRow(s)));
+    setImgPreview(it.image);
+    $('#fDelete').hidden = ii < 0;
+    dlg.showModal();
+    if (ii < 0) $('#fName').focus();
+  }
+  $('#addSize').onclick = () => { $('#fSizes').appendChild(sizeRow({ name: '', price: 0 })); $('#fSizes').lastChild.firstChild.focus(); };
+  $$('[data-close]', dlg).forEach(b => b.onclick = () => dlg.close());
+  $('#fImgRm').onclick = () => { editing.item.image = ''; setImgPreview(''); };
+  $('#fImgUp').onclick = () => pickImage(async (path) => { editing.item.image = path; setImgPreview(path); }, slug($('#fName').value) || 'urun');
+  $('#fDelete').onclick = () => {
+    if (!confirm('Bu ürün silinsin mi?')) return;
+    menu.categories[editing.ci].items.splice(editing.ii, 1);
+    dlg.close(); renderCats(); changed();
+  };
+  $('#itemForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const it = editing.item;
+    it.name = $('#fName').value.trim();
+    if (!it.name) { $('#fName').focus(); return; }
+    it.description = $('#fDesc').value.trim();
+    it.price = parsePrice($('#fPrice').value);
+    it.sizes = $$('.size', $('#fSizes')).map(r => ({ name: r.children[0].value.trim(), price: parsePrice(r.children[1].value) })).filter(s => s.name);
+    it.tags = $('#fTags').value.split(',').map(s => s.trim()).filter(Boolean);
+    it.available = $('#fAvail').checked;
+    const newCi = +$('#fCat').value;
+    if (editing.ii >= 0) {
+      if (newCi === editing.ci) menu.categories[editing.ci].items[editing.ii] = it;
+      else { menu.categories[editing.ci].items.splice(editing.ii, 1); menu.categories[newCi].items.push(it); }
+    } else menu.categories[newCi].items.push(it);
+    dlg.close(); renderCats(); changed();
+  });
+
+  // ---------- görsel yükleme ----------
+  let pickCb = null, pickName = '';
+  function pickImage(cb, name) {
+    if (!connected()) { toast('Fotoğraf yüklemek için önce Ayarlar\'dan GitHub bağlantısını kurun.', true); return; }
+    pickCb = cb; pickName = name; $('#filePick').value = ''; $('#filePick').click();
+  }
+  $('#filePick').addEventListener('change', async (e) => {
+    const file = e.target.files[0]; if (!file || !pickCb) return;
+    toast('Fotoğraf hazırlanıyor…');
+    try {
+      const dataUrl = await resizeImage(file, 900, 0.82);
+      const path = `images/${pickName}-${Date.now().toString(36)}.jpg`;
+      toast('Fotoğraf yükleniyor…');
+      await api('PUT', path, { message: 'Fotoğraf eklendi: ' + pickName, content: dataUrl.split(',')[1], branch: gh.branch });
+      imgCache[path] = dataUrl;
+      await pickCb(path);
+      toast('Fotoğraf yüklendi ✓ Görünmesi için "Yayınla"ya basmayı unutmayın.');
+    } catch (err) { toast(err.message || 'Fotoğraf yüklenemedi.', true); }
+  });
+  function resizeImage(file, max, q) {
+    return new Promise((res, rej) => {
+      const img = new Image(), url = URL.createObjectURL(file);
+      img.onload = () => {
+        const s = Math.min(1, max / Math.max(img.width, img.height));
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * s); cv.height = Math.round(img.height * s);
+        const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
+        g.drawImage(img, 0, 0, cv.width, cv.height);
+        URL.revokeObjectURL(url); res(cv.toDataURL('image/jpeg', q));
+      };
+      img.onerror = () => rej(new Error('Bu dosya açılamadı. JPG veya PNG deneyin.'));
+      img.src = url;
+    });
+  }
+
+  // ---------- kafe bilgileri / ekran ayarları ----------
+  function getPath(p) { return p.split('.').reduce((o, k) => o[k], menu); }
+  function setPath(p, v) { const ks = p.split('.'); const last = ks.pop(); ks.reduce((o, k) => o[k], menu)[last] = v; }
+  function renderFields() {
+    $$('[data-f]').forEach(el => { const v = getPath(el.dataset.f); el.value = v == null ? '' : v; });
+    $('#logoPreview').src = menu.cafe.logo ? imgSrc(menu.cafe.logo) : 'assets/icon.svg';
+    $('#logoRemove').hidden = !menu.cafe.logo;
+  }
+  $$('[data-f]').forEach(el => el.addEventListener('input', () => {
+    setPath(el.dataset.f, el.dataset.num ? (+el.value || 0) : el.value);
+    if (el.dataset.f === 'cafe.currency') renderCats();
+    if (el.dataset.f === 'theme.accent') C.applyAccent(menu);
+    changed();
+  }));
+  $('#logoUpload').onclick = () => pickImage((p) => { menu.cafe.logo = p; renderFields(); changed(); }, 'logo');
+  $('#logoRemove').onclick = () => { menu.cafe.logo = ''; renderFields(); changed(); };
+
+  // ---------- ayarlar ----------
+  function renderSettings() {
+    $('#ghOwner').value = gh.owner || ''; $('#ghRepo').value = gh.repo || '';
+    $('#ghBranch').value = gh.branch || 'main'; $('#ghToken').value = gh.token || '';
+    const base = C.baseUrl(menu);
+    $('#tvUrl').textContent = base + 'tv.html'; $('#tabUrl').textContent = base + '?kiosk=1';
+  }
+  $('#ghSave').onclick = async () => {
+    gh = { owner: $('#ghOwner').value.trim(), repo: $('#ghRepo').value.trim(), branch: $('#ghBranch').value.trim() || 'main', token: $('#ghToken').value.trim() };
+    if (!connected()) { toast('Tüm alanları doldurun.', true); return; }
+    const wasDirty = isDirty();
+    try {
+      const f = await api('GET', 'menu.json');
+      lsSet(LS_GH, gh);
+      remoteSha = f.sha;
+      const remote = C.normalize(JSON.parse(b64decode(f.content)));
+      published = JSON.stringify(remote);
+      if (!wasDirty) { menu = remote; renderAll(); }
+      toast('Bağlantı başarılı ✓');
+      updateStatus();
+    } catch (e) {
+      if (e.status === 404) { lsSet(LS_GH, gh); toast('Bağlandı. menu.json henüz yok; ilk "Yayınla"da oluşturulacak.'); updateStatus(); }
+      else toast(e.message, true);
+    }
+  };
+  $('#ghForget').onclick = () => {
+    if (!confirm('Bu cihazdaki erişim anahtarı silinsin mi?')) return;
+    gh = { owner: gh.owner, repo: gh.repo, branch: gh.branch }; lsSet(LS_GH, gh); renderSettings(); updateStatus(); toast('Çıkış yapıldı.');
+  };
+  $('#backupDl').onclick = () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(menu, null, 2)], { type: 'application/json' }));
+    a.download = 'menu-yedek-' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
+  };
+  $('#backupUl').onclick = () => { $('#jsonPick').value = ''; $('#jsonPick').click(); };
+  $('#jsonPick').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if (!data.categories) throw new Error();
+      if (!confirm('Mevcut menü bu yedekle değiştirilsin mi? (Yayınla\'ya basana kadar sitede değişmez)')) return;
+      menu = C.normalize(data); renderAll(); changed(); toast('Yedek yüklendi. Kontrol edip "Yayınla"ya basın.');
+    } catch (err) { toast('Bu dosya geçerli bir menü yedeği değil.', true); }
+  });
+  $('#reload').onclick = () => {
+    if (!isDirty()) { toast('Yayınlanmamış değişiklik yok.'); return; }
+    if (!confirm('Yayınlanmamış tüm değişiklikler silinsin mi?')) return;
+    menu = C.normalize(JSON.parse(published)); renderAll(); changed();
+  };
+
+  function renderAll() { C.applyAccent(menu); renderCats(); renderFields(); renderSettings(); updateStatus(); }
+  loadMenu();
+})();
+</script>
+</body>
+</html>
