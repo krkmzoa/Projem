@@ -56,6 +56,10 @@
   #dots { position: absolute; left: 0; right: 0; top: 5.6rem; text-align: center; }
   #dots span { display: inline-block; width: 1.1rem; height: 1.1rem; border-radius: 50%; margin: 0 .4rem; }
   .msg { position: absolute; top: 40%; left: 0; right: 0; text-align: center; font-size: 3rem; }
+  /* Tam ekran tanıtım resimleri (panelden yüklenir) */
+  #slide { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 50; background-color: #000; background-repeat: no-repeat; background-position: center center; -webkit-background-size: cover; background-size: cover; visibility: hidden; opacity: 0; -webkit-transition: opacity .8s; transition: opacity .8s; }
+  #slide.contain { -webkit-background-size: contain; background-size: contain; }
+  #slide.show { visibility: visible; opacity: 1; }
   #err { position: absolute; left: 1rem; bottom: .4rem; font-size: 1.4rem; color: #ff8a80; }
 </style>
 <style id="theme"></style>
@@ -64,6 +68,7 @@
 <div id="top"><div id="brand"></div><div id="clock"></div></div>
 <div id="stage"><div class="msg">Menü yükleniyor…</div></div>
 <div id="bottom"><div id="qr"></div><div id="dots"></div><div id="info"></div></div>
+<div id="slide"></div>
 <div id="err"></div>
 
 <script>
@@ -73,12 +78,12 @@
     if (e) e.innerHTML = 'Hata: ' + String(msg).replace(/</g, '&lt;') + ' (satır ' + line + ')';
   };
 </script>
-<script src="assets/vendor/qrcode.js?v=8"></script>
+<script src="assets/vendor/qrcode.js?v=9"></script>
 <script>
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 8;
+  var BUILD = 9;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -100,11 +105,11 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=8"></script>
+<script src="assets/core.js?v=9"></script>
 <script>
 (function () {
   var C = window.MenuCore, esc = C.esc;
-  var menu = null, lastJson = '', pages = [], pageIdx = 0, timer = null;
+  var menu = null, lastJson = '', pages = [], pageIdx = 0, timer = null, slideIdx = 0, slideInfo = {};
   var stage = document.getElementById('stage');
 
   function param(name) {
@@ -239,7 +244,7 @@
       pages.push(pg);
     }
     if (!pages.length) stage.innerHTML = '<div class="msg">Menü boş.</div>';
-    pageIdx = 0; dots(); schedule();
+    pageIdx = 0; hideSlide(); dots(); schedule();
   }
 
   function dots() {
@@ -247,16 +252,55 @@
     if (pages.length > 1) for (var i = 0; i < pages.length; i++) h += '<span' + (i === pageIdx ? ' class="on"' : '') + '></span>';
     $('dots').innerHTML = h;
   }
+  // ---------- akış: menü sayfaları sırayla, her turun sonunda 1 tanıtım resmi ----------
+  function activeSlides() {
+    var out = [], s = menu.tvSlides || [];
+    for (var i = 0; i < s.length; i++) if (s[i].active !== false && s[i].image) out.push(s[i]);
+    return out;
+  }
+  // Resimleri önceden yükle; ekran oranına yakınsa ekranı doldur, değilse sığdır (kesilmesin)
+  function preload() {
+    var s = activeSlides();
+    for (var i = 0; i < s.length; i++) (function (src) {
+      if (slideInfo[src]) return;
+      var im = new Image();
+      im.onload = function () { slideInfo[src] = { r: im.width / im.height }; };
+      im.src = src;
+    })(s[i].image);
+  }
+  function showPage(i) {
+    if (!pages.length) return;
+    pages[pageIdx].className = 'page';
+    pageIdx = i;
+    pages[pageIdx].className = 'page show';
+    dots();
+  }
+  function showSlide(sl) {
+    var el = $('slide'), info = slideInfo[sl.image], screenR = (window.innerWidth || 16) / (window.innerHeight || 9);
+    el.style.backgroundImage = 'url("' + sl.image.replace(/"/g, '%22') + '")';
+    el.className = (info && Math.abs(info.r - screenR) > 0.35) ? 'show contain' : 'show';
+  }
+  function hideSlide() { var el = $('slide'); el.className = el.className.replace('show', ''); }
   function schedule() {
-    clearInterval(timer);
-    if (pages.length < 2) return;
-    var secs = Math.max(4, +menu.theme.tvSeconds || 12);
-    timer = setInterval(function () {
-      pages[pageIdx].className = 'page';
-      pageIdx = (pageIdx + 1) % pages.length;
-      pages[pageIdx].className = 'page show';
-      dots();
-    }, secs * 1000);
+    clearTimeout(timer);
+    var menuSecs = Math.max(4, +menu.theme.tvSeconds || 12);
+    var slideSecs = Math.max(3, +menu.theme.tvSlideSeconds || 8);
+    preload();
+    function next() {
+      if (pageIdx < pages.length - 1) { showPage(pageIdx + 1); timer = setTimeout(next, menuSecs * 1000); return; }
+      var sl = activeSlides();
+      if (sl.length) {
+        showSlide(sl[slideIdx % sl.length]); slideIdx++;
+        timer = setTimeout(function () {
+          showPage(0); hideSlide();
+          timer = setTimeout(next, menuSecs * 1000);
+        }, slideSecs * 1000);
+      } else {
+        if (pages.length > 1) showPage(0);
+        timer = setTimeout(next, menuSecs * 1000);
+      }
+    }
+    timer = setTimeout(next, menuSecs * 1000);
   }
 
   function renderChrome() {

@@ -255,6 +255,13 @@
       <p class="hint">Menü TV ekranına sığmazsa otomatik olarak sayfalara bölünür ve sırayla gösterilir. TV, yayınladığınız değişiklikleri birkaç dakika içinde kendiliğinden alır.</p>
     </div>
     <div class="card">
+      <h3>TV'de geçecek resimler</h3>
+      <p class="hint" style="margin-top:0">Menü sayfaları bir tur dönünce, sıradaki resim tam ekran gösterilir, sonra menü baştan başlar. Kampanya, yeni ürün, etkinlik görselleri için. En iyi sonuç için yatay (16:9) resim kullanın.</p>
+      <label class="f" style="max-width:260px">Resim süresi (saniye)<input type="number" min="3" max="120" data-f="theme.tvSlideSeconds" data-num="1"></label>
+      <div id="slides" style="margin-top:12px"></div>
+      <button id="addSlide" style="margin-top:10px">+ Resim ekle</button>
+    </div>
+    <div class="card">
       <h3>QR kodun açacağı adres</h3>
       <label class="f">Menü adresi (boş bırakılırsa bu sitenin adresi kullanılır)<input data-f="cafe.menuUrl" type="url" placeholder="https://..."></label>
       <p class="hint">Kendi alan adınızı (ör. menu.kafeadi.com) bağlarsanız buraya yazın. QR kodları bastıktan sonra bu adresi değiştirmeyin.</p>
@@ -343,7 +350,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 8;
+  var BUILD = 9;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -365,7 +372,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=8"></script>
+<script src="assets/core.js?v=9"></script>
 <script>
 (() => {
   'use strict';
@@ -652,16 +659,16 @@
   });
 
   // ---------- görsel yükleme ----------
-  let pickCb = null, pickName = '';
-  function pickImage(cb, name) {
+  let pickCb = null, pickName = '', pickMax = 900;
+  function pickImage(cb, name, max) {
     if (!connected()) { toast('Fotoğraf yüklemek için önce Ayarlar\'dan GitHub bağlantısını kurun.', true); return; }
-    pickCb = cb; pickName = name; $('#filePick').value = ''; $('#filePick').click();
+    pickCb = cb; pickName = name; pickMax = max || 900; $('#filePick').value = ''; $('#filePick').click();
   }
   $('#filePick').addEventListener('change', async (e) => {
     const file = e.target.files[0]; if (!file || !pickCb) return;
     toast('Fotoğraf hazırlanıyor…');
     try {
-      const dataUrl = await resizeImage(file, 900, 0.82);
+      const dataUrl = await resizeImage(file, pickMax, pickMax > 1000 ? 0.85 : 0.82);
       const path = `images/${pickName}-${Date.now().toString(36)}.jpg`;
       toast('Fotoğraf yükleniyor…');
       await api('PUT', path, { message: 'Fotoğraf eklendi: ' + pickName, content: dataUrl.split(',')[1], branch: gh.branch });
@@ -685,6 +692,38 @@
       img.src = url;
     });
   }
+
+  // ---------- TV resimleri ----------
+  function renderSlides() {
+    const list = menu.tvSlides || [];
+    $('#slides').innerHTML = list.length ? list.map((s, i) => `
+      <div class="row slide${s.active ? '' : ' out'}" data-si="${i}">
+        <img class="thumb" style="width:96px;height:54px" src="${esc(imgSrc(s.image))}" alt="">
+        <div class="rmain"><div class="rname">Resim ${i + 1}</div><div class="rprice">${s.active ? 'TV\'de gösteriliyor' : 'Gizli'}</div></div>
+        <label class="switch" title="TV'de göster"><input type="checkbox" data-sa="show" ${s.active ? 'checked' : ''}><span class="hide-sm">Göster</span></label>
+        <button class="ghost" data-sa="up" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button class="ghost" data-sa="down" ${i === list.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="ghost danger" data-sa="del" title="Sil">🗑</button>
+      </div>`).join('') : '<div class="empty">Henüz resim yok. TV sadece menüyü gösteriyor.</div>';
+  }
+  $('#addSlide').onclick = () => pickImage((p) => {
+    menu.tvSlides = menu.tvSlides || [];
+    menu.tvSlides.push({ id: C.uid(), image: p, active: true });
+    renderSlides(); changed();
+  }, 'tv', 1920);
+  $('#slides').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-sa]'); if (!b || b.type === 'checkbox') return;
+    const i = +b.closest('.slide').dataset.si, L = menu.tvSlides;
+    if (b.dataset.sa === 'up') swap(L, i, i - 1);
+    else if (b.dataset.sa === 'down') swap(L, i, i + 1);
+    else if (b.dataset.sa === 'del') { if (!confirm('Bu resim TV\'den kaldırılsın mı?')) return; L.splice(i, 1); }
+    renderSlides(); changed();
+  });
+  $('#slides').addEventListener('change', (e) => {
+    if (e.target.dataset.sa !== 'show') return;
+    const i = +e.target.closest('.slide').dataset.si;
+    menu.tvSlides[i].active = e.target.checked; renderSlides(); changed();
+  });
 
   // ---------- kafe bilgileri / ekran ayarları ----------
   function getPath(p) { return p.split('.').reduce((o, k) => o[k], menu); }
@@ -806,7 +845,7 @@
   };
 
   window.qrBusy = () => !menu || isDirty() || dlg.open;
-  function renderAll() { C.applyAccent(menu); renderCats(); renderFields(); renderSettings(); updateStatus(); }
+  function renderAll() { C.applyAccent(menu); renderCats(); renderFields(); renderSlides(); renderSettings(); updateStatus(); }
   loadMenu();
 })();
 </script>
