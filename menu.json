@@ -15,7 +15,15 @@
   "theme": {
     "accent": "#d38301",
     "tvSeconds": 12,
-    "tvColumns": 3
+    "tvColumns": 2,
+    "mode": "auto",
+    "tvMode": "dark",
+    "colors": {
+      "bg": "#f7f3ee",
+      "surface": "#ffffff",
+      "text": "#2a201a",
+      "muted": "#7a6a5e"
+    }
   },
   "categories": [
     {
