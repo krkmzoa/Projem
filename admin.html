@@ -128,6 +128,17 @@
   .trbox .two { margin-top: 10px; }
   #fSizeTr .size input:first-child { flex: 1.2; opacity: .7; }
   .trmiss { font-size: 11px; font-weight: 600; color: var(--warn); border: 1px solid currentColor; border-radius: 5px; padding: 0 5px; margin-left: 4px; }
+  .marks { display: grid; gap: 8px; }
+  .mkpick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .mkb { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px 6px 7px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+  .mkb svg { width: 18px; height: 18px; flex: none; }
+  .mkb.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .mkb.bdg.on { background: var(--accent); color: var(--on-accent, #fff); border-color: var(--accent); }
+  .pairlist { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pchip { display: inline-flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 4px 4px 12px; font-size: 14px; font-weight: 500; }
+  .pchip button { border: 0; background: none; padding: 2px 7px; color: var(--muted); }
+  .rbadge { display: inline-flex; vertical-align: -3px; color: var(--accent); }
+  .rbadge svg { width: 16px; height: 16px; }
   .links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 </style>
 </head>
@@ -395,6 +406,16 @@
           <button type="button" class="danger" id="fImgRm" hidden>Kaldır</button>
         </div>
       </div>
+      <div class="marks">
+        <label class="f">Rozetler</label><div class="mkpick" data-group="badges"></div>
+        <label class="f">Beslenme</label><div class="mkpick" data-group="diet"></div>
+        <label class="f">Alerjenler <span class="hint">(üründe bulunanları işaretleyin; müşteri bunlara göre filtreleyebilir)</span></label><div class="mkpick" data-group="allergens"></div>
+      </div>
+      <div>
+        <label class="f">Yanında iyi gider <span class="hint">(en fazla 3 ürün; ürün detayında önerilir)</span></label>
+        <div id="fPairs" class="pairlist"></div>
+        <select id="fPairAdd" style="margin-top:6px"></select>
+      </div>
       <details class="trbox" id="fTrBox">
         <summary>Çeviriler <span class="hint" id="fTrState">(İngilizce / Rusça)</span></summary>
         <div class="two">
@@ -454,7 +475,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 15;
+  var BUILD = 16;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -476,7 +497,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=15"></script>
+<script src="assets/core.js?v=16"></script>
 <script>
 (() => {
   'use strict';
@@ -660,7 +681,7 @@
           ${c.items.length ? c.items.map((it, ii) => `
             <div class="row${it.available ? '' : ' out'}" data-ii="${ii}">
               ${it.image ? `<img class="thumb" src="${esc(imgSrc(it.image))}" alt="">` : '<div class="thumb"></div>'}
-              <div class="rmain" data-a="edit"><div class="rname">${esc(it.name || '(adsız)')}</div><div class="rprice">${esc(priceSummary(it))}${missingTr(it).length ? ` <span class="trmiss" title="Çevirisi eksik">${missingTr(it).map(l => l.toUpperCase()).join(' ')} yok</span>` : ''}</div></div>
+              <div class="rmain" data-a="edit"><div class="rname">${esc(it.name || '(adsız)')}${(it.badges || []).map(k => ` <span class="rbadge" title="${esc(C.markLabel(k, 'tr'))}">${C.markSvg(k)}</span>`).join('')}</div><div class="rprice">${esc(priceSummary(it))}${missingTr(it).length ? ` <span class="trmiss" title="Çevirisi eksik">${missingTr(it).map(l => l.toUpperCase()).join(' ')} yok</span>` : ''}</div></div>
               <label class="switch" title="Satışta mı?"><input type="checkbox" data-a="avail" ${it.available ? 'checked' : ''}><span class="hide-sm">Satışta</span></label>
               <button class="ghost" data-a="up" title="Yukarı" ${ii === 0 ? 'disabled' : ''}>↑</button>
               <button class="ghost" data-a="down" title="Aşağı" ${ii === c.items.length - 1 ? 'disabled' : ''}>↓</button>
@@ -725,7 +746,8 @@
   }
   function openItem(ci, ii) {
     const it = ii >= 0 ? JSON.parse(JSON.stringify(menu.categories[ci].items[ii]))
-      : { id: C.uid(), name: '', description: '', price: 0, sizes: [], tags: [], image: '', available: true };
+      : { id: C.uid(), name: '', description: '', price: 0, sizes: [], tags: [], image: '', available: true, badges: [], diet: [], allergens: [], pairs: [] };
+    ['badges', 'diet', 'allergens', 'pairs'].forEach(k => { if (!Array.isArray(it[k])) it[k] = []; });
     editing = { ci, ii, item: it };
     $('#dlgTitle').textContent = ii >= 0 ? 'Ürünü düzenle' : 'Yeni ürün';
     $('#fName').value = it.name; $('#fDesc').value = it.description; $('#fPrice').value = priceInput(it.price);
@@ -735,6 +757,7 @@
     $('#fNameEn').value = (i18.en && i18.en.name) || ''; $('#fNameRu').value = (i18.ru && i18.ru.name) || '';
     $('#fDescEn').value = (i18.en && i18.en.description) || ''; $('#fDescRu').value = (i18.ru && i18.ru.description) || '';
     $('#fTrBox').open = false;
+    renderMarks(); renderPairs();
     $('#fCat').innerHTML = menu.categories.map((c, i) => `<option value="${i}" ${i === ci ? 'selected' : ''}>${esc((c.icon ? c.icon + ' ' : '') + (c.name || 'Adsız'))}</option>`).join('');
     const sz = $('#fSizes'); sz.innerHTML = ''; it.sizes.forEach(s => sz.appendChild(sizeRow(s)));
     renderSizeTr(it.sizes);
@@ -773,6 +796,40 @@
     } else menu.categories[newCi].items.push(it);
     dlg.close(); renderCats(); changed();
   });
+
+  // ---------- rozet / beslenme / alerjen seçimi ----------
+  function renderMarks() {
+    $$('.mkpick').forEach(box => {
+      const g = box.dataset.group, sel = editing.item[g];
+      box.innerHTML = C.MARKS[g].map(k => `<button type="button" class="mkb${sel.includes(k) ? ' on' : ''}${g === 'badges' ? ' bdg' : ''}" data-k="${k}">${C.markSvg(k)}<span>${esc(C.markLabel(k, 'tr'))}</span></button>`).join('');
+    });
+  }
+  $('#itemDlg').addEventListener('click', (e) => {
+    const b = e.target.closest('.mkb'); if (!b) return;
+    const g = b.closest('.mkpick').dataset.group, arr = editing.item[g], k = b.dataset.k, i = arr.indexOf(k);
+    if (i === -1) {
+      arr.push(k);
+      if (k === 'caffeine') { const d = arr.indexOf('decaf'); if (d !== -1) arr.splice(d, 1); }   // kafein ve kafeinsiz birlikte olmaz
+      if (k === 'decaf') { const d = arr.indexOf('caffeine'); if (d !== -1) arr.splice(d, 1); }
+      if (k === 'vegan' && !arr.includes('vegetarian')) arr.push('vegetarian');                  // vegan olan vejetaryendir
+    } else arr.splice(i, 1);
+    renderMarks();
+  });
+  // Yanında iyi gider
+  function findById(id) { for (const c of menu.categories) for (const it of c.items) if (it.id === id) return it; return null; }
+  function renderPairs() {
+    const it = editing.item;
+    it.pairs = it.pairs.filter(id => id !== it.id && findById(id));
+    $('#fPairs').innerHTML = it.pairs.map(id => `<span class="pchip">${esc(findById(id).name)}<button type="button" data-rm="${esc(id)}" aria-label="Kaldır">✕</button></span>`).join('');
+    const sel = $('#fPairAdd');
+    sel.hidden = it.pairs.length >= 3;
+    sel.innerHTML = '<option value="">+ Ürün seç…</option>' + menu.categories.map(c => {
+      const opts = c.items.filter(x => x.id !== it.id && !it.pairs.includes(x.id)).map(x => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
+      return opts ? `<optgroup label="${esc(c.name || 'Kategori')}">${opts}</optgroup>` : '';
+    }).join('');
+  }
+  $('#fPairAdd').addEventListener('change', (e) => { if (e.target.value) { editing.item.pairs.push(e.target.value); renderPairs(); } });
+  $('#fPairs').addEventListener('click', (e) => { const b = e.target.closest('[data-rm]'); if (!b) return; editing.item.pairs = editing.item.pairs.filter(x => x !== b.dataset.rm); renderPairs(); });
 
   // ---------- çeviri yardımcıları ----------
   // Boş alanları atar; hiç çeviri yoksa undefined döner (menu.json temiz kalsın)
