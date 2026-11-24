@@ -33,7 +33,7 @@
     m.tvSlides.forEach(function (s) { if (!s.id) s.id = MenuCore.uid(); s.active = s.active !== false; });
     if (['auto', 'light', 'dark', 'custom'].indexOf(m.theme.mode) === -1) m.theme.mode = 'auto';
     if (['always', 'noqr', 'never'].indexOf(m.theme.landing) === -1) m.theme.landing = 'always';
-    if (['zoom', 'spin', 'none'].indexOf(m.theme.landingMotion) === -1) m.theme.landingMotion = 'zoom';
+    if (['zoom', 'spin', 'ripple', 'none'].indexOf(m.theme.landingMotion) === -1) m.theme.landingMotion = 'zoom';
     if (m.theme.tvMode !== 'same') m.theme.tvMode = 'dark';
     var pc = m.theme.colors = m.theme.colors || {};
     ['bg', 'surface', 'text', 'muted'].forEach(function (k) { if (!/^#[0-9a-fA-F]{6}$/.test(pc[k] || '')) pc[k] = MenuCore.PALETTES.light[k]; });
@@ -170,6 +170,8 @@
 
   /** Dosya yolu video mu? */
   MenuCore.isVideo = function (p) { return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(p || ''); };
+  /** Hareketli resim (animasyonlu WebP / GIF): video gibi engellenmez, Düşük Güç Modu'nda da oynar. */
+  MenuCore.isAnimImage = function (p) { return /\.(webp|gif)(\?|$)/i.test(p || ''); };
 
   MenuCore.qrSvg = function (text) {
     var qr = global.qrcode(0, 'M');

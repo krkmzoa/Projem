@@ -179,13 +179,14 @@
         <div id="coverPreview" class="coverbox"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button type="button" id="coverImg">Fotoğraf yükle</button>
-          <button type="button" id="coverVid">Video yükle</button>
+          <button type="button" id="coverVid">Video / hareketli resim yükle</button>
           <button type="button" class="danger" id="coverRm">Kaldır</button>
         </div>
       </div>
       <label class="f" style="margin-bottom:12px">Fotoğraf hareketi
         <select data-f="theme.landingMotion">
           <option value="zoom">Yavaş yakınlaşma</option>
+          <option value="ripple">Su dalgası (resim suyun altındaymış gibi dalgalanır)</option>
           <option value="spin">Yavaş dönme (dairesel resimler için)</option>
           <option value="none">Hareketsiz</option>
         </select>
@@ -197,7 +198,7 @@
           <option value="never">Hiç gösterme, doğrudan menü açılsın</option>
         </select>
       </label>
-      <p class="hint">Video: 5-10 saniyelik, sessiz, <b>MP4</b> ve en fazla <b>8 MB</b> olmalı (ideali 3 MB altı). iPhone videoları bazı Android telefonlarda oynamayabilir; CapCut veya Canva'dan "MP4" olarak dışa aktarın. Video yüklenmezse fotoğraf yavaşça yakınlaşarak gösterilir.</p>
+      <p class="hint"><b>En sağlamı hareketli resim (animasyonlu WebP/GIF):</b> iPhone Düşük Güç Modu'nda bile kendiliğinden oynar. Video ise o modda oynamaz; yerine ilk karesi su dalgasıyla gösterilir.<br>Video: 5-10 saniyelik, sessiz, <b>MP4</b> ve en fazla <b>8 MB</b> olmalı (ideali 3 MB altı). iPhone videoları bazı Android telefonlarda oynamayabilir; CapCut veya Canva'dan "MP4" olarak dışa aktarın. Video yüklenmezse fotoğraf yavaşça yakınlaşarak gösterilir.</p>
     </div>
     <div class="card">
       <h3>İletişim & Wi-Fi (☰ menüsünde ve sayfa altında görünür)</h3>
@@ -402,7 +403,7 @@
 </dialog>
 
 <input type="file" id="filePick" accept="image/*" hidden>
-<input type="file" id="videoPick" accept="video/mp4,video/webm,video/quicktime,.mp4,.mov,.webm" hidden>
+<input type="file" id="videoPick" accept="video/mp4,video/webm,video/quicktime,image/webp,image/gif,.mp4,.mov,.webm,.webp,.gif" hidden>
 <input type="file" id="jsonPick" accept="application/json,.json" hidden>
 <div class="toast" id="toast"></div>
 
@@ -410,7 +411,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 11;
+  var BUILD = 14;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -432,7 +433,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=11"></script>
+<script src="assets/core.js?v=14"></script>
 <script>
 (() => {
   'use strict';
@@ -753,7 +754,7 @@
     const p = menu.cafe.cover, box = $('#coverPreview');
     if (!p) box.innerHTML = 'Yok';
     else if (C.isVideo(p)) box.innerHTML = `<video src="${esc(imgSrc(p))}" muted autoplay loop playsinline></video>`;
-    else box.innerHTML = `<img src="${esc(imgSrc(p))}" alt="" class="${menu.theme.landingMotion === 'spin' ? 'spin' : ''}">`;
+    else box.innerHTML = `<img src="${esc(imgSrc(p))}" alt="" class="${menu.theme.landingMotion === 'spin' && !C.isAnimImage(p) ? 'spin' : ''}">`;
     $('#coverRm').hidden = !p;
   }
   $('#coverImg').onclick = () => pickImage((p) => { menu.cafe.cover = p; renderCover(); changed(); }, 'acilis', 1600);
@@ -767,15 +768,15 @@
     const mb = f.size / 1048576;
     if (mb > 8) { toast(`Video çok büyük (${mb.toFixed(1)} MB). En fazla 8 MB olmalı; daha kısa veya düşük kaliteli dışa aktarın.`, true); return; }
     if (mb > 3 && !confirm(`Video ${mb.toFixed(1)} MB. Müşterilerin telefonunda yavaş açılabilir (3 MB altı önerilir). Yine de yüklensin mi?`)) return;
-    const ext = (f.name.match(/\.(mp4|webm|mov|m4v)$/i) || ['', 'mp4'])[1].toLowerCase();
+    const ext = (f.name.match(/\.(mp4|webm|mov|m4v|webp|gif)$/i) || ['', f.type === 'image/webp' ? 'webp' : f.type === 'image/gif' ? 'gif' : 'mp4'])[1].toLowerCase();
     toast('Video yükleniyor…');
     try {
       const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
       const path = `images/acilis-${Date.now().toString(36)}.${ext}`;
-      await api('PUT', path, { message: 'Açılış videosu eklendi', content: dataUrl.split(',')[1], branch: gh.branch });
+      await api('PUT', path, { message: 'Açılış videosu / hareketli resmi eklendi', content: dataUrl.split(',')[1], branch: gh.branch });
       imgCache[path] = dataUrl;
       menu.cafe.cover = path; renderCover(); changed();
-      toast('Video yüklendi ✓ Görünmesi için "Yayınla"ya basın.');
+      toast((ext === 'webp' || ext === 'gif' ? 'Hareketli resim' : 'Video') + ' yüklendi ✓ Görünmesi için "Yayınla"ya basın.');
     } catch (err) { toast(err.message || 'Video yüklenemedi.', true); }
   });
 
