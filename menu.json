@@ -1,11 +1,11 @@
 {
   "cafe": {
-    "name": "Kafe Adı",
-    "slogan": "Taze kahve, ev yapımı tatlılar",
-    "logo": "",
+    "name": "ATELIER KOI ART & COFFEE",
+    "slogan": "Specialty Coffee & Art",
+    "logo": "images/logo-mwugr2oh.jpg",
     "currency": "₺",
     "phone": "",
-    "instagram": "",
+    "instagram": "@atelierkoicoffee",
     "address": "",
     "wifiName": "",
     "wifiPassword": "",
@@ -13,7 +13,7 @@
     "menuUrl": ""
   },
   "theme": {
-    "accent": "#b5651d",
+    "accent": "#d38301",
     "tvSeconds": 12,
     "tvColumns": 3
   },
@@ -24,13 +24,96 @@
       "icon": "☕",
       "hidden": false,
       "items": [
-        { "id": "turk-kahvesi", "name": "Türk Kahvesi", "description": "Lokum ile servis edilir", "price": 90, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "espresso", "name": "Espresso", "description": "", "price": 80, "sizes": [{ "name": "Tek", "price": 80 }, { "name": "Double", "price": 100 }], "tags": [], "image": "", "available": true },
-        { "id": "americano", "name": "Americano", "description": "", "price": 110, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "latte", "name": "Latte", "description": "Espresso ve sıcak süt", "price": 0, "sizes": [{ "name": "Küçük", "price": 120 }, { "name": "Büyük", "price": 145 }], "tags": [], "image": "", "available": true },
-        { "id": "cappuccino", "name": "Cappuccino", "description": "", "price": 125, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "flat-white", "name": "Flat White", "description": "Double ristretto, ipeksi süt", "price": 135, "sizes": [], "tags": ["Yeni"], "image": "", "available": true },
-        { "id": "mocha", "name": "Mocha", "description": "Bitter çikolata ve espresso", "price": 140, "sizes": [], "tags": [], "image": "", "available": true }
+        {
+          "id": "turk-kahvesi",
+          "name": "Türk Kahvesi",
+          "description": "Lokum ile servis edilir",
+          "price": 90,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "espresso",
+          "name": "Espresso",
+          "description": "",
+          "price": 80,
+          "sizes": [
+            {
+              "name": "Tek",
+              "price": 80
+            },
+            {
+              "name": "Double",
+              "price": 100
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "americano",
+          "name": "Americano",
+          "description": "",
+          "price": 110,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "latte",
+          "name": "Latte",
+          "description": "Espresso ve sıcak süt",
+          "price": 0,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 120
+            },
+            {
+              "name": "Büyük",
+              "price": 145
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "cappuccino",
+          "name": "Cappuccino",
+          "description": "",
+          "price": 125,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "flat-white",
+          "name": "Flat White",
+          "description": "Double ristretto, ipeksi süt",
+          "price": 135,
+          "sizes": [],
+          "tags": [
+            "Yeni"
+          ],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "mocha",
+          "name": "Mocha",
+          "description": "Bitter çikolata ve espresso",
+          "price": 140,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        }
       ]
     },
     {
@@ -39,10 +122,46 @@
       "icon": "🧊",
       "hidden": false,
       "items": [
-        { "id": "iced-latte", "name": "Iced Latte", "description": "", "price": 140, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "iced-americano", "name": "Iced Americano", "description": "", "price": 115, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "cold-brew", "name": "Cold Brew", "description": "18 saat soğuk demleme", "price": 150, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "frappe", "name": "Karamel Frappé", "description": "", "price": 155, "sizes": [], "tags": [], "image": "", "available": false }
+        {
+          "id": "iced-latte",
+          "name": "Iced Latte",
+          "description": "",
+          "price": 140,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "iced-americano",
+          "name": "Iced Americano",
+          "description": "",
+          "price": 115,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "cold-brew",
+          "name": "Cold Brew",
+          "description": "18 saat soğuk demleme",
+          "price": 150,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "frappe",
+          "name": "Karamel Frappé",
+          "description": "",
+          "price": 155,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": false
+        }
       ]
     },
     {
@@ -51,10 +170,57 @@
       "icon": "🫖",
       "hidden": false,
       "items": [
-        { "id": "cay", "name": "Çay", "description": "", "price": 30, "sizes": [{ "name": "İnce belli", "price": 30 }, { "name": "Fincan", "price": 45 }], "tags": [], "image": "", "available": true },
-        { "id": "bitki-cayi", "name": "Bitki Çayı", "description": "Ihlamur, adaçayı, kuşburnu", "price": 70, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "sicak-cikolata", "name": "Sıcak Çikolata", "description": "", "price": 120, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "salep", "name": "Salep", "description": "Tarçın ile", "price": 110, "sizes": [], "tags": ["Mevsimlik"], "image": "", "available": true }
+        {
+          "id": "cay",
+          "name": "Çay",
+          "description": "",
+          "price": 30,
+          "sizes": [
+            {
+              "name": "İnce belli",
+              "price": 30
+            },
+            {
+              "name": "Fincan",
+              "price": 45
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "bitki-cayi",
+          "name": "Bitki Çayı",
+          "description": "Ihlamur, adaçayı, kuşburnu",
+          "price": 70,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "sicak-cikolata",
+          "name": "Sıcak Çikolata",
+          "description": "",
+          "price": 120,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "salep",
+          "name": "Salep",
+          "description": "Tarçın ile",
+          "price": 110,
+          "sizes": [],
+          "tags": [
+            "Mevsimlik"
+          ],
+          "image": "",
+          "available": true
+        }
       ]
     },
     {
@@ -63,10 +229,46 @@
       "icon": "🍋",
       "hidden": false,
       "items": [
-        { "id": "limonata", "name": "Ev Yapımı Limonata", "description": "Taze nane ile", "price": 100, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "taze-portakal", "name": "Taze Portakal Suyu", "description": "", "price": 110, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "soda", "name": "Maden Suyu", "description": "", "price": 35, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "su", "name": "Su", "description": "", "price": 20, "sizes": [], "tags": [], "image": "", "available": true }
+        {
+          "id": "limonata",
+          "name": "Ev Yapımı Limonata",
+          "description": "Taze nane ile",
+          "price": 100,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "taze-portakal",
+          "name": "Taze Portakal Suyu",
+          "description": "",
+          "price": 110,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "soda",
+          "name": "Maden Suyu",
+          "description": "",
+          "price": 35,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "su",
+          "name": "Su",
+          "description": "",
+          "price": 20,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        }
       ]
     },
     {
@@ -75,10 +277,50 @@
       "icon": "🍰",
       "hidden": false,
       "items": [
-        { "id": "cheesecake", "name": "San Sebastian Cheesecake", "description": "Ev yapımı, akışkan kıvamlı", "price": 180, "sizes": [], "tags": ["Popüler"], "image": "", "available": true },
-        { "id": "brownie", "name": "Brownie", "description": "Dondurma ile servis edilir", "price": 150, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "tiramisu", "name": "Tiramisu", "description": "", "price": 165, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "kurabiye", "name": "Çikolatalı Kurabiye", "description": "", "price": 60, "sizes": [], "tags": ["Vegan"], "image": "", "available": true }
+        {
+          "id": "cheesecake",
+          "name": "San Sebastian Cheesecake",
+          "description": "Ev yapımı, akışkan kıvamlı",
+          "price": 180,
+          "sizes": [],
+          "tags": [
+            "Popüler"
+          ],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "brownie",
+          "name": "Brownie",
+          "description": "Dondurma ile servis edilir",
+          "price": 150,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "tiramisu",
+          "name": "Tiramisu",
+          "description": "",
+          "price": 165,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "kurabiye",
+          "name": "Çikolatalı Kurabiye",
+          "description": "",
+          "price": 60,
+          "sizes": [],
+          "tags": [
+            "Vegan"
+          ],
+          "image": "",
+          "available": true
+        }
       ]
     },
     {
@@ -87,9 +329,36 @@
       "icon": "🥐",
       "hidden": false,
       "items": [
-        { "id": "kruvasan", "name": "Tereyağlı Kruvasan", "description": "", "price": 90, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "tost", "name": "Kaşarlı Tost", "description": "Yanında patates cipsi", "price": 130, "sizes": [], "tags": [], "image": "", "available": true },
-        { "id": "sandvic", "name": "Hindi Füme Sandviç", "description": "Ekşi maya ekmeği, cheddar, roka", "price": 190, "sizes": [], "tags": [], "image": "", "available": true }
+        {
+          "id": "kruvasan",
+          "name": "Tereyağlı Kruvasan",
+          "description": "",
+          "price": 90,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "tost",
+          "name": "Kaşarlı Tost",
+          "description": "Yanında patates cipsi",
+          "price": 130,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        },
+        {
+          "id": "sandvic",
+          "name": "Hindi Füme Sandviç",
+          "description": "Ekşi maya ekmeği, cheddar, roka",
+          "price": 190,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true
+        }
       ]
     }
   ]
