@@ -28,6 +28,9 @@
     if (!m.theme.tvSeconds) m.theme.tvSeconds = 12;
     if (!m.theme.tvColumns) m.theme.tvColumns = 3;
     m.theme.tvScale = Math.max(0.7, Math.min(2.5, Number(m.theme.tvScale) || 1));
+    m.theme.tvSlideSeconds = Math.max(3, Math.min(120, Number(m.theme.tvSlideSeconds) || 8));
+    m.tvSlides = (Array.isArray(m.tvSlides) ? m.tvSlides : []).filter(function (s) { return s && s.image; });
+    m.tvSlides.forEach(function (s) { if (!s.id) s.id = MenuCore.uid(); s.active = s.active !== false; });
     if (['auto', 'light', 'dark', 'custom'].indexOf(m.theme.mode) === -1) m.theme.mode = 'auto';
     if (m.theme.tvMode !== 'same') m.theme.tvMode = 'dark';
     var pc = m.theme.colors = m.theme.colors || {};
