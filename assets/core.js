@@ -170,6 +170,8 @@
 
   /** Dosya yolu video mu? */
   MenuCore.isVideo = function (p) { return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(p || ''); };
+  /** Hareketli resim (animasyonlu WebP / GIF): video gibi engellenmez, Düşük Güç Modu'nda da oynar. */
+  MenuCore.isAnimImage = function (p) { return /\.(webp|gif)(\?|$)/i.test(p || ''); };
 
   MenuCore.qrSvg = function (text) {
     var qr = global.qrcode(0, 'M');

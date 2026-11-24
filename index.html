@@ -207,7 +207,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 13;
+  var BUILD = 14;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -229,8 +229,8 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=13"></script>
-<script src="assets/ripple.js?v=13"></script>
+<script src="assets/core.js?v=14"></script>
+<script src="assets/ripple.js?v=14"></script>
 <script>
 (function () {
   'use strict';
@@ -290,6 +290,7 @@
     var cafe = menu.cafe, el = $('landing'), bg;
     stopRipple();
     if (cafe.cover && C.isVideo(cafe.cover)) bg = '<video class="bg" src="' + esc(cafe.cover) + '" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>';
+    else if (cafe.cover && C.isAnimImage(cafe.cover)) bg = '<div class="bg" style="background-image:url(\'' + esc(cafe.cover) + '\')"></div>';
     else if (cafe.cover && menu.theme.landingMotion === 'ripple') bg = '<div class="bg" id="ripBase" style="background-image:url(\'' + esc(cafe.cover) + '\')"></div><canvas class="bg" id="rip"></canvas>';
     else if (cafe.cover) bg = '<div class="bg' + ({ zoom: ' kb', spin: ' spin', none: '' })[menu.theme.landingMotion] + '" style="background-image:url(\'' + esc(cafe.cover) + '\')"></div>';
     else bg = '<div class="bg grad"></div>';
