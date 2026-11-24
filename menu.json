@@ -15,7 +15,17 @@
     "website": "",
     "facebook": "",
     "hours": "",
-    "mapsUrl": ""
+    "mapsUrl": "",
+    "i18n": {
+      "en": {
+        "slogan": "Specialty Coffee & Art",
+        "note": "Prices include VAT. Please ask our staff for allergen information."
+      },
+      "ru": {
+        "slogan": "Спешелти-кофе и искусство",
+        "note": "Цены включают НДС. Информацию об аллергенах уточняйте у персонала."
+      }
+    }
   },
   "theme": {
     "accent": "#fefb41",
@@ -32,7 +42,12 @@
     "tvScale": 1.15,
     "tvSlideSeconds": 8,
     "landing": "always",
-    "landingMotion": "zoom"
+    "landingMotion": "zoom",
+    "languages": [
+      "tr",
+      "en",
+      "ru"
+    ]
   },
   "categories": [
     {
@@ -50,7 +65,17 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Turkish Coffee",
+              "description": "Served with Turkish delight"
+            },
+            "ru": {
+              "name": "Турецкий кофе",
+              "description": "Подаётся с рахат-лукумом"
+            }
+          }
         },
         {
           "id": "espresso",
@@ -70,7 +95,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Espresso"
+            },
+            "ru": {
+              "name": "Эспрессо"
+            }
+          }
         },
         {
           "id": "americano",
@@ -81,7 +114,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Americano"
+            },
+            "ru": {
+              "name": "Американо"
+            }
+          }
         },
         {
           "id": "latte",
@@ -101,7 +142,17 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Latte",
+              "description": "Espresso with steamed milk"
+            },
+            "ru": {
+              "name": "Латте",
+              "description": "Эспрессо с горячим молоком"
+            }
+          }
         },
         {
           "id": "cappuccino",
@@ -112,7 +163,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Cappuccino"
+            },
+            "ru": {
+              "name": "Капучино"
+            }
+          }
         },
         {
           "id": "flat-white",
@@ -125,7 +184,17 @@
           ],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Flat White",
+              "description": "Double ristretto, silky milk"
+            },
+            "ru": {
+              "name": "Флэт уайт",
+              "description": "Двойной ристретто, шелковистое молоко"
+            }
+          }
         },
         {
           "id": "mocha",
@@ -136,11 +205,29 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Mocha",
+              "description": "Dark chocolate and espresso"
+            },
+            "ru": {
+              "name": "Мокко",
+              "description": "Горький шоколад и эспрессо"
+            }
+          }
         }
       ],
       "image": "",
-      "description": ""
+      "description": "",
+      "i18n": {
+        "en": {
+          "name": "Hot Coffees"
+        },
+        "ru": {
+          "name": "Горячий кофе"
+        }
+      }
     },
     {
       "id": "soguk-kahveler",
@@ -157,7 +244,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Iced Latte"
+            },
+            "ru": {
+              "name": "Айс латте"
+            }
+          }
         },
         {
           "id": "iced-americano",
@@ -168,7 +263,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Iced Americano"
+            },
+            "ru": {
+              "name": "Айс американо"
+            }
+          }
         },
         {
           "id": "cold-brew",
@@ -179,7 +282,17 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Cold Brew",
+              "description": "Cold-brewed for 18 hours"
+            },
+            "ru": {
+              "name": "Колд брю",
+              "description": "Холодное заваривание 18 часов"
+            }
+          }
         },
         {
           "id": "frappe",
@@ -190,11 +303,27 @@
           "tags": [],
           "image": "",
           "available": false,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Caramel Frappé"
+            },
+            "ru": {
+              "name": "Карамельный фраппе"
+            }
+          }
         }
       ],
       "image": "",
-      "description": ""
+      "description": "",
+      "i18n": {
+        "en": {
+          "name": "Iced Coffees"
+        },
+        "ru": {
+          "name": "Холодный кофе"
+        }
+      }
     },
     {
       "id": "caylar",
@@ -210,7 +339,11 @@
           "sizes": [
             {
               "name": "İnce belli",
-              "price": 30
+              "price": 30,
+              "i18n": {
+                "en": "Tulip glass",
+                "ru": "Стакан-армуду"
+              }
             },
             {
               "name": "Fincan",
@@ -220,7 +353,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Turkish Tea"
+            },
+            "ru": {
+              "name": "Турецкий чай"
+            }
+          }
         },
         {
           "id": "bitki-cayi",
@@ -231,7 +372,17 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Herbal Tea",
+              "description": "Linden, sage, rosehip"
+            },
+            "ru": {
+              "name": "Травяной чай",
+              "description": "Липа, шалфей, шиповник"
+            }
+          }
         },
         {
           "id": "sicak-cikolata",
@@ -242,7 +393,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Hot Chocolate"
+            },
+            "ru": {
+              "name": "Горячий шоколад"
+            }
+          }
         },
         {
           "id": "salep",
@@ -255,11 +414,29 @@
           ],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Salep",
+              "description": "Traditional hot milk drink with cinnamon"
+            },
+            "ru": {
+              "name": "Салеп",
+              "description": "Традиционный горячий молочный напиток с корицей"
+            }
+          }
         }
       ],
       "image": "",
-      "description": ""
+      "description": "",
+      "i18n": {
+        "en": {
+          "name": "Teas & Hot Drinks"
+        },
+        "ru": {
+          "name": "Чай и горячие напитки"
+        }
+      }
     },
     {
       "id": "soguk-icecekler",
@@ -276,7 +453,17 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Homemade Lemonade",
+              "description": "With fresh mint"
+            },
+            "ru": {
+              "name": "Домашний лимонад",
+              "description": "Со свежей мятой"
+            }
+          }
         },
         {
           "id": "taze-portakal",
@@ -287,7 +474,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Fresh Orange Juice"
+            },
+            "ru": {
+              "name": "Свежевыжатый апельсиновый сок"
+            }
+          }
         },
         {
           "id": "soda",
@@ -298,7 +493,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Sparkling Mineral Water"
+            },
+            "ru": {
+              "name": "Минеральная вода с газом"
+            }
+          }
         },
         {
           "id": "su",
@@ -309,11 +512,27 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Water"
+            },
+            "ru": {
+              "name": "Вода"
+            }
+          }
         }
       ],
       "image": "",
-      "description": ""
+      "description": "",
+      "i18n": {
+        "en": {
+          "name": "Cold Drinks"
+        },
+        "ru": {
+          "name": "Холодные напитки"
+        }
+      }
     },
     {
       "id": "tatlilar",
@@ -332,7 +551,17 @@
           ],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "San Sebastian Cheesecake",
+              "description": "Homemade, with a creamy centre"
+            },
+            "ru": {
+              "name": "Чизкейк Сан-Себастьян",
+              "description": "Домашний, с нежной кремовой серединой"
+            }
+          }
         },
         {
           "id": "brownie",
@@ -343,7 +572,17 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Brownie",
+              "description": "Served with ice cream"
+            },
+            "ru": {
+              "name": "Брауни",
+              "description": "Подаётся с мороженым"
+            }
+          }
         },
         {
           "id": "tiramisu",
@@ -354,7 +593,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Tiramisu"
+            },
+            "ru": {
+              "name": "Тирамису"
+            }
+          }
         },
         {
           "id": "kurabiye",
@@ -367,11 +614,27 @@
           ],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Chocolate Cookie"
+            },
+            "ru": {
+              "name": "Шоколадное печенье"
+            }
+          }
         }
       ],
       "image": "",
-      "description": ""
+      "description": "",
+      "i18n": {
+        "en": {
+          "name": "Desserts"
+        },
+        "ru": {
+          "name": "Десерты"
+        }
+      }
     },
     {
       "id": "kahvalti",
@@ -388,7 +651,15 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Butter Croissant"
+            },
+            "ru": {
+              "name": "Круассан со сливочным маслом"
+            }
+          }
         },
         {
           "id": "tost",
@@ -399,7 +670,17 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Cheese Toastie",
+              "description": "Served with potato crisps"
+            },
+            "ru": {
+              "name": "Тост с сыром",
+              "description": "Подаётся с картофельными чипсами"
+            }
+          }
         },
         {
           "id": "sandvic",
@@ -410,11 +691,29 @@
           "tags": [],
           "image": "",
           "available": true,
-          "calories": 0
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Smoked Turkey Sandwich",
+              "description": "Sourdough bread, cheddar, rocket"
+            },
+            "ru": {
+              "name": "Сэндвич с копчёной индейкой",
+              "description": "Хлеб на закваске, чеддер, руккола"
+            }
+          }
         }
       ],
       "image": "",
-      "description": ""
+      "description": "",
+      "i18n": {
+        "en": {
+          "name": "Snacks"
+        },
+        "ru": {
+          "name": "Закуски"
+        }
+      }
     }
   ],
   "tvSlides": []

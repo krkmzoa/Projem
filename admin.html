@@ -123,6 +123,11 @@
   .coverbox { position: relative; }
   .coverbox img.spin { position: absolute; left: 50%; top: 50%; width: 240px; height: 240px; margin: -120px 0 0 -120px; animation: aspin 40s linear infinite; }
   @keyframes aspin { to { transform: rotate(360deg); } }
+  .trbox { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; }
+  .trbox summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  .trbox .two { margin-top: 10px; }
+  #fSizeTr .size input:first-child { flex: 1.2; opacity: .7; }
+  .trmiss { font-size: 11px; font-weight: 600; color: var(--warn); border: 1px solid currentColor; border-radius: 5px; padding: 0 5px; margin-left: 4px; }
   .links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 </style>
 </head>
@@ -215,7 +220,25 @@
         <label class="f full">Alt not<textarea data-f="cafe.note" rows="2"></textarea></label>
       </div>
     </div>
-  </section>
+      <div class="card">
+      <h3>Diller</h3>
+      <p class="hint" style="margin-top:0">Menü, müşterinin telefonu hangi dildeyse o dilde açılır; müşteri üstteki <b>TR / EN / RU</b> düğmeleriyle de değiştirebilir. Çevirisi girilmemiş yazılar Türkçe görünür.</p>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 14px">
+        <label class="switch"><input type="checkbox" checked disabled> Türkçe</label>
+        <label class="switch"><input type="checkbox" data-lang="en"> English</label>
+        <label class="switch"><input type="checkbox" data-lang="ru"> Русский</label>
+      </div>
+      <div class="grid" id="cafeTr">
+        <label class="f">Slogan (EN)<input data-f="cafe.i18n.en.slogan"></label>
+        <label class="f">Slogan (RU)<input data-f="cafe.i18n.ru.slogan"></label>
+        <label class="f">Çalışma saatleri (EN)<textarea rows="2" data-f="cafe.i18n.en.hours" placeholder="Every day 08:00 - 23:00"></textarea></label>
+        <label class="f">Çalışma saatleri (RU)<textarea rows="2" data-f="cafe.i18n.ru.hours" placeholder="Ежедневно 08:00 - 23:00"></textarea></label>
+        <label class="f">Alt not (EN)<textarea rows="2" data-f="cafe.i18n.en.note"></textarea></label>
+        <label class="f">Alt not (RU)<textarea rows="2" data-f="cafe.i18n.ru.note"></textarea></label>
+      </div>
+      <p class="hint">Boyut ve etiket adları (Küçük, Büyük, Yeni, Vegan…) kendiliğinden çevrilir. Ürün ve kategori çevirileri ürünün / kategorinin kendi penceresinde.</p>
+    </div>
+</section>
 
   <!-- RENKLER -->
   <section class="panel" id="p-colors" hidden>
@@ -372,6 +395,17 @@
           <button type="button" class="danger" id="fImgRm" hidden>Kaldır</button>
         </div>
       </div>
+      <details class="trbox" id="fTrBox">
+        <summary>Çeviriler <span class="hint" id="fTrState">(İngilizce / Rusça)</span></summary>
+        <div class="two">
+          <label class="f">Ad (EN)<input id="fNameEn"></label>
+          <label class="f">Ad (RU)<input id="fNameRu"></label>
+          <label class="f">Açıklama (EN)<textarea id="fDescEn" rows="2"></textarea></label>
+          <label class="f">Açıklama (RU)<textarea id="fDescRu" rows="2"></textarea></label>
+        </div>
+        <div id="fSizeTr"></div>
+        <p class="hint">Boş bırakılan çeviri yerine Türkçesi görünür. Küçük, Büyük, Tek, Double gibi yaygın boyut adları kendiliğinden çevrilir.</p>
+      </details>
       <label class="switch"><input type="checkbox" id="fAvail"> Satışta (kapalıysa "Tükendi" görünür)</label>
     </div>
     <div class="dfoot">
@@ -397,6 +431,15 @@
         </div>
       </div>
       <label class="f">Açıklama<textarea id="cDesc" rows="2" placeholder="ör. Her gün 08:30 - 14:00 arası"></textarea></label>
+      <details class="trbox" open>
+        <summary>Çeviriler <span class="hint">(İngilizce / Rusça)</span></summary>
+        <div class="two">
+          <label class="f">Ad (EN)<input id="cNameEn"></label>
+          <label class="f">Ad (RU)<input id="cNameRu"></label>
+          <label class="f">Açıklama (EN)<textarea id="cDescEn" rows="2"></textarea></label>
+          <label class="f">Açıklama (RU)<textarea id="cDescRu" rows="2"></textarea></label>
+        </div>
+      </details>
     </div>
     <div class="dfoot"><span class="sp"></span><button type="button" data-close>Vazgeç</button><button type="submit" class="primary">Tamam</button></div>
   </form>
@@ -411,7 +454,7 @@
 /* Otomatik güncelleme: site yenilenince (version.json) eski hafızadaki sayfa kendini yeniler.
    Ana ekran uygulaması, tablet ve TV için. Eski tarayıcılarla uyumlu yazıldı. */
 (function () {
-  var BUILD = 14;
+  var BUILD = 15;
   function check() {
     if (window.qrBusy && window.qrBusy()) return;
     var x = new XMLHttpRequest();
@@ -433,7 +476,7 @@
   if (document.addEventListener) document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 </script>
-<script src="assets/core.js?v=14"></script>
+<script src="assets/core.js?v=15"></script>
 <script>
 (() => {
   'use strict';
@@ -617,7 +660,7 @@
           ${c.items.length ? c.items.map((it, ii) => `
             <div class="row${it.available ? '' : ' out'}" data-ii="${ii}">
               ${it.image ? `<img class="thumb" src="${esc(imgSrc(it.image))}" alt="">` : '<div class="thumb"></div>'}
-              <div class="rmain" data-a="edit"><div class="rname">${esc(it.name || '(adsız)')}</div><div class="rprice">${esc(priceSummary(it))}</div></div>
+              <div class="rmain" data-a="edit"><div class="rname">${esc(it.name || '(adsız)')}</div><div class="rprice">${esc(priceSummary(it))}${missingTr(it).length ? ` <span class="trmiss" title="Çevirisi eksik">${missingTr(it).map(l => l.toUpperCase()).join(' ')} yok</span>` : ''}</div></div>
               <label class="switch" title="Satışta mı?"><input type="checkbox" data-a="avail" ${it.available ? 'checked' : ''}><span class="hide-sm">Satışta</span></label>
               <button class="ghost" data-a="up" title="Yukarı" ${ii === 0 ? 'disabled' : ''}>↑</button>
               <button class="ghost" data-a="down" title="Aşağı" ${ii === c.items.length - 1 ? 'disabled' : ''}>↓</button>
@@ -688,8 +731,13 @@
     $('#fName').value = it.name; $('#fDesc').value = it.description; $('#fPrice').value = priceInput(it.price);
     $('#fTags').value = it.tags.join(', '); $('#fAvail').checked = it.available;
     $('#fKcal').value = it.calories || '';
+    const i18 = it.i18n || {};
+    $('#fNameEn').value = (i18.en && i18.en.name) || ''; $('#fNameRu').value = (i18.ru && i18.ru.name) || '';
+    $('#fDescEn').value = (i18.en && i18.en.description) || ''; $('#fDescRu').value = (i18.ru && i18.ru.description) || '';
+    $('#fTrBox').open = false;
     $('#fCat').innerHTML = menu.categories.map((c, i) => `<option value="${i}" ${i === ci ? 'selected' : ''}>${esc((c.icon ? c.icon + ' ' : '') + (c.name || 'Adsız'))}</option>`).join('');
     const sz = $('#fSizes'); sz.innerHTML = ''; it.sizes.forEach(s => sz.appendChild(sizeRow(s)));
+    renderSizeTr(it.sizes);
     setImgPreview(it.image);
     $('#fDelete').hidden = ii < 0;
     dlg.showModal();
@@ -715,6 +763,9 @@
     it.tags = $('#fTags').value.split(',').map(s => s.trim()).filter(Boolean);
     it.available = $('#fAvail').checked;
     it.calories = Math.max(0, parseInt($('#fKcal').value, 10) || 0);
+    it.i18n = trObj({ en: { name: $('#fNameEn').value, description: $('#fDescEn').value }, ru: { name: $('#fNameRu').value, description: $('#fDescRu').value } });
+    const strs = readSizeTr();
+    it.sizes.forEach(sz => { const t = strs[sz.name.toLocaleLowerCase('tr')]; if (t && (t.en || t.ru)) sz.i18n = t; else delete sz.i18n; });
     const newCi = +$('#fCat').value;
     if (editing.ii >= 0) {
       if (newCi === editing.ci) menu.categories[editing.ci].items[editing.ii] = it;
@@ -722,6 +773,37 @@
     } else menu.categories[newCi].items.push(it);
     dlg.close(); renderCats(); changed();
   });
+
+  // ---------- çeviri yardımcıları ----------
+  // Boş alanları atar; hiç çeviri yoksa undefined döner (menu.json temiz kalsın)
+  function trObj(o) {
+    const out = {};
+    Object.keys(o).forEach(l => { const f = {}; Object.keys(o[l]).forEach(k => { const v = (o[l][k] || '').trim(); if (v) f[k] = v; }); if (Object.keys(f).length) out[l] = f; });
+    return Object.keys(out).length ? out : undefined;
+  }
+  // Boyut adlarının çevirisi: o an pencerede yazılı boyutlar için EN/RU kutuları
+  function currentSizeNames() { return $$('.size', $('#fSizes')).map(r => r.children[0].value.trim()).filter(Boolean); }
+  function renderSizeTr(sizes) {
+    const prev = readSizeTr();
+    const known = {}; (sizes || []).forEach(s => { if (s.i18n) known[s.name.toLocaleLowerCase('tr')] = s.i18n; });
+    const names = sizes ? sizes.map(s => s.name) : currentSizeNames();
+    $('#fSizeTr').innerHTML = names.length ? '<label class="f" style="margin-top:6px">Boyut adları</label>' + names.map(n => {
+      const k = n.toLocaleLowerCase('tr'), v = prev[k] || known[k] || {};
+      return `<div class="size" data-k="${esc(k)}"><input disabled value="${esc(n)}"><input placeholder="${esc(C.word(n, 'en'))}" value="${esc(v.en || '')}" data-l="en"><input placeholder="${esc(C.word(n, 'ru'))}" value="${esc(v.ru || '')}" data-l="ru"></div>`;
+    }).join('') : '';
+  }
+  function readSizeTr() {
+    const out = {};
+    $$('#fSizeTr .size').forEach(r => { const o = {}; $$('input[data-l]', r).forEach(i => { if (i.value.trim()) o[i.dataset.l] = i.value.trim(); }); out[r.dataset.k] = o; });
+    return out;
+  }
+  $('#fSizes').addEventListener('input', () => renderSizeTr());
+  $('#fSizes').addEventListener('click', () => setTimeout(() => renderSizeTr(), 0));
+  $('#addSize').addEventListener('click', () => renderSizeTr());
+  function missingTr(it) {
+    const langs = (menu.theme.languages || []).filter(l => l !== 'tr');
+    return langs.filter(l => !(it.i18n && it.i18n[l] && it.i18n[l].name));
+  }
 
   // ---------- kategori penceresi ----------
   const catDlg = $('#catDlg');
@@ -736,6 +818,10 @@
     catEditing = { ci, image: c.image || '' };
     $('#catTitle').textContent = (c.icon ? c.icon + ' ' : '') + (c.name || 'Kategori');
     $('#cDesc').value = c.description || '';
+    const ci18 = c.i18n || {};
+    $('#cNameEn').value = (ci18.en && ci18.en.name) || ''; $('#cNameRu').value = (ci18.ru && ci18.ru.name) || '';
+    $('#cDescEn').value = (ci18.en && ci18.en.description) || ''; $('#cDescRu').value = (ci18.ru && ci18.ru.description) || '';
+    $('#cNameEn').placeholder = $('#cNameRu').placeholder = c.name || '';
     setCatImg(catEditing.image);
     catDlg.showModal();
   }
@@ -746,6 +832,7 @@
     e.preventDefault();
     const c = menu.categories[catEditing.ci];
     c.image = catEditing.image; c.description = $('#cDesc').value.trim();
+    c.i18n = trObj({ en: { name: $('#cNameEn').value, description: $('#cDescEn').value }, ru: { name: $('#cNameRu').value, description: $('#cDescRu').value } });
     catDlg.close(); renderCats(); changed();
   });
 
@@ -847,15 +934,23 @@
     menu.tvSlides[i].active = e.target.checked; renderSlides(); changed();
   });
 
+  // ---------- diller ----------
+  $$('[data-lang]').forEach(cb => cb.addEventListener('change', () => {
+    const L = ['tr'].concat(['en', 'ru'].filter(l => $(`[data-lang="${l}"]`).checked));
+    menu.theme.languages = L; renderCats(); changed();
+  }));
+  function renderLangs() { $$('[data-lang]').forEach(cb => cb.checked = menu.theme.languages.indexOf(cb.dataset.lang) !== -1); }
+
   // ---------- kafe bilgileri / ekran ayarları ----------
-  function getPath(p) { return p.split('.').reduce((o, k) => o[k], menu); }
-  function setPath(p, v) { const ks = p.split('.'); const last = ks.pop(); ks.reduce((o, k) => o[k], menu)[last] = v; }
+  function getPath(p) { return p.split('.').reduce((o, k) => (o == null ? undefined : o[k]), menu); }
+  function setPath(p, v) { const ks = p.split('.'); const last = ks.pop(); ks.reduce((o, k) => (o[k] = o[k] && typeof o[k] === 'object' ? o[k] : {}), menu)[last] = v; }
   function renderFields() {
     $$('[data-f]').forEach(el => { const v = getPath(el.dataset.f); el.value = v == null ? '' : v; });
     $('#logoPreview').src = menu.cafe.logo ? imgSrc(menu.cafe.logo) : 'assets/icon.svg';
     $('#logoRemove').hidden = !menu.cafe.logo;
     renderColors();
     renderCover();
+    renderLangs();
   }
   $$('[data-f]').forEach(el => el.addEventListener('input', () => {
     setPath(el.dataset.f, el.dataset.num ? (+el.value || 0) : el.value);

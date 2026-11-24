@@ -28,6 +28,9 @@
     if (!m.theme.tvSeconds) m.theme.tvSeconds = 12;
     if (!m.theme.tvColumns) m.theme.tvColumns = 3;
     m.theme.tvScale = Math.max(0.7, Math.min(2.5, Number(m.theme.tvScale) || 1));
+    var langs = Array.isArray(m.theme.languages) ? m.theme.languages : ['tr', 'en', 'ru'];
+    m.theme.languages = ['tr'].concat(langs.filter(function (l) { return l !== 'tr' && MenuCore.LANGS[l]; }));
+    c.i18n = c.i18n || {};
     m.theme.tvSlideSeconds = Math.max(3, Math.min(120, Number(m.theme.tvSlideSeconds) || 8));
     m.tvSlides = (Array.isArray(m.tvSlides) ? m.tvSlides : []).filter(function (s) { return s && s.image; });
     m.tvSlides.forEach(function (s) { if (!s.id) s.id = MenuCore.uid(); s.active = s.active !== false; });
@@ -44,6 +47,7 @@
       cat.hidden = !!cat.hidden;
       cat.image = cat.image || '';
       cat.description = cat.description || '';
+      if (cat.i18n && typeof cat.i18n !== 'object') cat.i18n = {};
       cat.items = Array.isArray(cat.items) ? cat.items : [];
       cat.items.forEach(function (it) {
         if (!it.id) it.id = MenuCore.uid();
@@ -58,6 +62,44 @@
       });
     });
     return m;
+  };
+
+  // ---------- diller ----------
+  MenuCore.LANGS = {
+    tr: { name: 'Türkçe', short: 'TR' },
+    en: { name: 'English', short: 'EN' },
+    ru: { name: 'Русский', short: 'RU' }
+  };
+  /** Bir alanın seçili dildeki hâli; çevirisi yoksa Türkçesi. */
+  MenuCore.t = function (obj, field, lang) {
+    if (!obj) return '';
+    if (lang && lang !== 'tr' && obj.i18n && obj.i18n[lang] && obj.i18n[lang][field]) return obj.i18n[lang][field];
+    return obj[field] || '';
+  };
+  /** Sık kullanılan boyut / etiket kelimeleri için hazır sözlük (panelde ayrıca çeviri girmek gerekmez). */
+  MenuCore.DICT = {
+    en: {
+      'küçük': 'Small', 'orta': 'Medium', 'büyük': 'Large', 'tek': 'Single', 'double': 'Double', 'duble': 'Double', 'sıcak': 'Hot', 'soğuk': 'Cold', 'buzlu': 'Iced',
+      'fincan': 'Cup', 'bardak': 'Glass', 'ince belli': 'Tulip glass', 'porsiyon': 'Portion', 'yarım': 'Half', 'tam': 'Full', 'dilim': 'Slice', 'şişe': 'Bottle', 'kutu': 'Can',
+      'yeni': 'New', 'popüler': 'Popular', 'vegan': 'Vegan', 'vejetaryen': 'Vegetarian', 'glutensiz': 'Gluten-free', 'mevsimlik': 'Seasonal', 'acı': 'Spicy',
+      'şekersiz': 'Sugar-free', 'laktozsuz': 'Lactose-free', 'ev yapımı': 'Homemade', 'şefin önerisi': "Chef's pick", 'kampanya': 'Offer', 'imza': 'Signature'
+    },
+    ru: {
+      'küçük': 'Маленький', 'orta': 'Средний', 'büyük': 'Большой', 'tek': 'Одинарный', 'double': 'Двойной', 'duble': 'Двойной', 'sıcak': 'Горячий', 'soğuk': 'Холодный', 'buzlu': 'Со льдом',
+      'fincan': 'Чашка', 'bardak': 'Стакан', 'ince belli': 'Стакан-армуду', 'porsiyon': 'Порция', 'yarım': 'Половина', 'tam': 'Полная', 'dilim': 'Кусочек', 'şişe': 'Бутылка', 'kutu': 'Банка',
+      'yeni': 'Новинка', 'popüler': 'Популярное', 'vegan': 'Веган', 'vejetaryen': 'Вегетарианское', 'glutensiz': 'Без глютена', 'mevsimlik': 'Сезонное', 'acı': 'Острое',
+      'şekersiz': 'Без сахара', 'laktozsuz': 'Без лактозы', 'ev yapımı': 'Домашнее', 'şefin önerisi': 'Выбор шефа', 'kampanya': 'Акция', 'imza': 'Фирменное'
+    }
+  };
+  MenuCore.word = function (text, lang) {
+    if (!text || !lang || lang === 'tr' || !MenuCore.DICT[lang]) return text || '';
+    return MenuCore.DICT[lang][String(text).toLocaleLowerCase('tr').trim()] || text;
+  };
+  /** Boyut adı: elle girilen çeviri > sözlük > Türkçesi */
+  MenuCore.sizeName = function (s, lang) {
+    if (!s || !s.name) return '';
+    if (lang && lang !== 'tr' && s.i18n && s.i18n[lang]) return s.i18n[lang];
+    return MenuCore.word(s.name, lang);
   };
 
   MenuCore.uid = function () {
