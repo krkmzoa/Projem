@@ -44,7 +44,7 @@
       "text": "#000000",
       "muted": "#263e0f"
     },
-    "tvScale": 1.15,
+    "tvScale": 1.3,
     "tvSlideSeconds": 8,
     "landing": "always",
     "landingMotion": "zoom",
