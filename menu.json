@@ -57,15 +57,15 @@
   "categories": [
     {
       "id": "sicak-kahveler",
-      "name": "Sıcak Kahveler",
+      "name": "COFFEE",
       "icon": "☕",
       "hidden": false,
       "items": [
         {
           "id": "turk-kahvesi",
-          "name": "Türk Kahvesi",
-          "description": "Lokum ile servis edilir",
-          "price": 90,
+          "name": "Cortado",
+          "description": "",
+          "price": 200,
           "sizes": [],
           "tags": [],
           "image": "",
@@ -82,23 +82,27 @@
             }
           },
           "badges": [],
-          "diet": [],
-          "allergens": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
           "pairs": []
         },
         {
           "id": "espresso",
           "name": "Espresso",
           "description": "",
-          "price": 80,
+          "price": 150,
           "sizes": [
             {
               "name": "Tek",
-              "price": 80
+              "price": 150
             },
             {
               "name": "Double",
-              "price": 100
+              "price": 160
             }
           ],
           "tags": [],
@@ -114,7 +118,9 @@
             }
           },
           "badges": [],
-          "diet": [],
+          "diet": [
+            "caffeine"
+          ],
           "allergens": [],
           "pairs": []
         },
@@ -122,8 +128,17 @@
           "id": "americano",
           "name": "Americano",
           "description": "",
-          "price": 110,
-          "sizes": [],
+          "price": 200,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 200
+            },
+            {
+              "name": "Büyük",
+              "price": 220
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -137,23 +152,25 @@
             }
           },
           "badges": [],
-          "diet": [],
+          "diet": [
+            "caffeine"
+          ],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "latte",
           "name": "Latte",
-          "description": "Espresso ve sıcak süt",
+          "description": "",
           "price": 0,
           "sizes": [
             {
               "name": "Küçük",
-              "price": 120
+              "price": 220
             },
             {
               "name": "Büyük",
-              "price": 145
+              "price": 240
             }
           ],
           "tags": [],
@@ -171,8 +188,12 @@
             }
           },
           "badges": [],
-          "diet": [],
-          "allergens": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
           "pairs": []
         },
         {
@@ -180,7 +201,16 @@
           "name": "Cappuccino",
           "description": "",
           "price": 125,
-          "sizes": [],
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 220
+            },
+            {
+              "name": "Büyük",
+              "price": 240
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -194,19 +224,21 @@
             }
           },
           "badges": [],
-          "diet": [],
-          "allergens": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
           "pairs": []
         },
         {
           "id": "flat-white",
           "name": "Flat White",
-          "description": "Double ristretto, ipeksi süt",
-          "price": 135,
+          "description": "",
+          "price": 220,
           "sizes": [],
-          "tags": [
-            "Yeni"
-          ],
+          "tags": [],
           "image": "",
           "available": true,
           "calories": 0,
@@ -221,15 +253,19 @@
             }
           },
           "badges": [],
-          "diet": [],
-          "allergens": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
           "pairs": []
         },
         {
           "id": "mocha",
-          "name": "Mocha",
-          "description": "Bitter çikolata ve espresso",
-          "price": 140,
+          "name": "Filtre Kahve",
+          "description": "",
+          "price": 230,
           "sizes": [],
           "tags": [],
           "image": "",
@@ -246,9 +282,211 @@
             }
           },
           "badges": [],
-          "diet": [],
+          "diet": [
+            "caffeine"
+          ],
           "allergens": [],
           "pairs": []
+        },
+        {
+          "id": "xmwxqd7urjv4jx",
+          "name": "Caramel Macchiato",
+          "description": "",
+          "price": 240,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 240
+            },
+            {
+              "name": "Büyük",
+              "price": 260
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxqgvckys3g4",
+          "name": "White Chocolate Mocha",
+          "description": "",
+          "price": 240,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 240
+            },
+            {
+              "name": "Büyük",
+              "price": 260
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxqikcodxgcf",
+          "name": "Türk Kahvesi",
+          "description": "",
+          "price": 120,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxqkrm4rc2zp",
+          "name": "Cold Brew",
+          "description": "",
+          "price": 230,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxqlbaaqb0vh",
+          "name": "Ice Latte",
+          "description": "",
+          "price": 240,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 240
+            },
+            {
+              "name": "Büyük",
+              "price": 260
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxqmcjb553el",
+          "name": "Ice Americano",
+          "description": "",
+          "price": 220,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 220
+            },
+            {
+              "name": "Büyük",
+              "price": 240
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxqnhmzfhuwx",
+          "name": "Ice White Mocha",
+          "description": "",
+          "price": 260,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 260
+            },
+            {
+              "name": "Büyük",
+              "price": 280
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxqojqz4ppto",
+          "name": "Ice Caramel Macchiato",
+          "description": "",
+          "price": 260,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 260
+            },
+            {
+              "name": "Büyük",
+              "price": 280
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [
+            "caffeine"
+          ],
+          "allergens": [
+            "milk"
+          ],
+          "pairs": [],
+          "calories": 0
         }
       ],
       "image": "",
@@ -264,15 +502,15 @@
     },
     {
       "id": "soguk-kahveler",
-      "name": "Soğuk Kahveler",
-      "icon": "🧊",
+      "name": "MATCHA",
+      "icon": "🍵",
       "hidden": false,
       "items": [
         {
           "id": "iced-latte",
-          "name": "Iced Latte",
+          "name": "Ceremonial Matcha",
           "description": "",
-          "price": 140,
+          "price": 200,
           "sizes": [],
           "tags": [],
           "image": "",
@@ -286,17 +524,32 @@
               "name": "Айс латте"
             }
           },
-          "badges": [],
-          "diet": [],
+          "badges": [
+            "recommended"
+          ],
+          "diet": [
+            "caffeine",
+            "vegan",
+            "vegetarian"
+          ],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "iced-americano",
-          "name": "Iced Americano",
+          "name": "Matcha Latte",
           "description": "",
-          "price": 115,
-          "sizes": [],
+          "price": 220,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 220
+            },
+            {
+              "name": "Büyük",
+              "price": 240
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -309,17 +562,34 @@
               "name": "Айс американо"
             }
           },
-          "badges": [],
-          "diet": [],
-          "allergens": [],
+          "badges": [
+            "recommended"
+          ],
+          "diet": [
+            "caffeine",
+            "vegan",
+            "vegetarian"
+          ],
+          "allergens": [
+            "milk"
+          ],
           "pairs": []
         },
         {
           "id": "cold-brew",
-          "name": "Cold Brew",
-          "description": "18 saat soğuk demleme",
-          "price": 150,
-          "sizes": [],
+          "name": "Ice Matcha Latte",
+          "description": "",
+          "price": 240,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 240
+            },
+            {
+              "name": "Büyük",
+              "price": 260
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -334,32 +604,17 @@
               "description": "Холодное заваривание 18 часов"
             }
           },
-          "badges": [],
-          "diet": [],
-          "allergens": [],
-          "pairs": []
-        },
-        {
-          "id": "frappe",
-          "name": "Karamel Frappé",
-          "description": "",
-          "price": 155,
-          "sizes": [],
-          "tags": [],
-          "image": "",
-          "available": false,
-          "calories": 0,
-          "i18n": {
-            "en": {
-              "name": "Caramel Frappé"
-            },
-            "ru": {
-              "name": "Карамельный фраппе"
-            }
-          },
-          "badges": [],
-          "diet": [],
-          "allergens": [],
+          "badges": [
+            "recommended"
+          ],
+          "diet": [
+            "caffeine",
+            "vegan",
+            "vegetarian"
+          ],
+          "allergens": [
+            "milk"
+          ],
           "pairs": []
         }
       ],
@@ -376,7 +631,7 @@
     },
     {
       "id": "caylar",
-      "name": "Çaylar & Sıcak İçecekler",
+      "name": "TEA & HOT DRİNKS",
       "icon": "🫖",
       "hidden": false,
       "items": [
