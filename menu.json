@@ -1,7 +1,7 @@
 {
   "cafe": {
     "name": "ATELIER KOI ART & COFFEE",
-    "slogan": "Specialty Coffee & Art",
+    "slogan": "SPECİALİTY COFFEE & ART",
     "logo": "images/logo-mwugr2oh.jpg",
     "currency": "₺",
     "phone": "05399553723",
@@ -33,16 +33,16 @@
     "whatsapp": "05399553723"
   },
   "theme": {
-    "accent": "#fefb41",
+    "accent": "#669d34",
     "tvSeconds": 12,
     "tvColumns": 2,
     "mode": "custom",
     "tvMode": "same",
     "colors": {
-      "bg": "#121110",
-      "surface": "#1e1c1a",
-      "text": "#f5f0e6",
-      "muted": "#ffffff"
+      "bg": "#ffffff",
+      "surface": "#b1dd8b",
+      "text": "#000000",
+      "muted": "#263e0f"
     },
     "tvScale": 1.15,
     "tvSlideSeconds": 8,
@@ -1656,7 +1656,9 @@
           ],
           "calories": 0
         }
-      ]
+      ],
+      "image": "",
+      "description": ""
     },
     {
       "id": "xmwxwf089ppw2f",
@@ -1717,7 +1719,9 @@
           "pairs": [],
           "calories": 0
         }
-      ]
+      ],
+      "image": "",
+      "description": ""
     }
   ],
   "tvSlides": []
