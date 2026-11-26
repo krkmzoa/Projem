@@ -779,7 +779,7 @@
         {
           "id": "limonata",
           "name": "Ichigo Matcha",
-          "description": "Çilek - Matcha",
+          "description": "Çilek - Süt - Matcha",
           "price": 285,
           "sizes": [
             {
@@ -851,6 +851,35 @@
           "pairs": []
         },
         {
+          "id": "xmwxuyg11nkw7o",
+          "name": "Lotus Latte",
+          "description": "Lotus Kreması - Süt - Espresso",
+          "price": 300,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 300
+            },
+            {
+              "name": "Büyük",
+              "price": 325
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended",
+            "signature"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
           "id": "soda",
           "name": "Koi Garden",
           "description": "Hindistan Cevizi Sütü - Çilek - Matcha Kreması",
@@ -889,11 +918,22 @@
         },
         {
           "id": "su",
-          "name": "Su",
-          "description": "",
-          "price": 20,
-          "sizes": [],
-          "tags": [],
+          "name": "Fuji Cloud",
+          "description": "Süt - Matcha - Vanilya Kreması",
+          "price": 258,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 250
+            },
+            {
+              "name": "Büyük",
+              "price": 275
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
           "image": "",
           "available": true,
           "calories": 0,
@@ -905,10 +945,187 @@
               "name": "Вода"
             }
           },
-          "badges": [],
+          "badges": [
+            "recommended",
+            "signature"
+          ],
           "diet": [],
           "allergens": [],
           "pairs": []
+        },
+        {
+          "id": "xmwxunspiuao97",
+          "name": "Golden Koi",
+          "description": "Mango - Süt - Matcha - Vanilya Kreması",
+          "price": 300,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 300
+            },
+            {
+              "name": "Büyük",
+              "price": 325
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended",
+            "signature"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxuq4f60gous",
+          "name": "Yuki Cloud",
+          "description": "Beyaz Çikolata - Süt - Matcha - Vanilya Kreması",
+          "price": 300,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 300
+            },
+            {
+              "name": "Büyük",
+              "price": 325
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended",
+            "signature"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxusf4uy1ry3",
+          "name": "Midnight Geisha",
+          "description": "Süt - Butterfly Pea Flower - Vanilya Kreması",
+          "price": 250,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 250
+            },
+            {
+              "name": "Büyük",
+              "price": 275
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended",
+            "signature"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxuu0h2vrsr2",
+          "name": "Murasaki Kumo",
+          "description": "Süt - Ube - Vanilya Kreması",
+          "price": 250,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 250
+            },
+            {
+              "name": "Büyük",
+              "price": 275
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended",
+            "signature"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxuvg63gjk9p",
+          "name": "Kyoto Mist",
+          "description": "Muz - Süt - Matcha Kreması",
+          "price": 300,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 300
+            },
+            {
+              "name": "Büyük",
+              "price": 325
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended",
+            "signature"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxuwt1dvrorf",
+          "name": "Black Shogun",
+          "description": "Soğuk Demlenmiş Kahve - Vanilya Kreması",
+          "price": 250,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 250
+            },
+            {
+              "name": "Büyük",
+              "price": 275
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "signature",
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
         }
       ],
       "image": "",
@@ -924,17 +1141,19 @@
     },
     {
       "id": "tatlilar",
-      "name": "Tatlılar",
-      "icon": "🍰",
+      "name": "TEA",
+      "icon": "🫖",
       "hidden": false,
       "items": [
         {
           "id": "brownie",
-          "name": "Brownie",
-          "description": "Dondurma ile servis edilir",
-          "price": 150,
+          "name": "Rooibos Vanilla",
+          "description": "Bitki Çayı",
+          "price": 210,
           "sizes": [],
-          "tags": [],
+          "tags": [
+            "Güney Afrika"
+          ],
           "image": "",
           "available": true,
           "calories": 0,
@@ -948,19 +1167,21 @@
               "description": "Подаётся с мороженым"
             }
           },
-          "badges": [],
+          "badges": [
+            "recommended"
+          ],
           "diet": [],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "cheesecake",
-          "name": "San Sebastian Cheesecake",
-          "description": "Ev yapımı, akışkan kıvamlı",
-          "price": 180,
+          "name": "Chai Masala",
+          "description": "Bitki Çayı",
+          "price": 210,
           "sizes": [],
           "tags": [
-            "Popüler"
+            "Hindistan"
           ],
           "image": "",
           "available": true,
@@ -975,18 +1196,22 @@
               "description": "Домашний, с нежной кремовой серединой"
             }
           },
-          "badges": [],
+          "badges": [
+            "recommended"
+          ],
           "diet": [],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "tiramisu",
-          "name": "Tiramisu",
-          "description": "",
-          "price": 165,
+          "name": "Yaseminli Yeşil Çay",
+          "description": "Bitki Çayı",
+          "price": 210,
           "sizes": [],
-          "tags": [],
+          "tags": [
+            "Çin"
+          ],
           "image": "",
           "available": true,
           "calories": 0,
@@ -998,19 +1223,21 @@
               "name": "Тирамису"
             }
           },
-          "badges": [],
+          "badges": [
+            "recommended"
+          ],
           "diet": [],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "kurabiye",
-          "name": "Çikolatalı Kurabiye",
-          "description": "",
-          "price": 60,
+          "name": "Kavunlu Beyaz Çay",
+          "description": "Bitki Çayı",
+          "price": 210,
           "sizes": [],
           "tags": [
-            "Vegan"
+            "Çin"
           ],
           "image": "",
           "available": true,
@@ -1023,10 +1250,107 @@
               "name": "Шоколадное печенье"
             }
           },
-          "badges": [],
+          "badges": [
+            "recommended"
+          ],
           "diet": [],
           "allergens": [],
           "pairs": []
+        },
+        {
+          "id": "xmwxv6hemx56f5",
+          "name": "Milk Oolong",
+          "description": "Bitki Çayı",
+          "price": 210,
+          "sizes": [],
+          "tags": [
+            "Tayvan"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxv7fsr76lcp",
+          "name": "Golden Pu-Erh",
+          "description": "Bitki Çayı",
+          "price": 210,
+          "sizes": [],
+          "tags": [
+            "Çin"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxv9g1oj6hkl",
+          "name": "Koi Blend",
+          "description": "Bitki Çayı",
+          "price": 210,
+          "sizes": [],
+          "tags": [
+            "Lavanta - Ebegümeci Çiçeği"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxvblsarlgej",
+          "name": "Berry Love",
+          "description": "Meyve Çayı",
+          "price": 210,
+          "sizes": [],
+          "tags": [
+            "Almanya"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxvcm28s1nr4",
+          "name": "Türk Çayı",
+          "description": "",
+          "price": 70,
+          "sizes": [],
+          "tags": [
+            "Türkiye"
+          ],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
         }
       ],
       "image": "",
@@ -1042,16 +1366,25 @@
     },
     {
       "id": "kahvalti",
-      "name": "Atıştırmalıklar",
-      "icon": "🥐",
+      "name": "REFRESHMENTS",
+      "icon": "🧋",
       "hidden": false,
       "items": [
         {
           "id": "kruvasan",
-          "name": "Tereyağlı Kruvasan",
+          "name": "Koi Lime",
           "description": "",
-          "price": 90,
-          "sizes": [],
+          "price": 230,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 230
+            },
+            {
+              "name": "Büyük",
+              "price": 250
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -1064,17 +1397,32 @@
               "name": "Круассан со сливочным маслом"
             }
           },
-          "badges": [],
-          "diet": [],
+          "badges": [
+            "recommended"
+          ],
+          "diet": [
+            "decaf",
+            "vegan",
+            "vegetarian"
+          ],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "tost",
-          "name": "Kaşarlı Tost",
-          "description": "Yanında patates cipsi",
-          "price": 130,
-          "sizes": [],
+          "name": "Koi Hibiscus",
+          "description": "",
+          "price": 230,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 230
+            },
+            {
+              "name": "Büyük",
+              "price": 250
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -1089,17 +1437,32 @@
               "description": "Подаётся с картофельными чипсами"
             }
           },
-          "badges": [],
-          "diet": [],
+          "badges": [
+            "recommended"
+          ],
+          "diet": [
+            "decaf",
+            "vegan",
+            "vegetarian"
+          ],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "sandvic",
-          "name": "Hindi Füme Sandviç",
-          "description": "Ekşi maya ekmeği, cheddar, roka",
-          "price": 190,
-          "sizes": [],
+          "name": "Butterfly Limonata",
+          "description": "Blue Butterfly Pea - Limonata",
+          "price": 220,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 220
+            },
+            {
+              "name": "Büyük",
+              "price": 240
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -1114,10 +1477,101 @@
               "description": "Хлеб на закваске, чеддер, руккола"
             }
           },
+          "badges": [
+            "signature",
+            "recommended"
+          ],
+          "diet": [
+            "vegan",
+            "vegetarian",
+            "decaf"
+          ],
+          "allergens": [],
+          "pairs": []
+        },
+        {
+          "id": "xmwxvoyhv4xpbe",
+          "name": "Butterfly Mango Limonata",
+          "description": "Blue Butterfly Pea - Mango - Limonata",
+          "price": 230,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 230
+            },
+            {
+              "name": "Büyük",
+              "price": 250
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [
+            "signature"
+          ],
+          "diet": [
+            "decaf",
+            "vegan",
+            "vegetarian"
+          ],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxvqnyur8sm1",
+          "name": "Limonata",
+          "description": "",
+          "price": 180,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 180
+            },
+            {
+              "name": "Büyük",
+              "price": 200
+            }
+          ],
+          "tags": [],
+          "image": "",
+          "available": true,
           "badges": [],
           "diet": [],
           "allergens": [],
-          "pairs": []
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxvrp3bwaa9i",
+          "name": "Su",
+          "description": "",
+          "price": 40,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxvs3hkh38wy",
+          "name": "Soda",
+          "description": "Tercihe Göre Meyveli",
+          "price": 120,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
         }
       ],
       "image": "",
@@ -1130,6 +1584,140 @@
           "name": "Закуски"
         }
       }
+    },
+    {
+      "id": "xmwxvyjj0qokse",
+      "name": "SANDWICH",
+      "icon": "🥪",
+      "hidden": false,
+      "items": [
+        {
+          "id": "xmwxvzb8f4o055",
+          "name": "Hindi & Roast Beef Sandwich",
+          "description": "Hindi Füme - Rozbif - Gouda Peyniri\nMarul - Domates\nAcılı Mayonez - Ranch Sos",
+          "price": 380,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [
+            "signature",
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [
+            "xmwxqlbaaqb0vh"
+          ],
+          "calories": 0
+        },
+        {
+          "id": "xmwxw6d1oxlki2",
+          "name": "Tuna Sandwich",
+          "description": "Ton Balığı - Mısır - Marul - Mayonez",
+          "price": 400,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [
+            "signature",
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [
+            "fish",
+            "gluten"
+          ],
+          "pairs": [
+            "kruvasan"
+          ],
+          "calories": 0
+        },
+        {
+          "id": "xmwxwc9ohqxjfn",
+          "name": "Pesto Sandwich",
+          "description": "Pesto Sos - Mozzarella - Roka - Domates",
+          "price": 340,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [
+            "vegan",
+            "vegetarian"
+          ],
+          "allergens": [],
+          "pairs": [
+            "xmwxqmcjb553el"
+          ],
+          "calories": 0
+        }
+      ]
+    },
+    {
+      "id": "xmwxwf089ppw2f",
+      "name": "DESSERTS",
+      "icon": "🧁",
+      "hidden": false,
+      "items": [
+        {
+          "id": "xmwxwg6b08gdqo",
+          "name": "Sufle",
+          "description": "",
+          "price": 300,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [
+            "latte"
+          ],
+          "calories": 0
+        },
+        {
+          "id": "xmwxwhbklv2hy5",
+          "name": "Matcha White Chocolate",
+          "description": "Beyaz Çikolata - Matcha",
+          "price": 300,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        },
+        {
+          "id": "xmwxwixlpjnzi7",
+          "name": "Koi Chocolate",
+          "description": "Rooibos Çayı - Ruby Çikolatası",
+          "price": 300,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "badges": [
+            "recommended"
+          ],
+          "diet": [],
+          "allergens": [],
+          "pairs": [],
+          "calories": 0
+        }
+      ]
     }
   ],
   "tvSlides": []
