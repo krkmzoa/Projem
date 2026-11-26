@@ -631,27 +631,23 @@
     },
     {
       "id": "caylar",
-      "name": "TEA & HOT DRİNKS",
-      "icon": "🫖",
+      "name": "HOT DRİNKS",
+      "icon": "♨️",
       "hidden": false,
       "items": [
         {
           "id": "cay",
-          "name": "Çay",
+          "name": "Chai Tea Latte",
           "description": "",
-          "price": 30,
+          "price": 240,
           "sizes": [
             {
-              "name": "İnce belli",
-              "price": 30,
-              "i18n": {
-                "en": "Tulip glass",
-                "ru": "Стакан-армуду"
-              }
+              "name": "Küçük",
+              "price": 240
             },
             {
-              "name": "Fincan",
-              "price": 45
+              "name": "Büyük",
+              "price": 260
             }
           ],
           "tags": [],
@@ -668,15 +664,26 @@
           },
           "badges": [],
           "diet": [],
-          "allergens": [],
+          "allergens": [
+            "milk"
+          ],
           "pairs": []
         },
         {
           "id": "bitki-cayi",
-          "name": "Bitki Çayı",
-          "description": "Ihlamur, adaçayı, kuşburnu",
-          "price": 70,
-          "sizes": [],
+          "name": "Pumpkin Spice Latte",
+          "description": "",
+          "price": 240,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 240
+            },
+            {
+              "name": "Büyük",
+              "price": 260
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -693,14 +700,16 @@
           },
           "badges": [],
           "diet": [],
-          "allergens": [],
+          "allergens": [
+            "milk"
+          ],
           "pairs": []
         },
         {
           "id": "sicak-cikolata",
           "name": "Sıcak Çikolata",
-          "description": "",
-          "price": 120,
+          "description": "Sadece Kış Aylarında Mevcut",
+          "price": 230,
           "sizes": [],
           "tags": [],
           "image": "",
@@ -716,17 +725,20 @@
           },
           "badges": [],
           "diet": [],
-          "allergens": [],
+          "allergens": [
+            "milk",
+            "gluten"
+          ],
           "pairs": []
         },
         {
           "id": "salep",
           "name": "Salep",
           "description": "Tarçın ile",
-          "price": 110,
+          "price": 250,
           "sizes": [],
           "tags": [
-            "Mevsimlik"
+            "Sadece Kış Aylarında"
           ],
           "image": "",
           "available": true,
@@ -760,16 +772,25 @@
     },
     {
       "id": "soguk-icecekler",
-      "name": "Soğuk İçecekler",
-      "icon": "🍋",
+      "name": "KOI SIGNATURE",
+      "icon": "✍️",
       "hidden": false,
       "items": [
         {
           "id": "limonata",
-          "name": "Ev Yapımı Limonata",
-          "description": "Taze nane ile",
-          "price": 100,
-          "sizes": [],
+          "name": "Ichigo Matcha",
+          "description": "Çilek - Matcha",
+          "price": 285,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 285
+            },
+            {
+              "name": "Büyük",
+              "price": 310
+            }
+          ],
           "tags": [],
           "image": "",
           "available": true,
@@ -784,18 +805,32 @@
               "description": "Со свежей мятой"
             }
           },
-          "badges": [],
+          "badges": [
+            "signature",
+            "recommended"
+          ],
           "diet": [],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "taze-portakal",
-          "name": "Taze Portakal Suyu",
-          "description": "",
-          "price": 110,
-          "sizes": [],
-          "tags": [],
+          "name": "Sakura Kiss",
+          "description": "Matcha - Süt - Çilek Kreması",
+          "price": 300,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 300
+            },
+            {
+              "name": "Büyük",
+              "price": 325
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
           "image": "",
           "available": true,
           "calories": 0,
@@ -807,18 +842,32 @@
               "name": "Свежевыжатый апельсиновый сок"
             }
           },
-          "badges": [],
+          "badges": [
+            "signature",
+            "recommended"
+          ],
           "diet": [],
           "allergens": [],
           "pairs": []
         },
         {
           "id": "soda",
-          "name": "Maden Suyu",
-          "description": "",
-          "price": 35,
-          "sizes": [],
-          "tags": [],
+          "name": "Koi Garden",
+          "description": "Hindistan Cevizi Sütü - Çilek - Matcha Kreması",
+          "price": 300,
+          "sizes": [
+            {
+              "name": "Küçük",
+              "price": 300
+            },
+            {
+              "name": "Büyük",
+              "price": 325
+            }
+          ],
+          "tags": [
+            "El Yapımı Krema"
+          ],
           "image": "",
           "available": true,
           "calories": 0,
@@ -830,7 +879,10 @@
               "name": "Минеральная вода с газом"
             }
           },
-          "badges": [],
+          "badges": [
+            "recommended",
+            "signature"
+          ],
           "diet": [],
           "allergens": [],
           "pairs": []
@@ -877,6 +929,31 @@
       "hidden": false,
       "items": [
         {
+          "id": "brownie",
+          "name": "Brownie",
+          "description": "Dondurma ile servis edilir",
+          "price": 150,
+          "sizes": [],
+          "tags": [],
+          "image": "",
+          "available": true,
+          "calories": 0,
+          "i18n": {
+            "en": {
+              "name": "Brownie",
+              "description": "Served with ice cream"
+            },
+            "ru": {
+              "name": "Брауни",
+              "description": "Подаётся с мороженым"
+            }
+          },
+          "badges": [],
+          "diet": [],
+          "allergens": [],
+          "pairs": []
+        },
+        {
           "id": "cheesecake",
           "name": "San Sebastian Cheesecake",
           "description": "Ev yapımı, akışkan kıvamlı",
@@ -896,31 +973,6 @@
             "ru": {
               "name": "Чизкейк Сан-Себастьян",
               "description": "Домашний, с нежной кремовой серединой"
-            }
-          },
-          "badges": [],
-          "diet": [],
-          "allergens": [],
-          "pairs": []
-        },
-        {
-          "id": "brownie",
-          "name": "Brownie",
-          "description": "Dondurma ile servis edilir",
-          "price": 150,
-          "sizes": [],
-          "tags": [],
-          "image": "",
-          "available": true,
-          "calories": 0,
-          "i18n": {
-            "en": {
-              "name": "Brownie",
-              "description": "Served with ice cream"
-            },
-            "ru": {
-              "name": "Брауни",
-              "description": "Подаётся с мороженым"
             }
           },
           "badges": [],
