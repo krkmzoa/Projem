@@ -35,7 +35,7 @@
   "theme": {
     "accent": "#ffffff",
     "tvSeconds": 12,
-    "tvColumns": 3,
+    "tvColumns": 2,
     "mode": "custom",
     "tvMode": "same",
     "colors": {
@@ -44,7 +44,7 @@
       "text": "#000000",
       "muted": "#4e7a27"
     },
-    "tvScale": 1.3,
+    "tvScale": 1.15,
     "tvSlideSeconds": 8,
     "landing": "always",
     "landingMotion": "zoom",
