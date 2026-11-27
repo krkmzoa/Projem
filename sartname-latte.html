@@ -384,9 +384,25 @@ canvas{display:block;width:100%;height:100%}
   function milkH(){ const f = DRINKS[drink||'latte'].foam/10; return (S.foam/10)*(4.5-f)/f; }
   function liquidTop(){ return espH() + (S.foam>0 ? milkH() + S.foam/10 : 0); }
 
-  // ---------- ses: Web Audio ile üretilir, dosya yok ----------
+  // ---------- ses ----------
+  // Öğütme, espresso ve süt: kafede kaydedilmiş gerçek sesler (sounds/*.wav), başlangıç + kesintisiz döngü.
+  // Köpük ve sonuç sesleri Web Audio ile üretilir. Kayıt yüklenemezse o adım da üretilmiş sese döner.
   const SND = (() => {
     let ac = null, master = null, nb = null, cur = null;
+    const SAMPLES = [ {file:'grind', loopStart:0.4, loopEnd:4.6},
+                      {file:'shot',  loopStart:0.7, loopEnd:8.75},
+                      {file:'steam', loopStart:1.4, loopEnd:11.5} ];
+    const raw = [], buf = [];
+    SAMPLES.forEach((smp, k) => {   // dosyaları baştan indir; çözme işi ilk dokunuşta
+      try { fetch(`sounds/${smp.file}.wav`).then(r => r.ok ? r.arrayBuffer() : null).then(b => { raw[k] = b; decode(); }).catch(() => {}); } catch(e) {}
+    });
+    function decode(){
+      if (!ac) return;
+      raw.forEach((b, k) => {
+        if (!b || buf[k] || b._busy) return; b._busy = true;
+        new Promise((res, rej) => ac.decodeAudioData(b.slice(0), res, rej)).then(d => { buf[k] = d; }).catch(() => {});
+      });
+    }
     let on = true; try { on = localStorage.getItem('koiSound') !== '0'; } catch(e) {}
     const VOL = .55;
     function unlock(){
@@ -398,6 +414,7 @@ canvas{display:block;width:100%;height:100%}
         nb = ac.createBuffer(1, ac.sampleRate*2, ac.sampleRate);
         const d = nb.getChannelData(0); for (let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
       }
+      decode();
       if (ac.state === 'suspended') ac.resume().catch(()=>{});
       return true;
     }
@@ -412,6 +429,11 @@ canvas{display:block;width:100%;height:100%}
       const t = ac.currentTime, out = gain(0); out.connect(master);
       out.gain.setValueAtTime(0, t); out.gain.linearRampToValueAtTime(1, t + .06);
       const src = [], m = {};
+      if (buf[step]){             // gerçek kayıt: başlangıç bir kez, sonra döngü
+        const b = ac.createBufferSource(); b.buffer = buf[step]; b.loop = true;
+        b.loopStart = SAMPLES[step].loopStart; b.loopEnd = Math.min(SAMPLES[step].loopEnd, buf[step].duration);
+        chain(b, gain(.9), out); b.start(); cur = {out, src:[b], m, step, rec:true}; return;
+      }
       if (step===0){            // değirmen: motor uğultusu + çekirdek kırılma çıtırtısı
         m.motor = osc('sawtooth', 92); chain(m.motor, filt('lowpass', 700), gain(.18), out);
         const m2 = osc('square', 184); chain(m2, filt('lowpass', 500), gain(.05), out);
@@ -428,8 +450,8 @@ canvas{display:block;width:100%;height:100%}
         m.w = osc('sine', 500); m.whistle = gain(0); chain(m.w, m.whistle, out);
         src.push(n, n2, m.w);
       } else {                  // köpük: dökülen süt, yumuşak lıkırtı
-        const n = noise(), g = gain(.3); chain(n, filt('lowpass', 650, .8), g, out);
-        const lfo = osc('sine', 7), lg = gain(.12); lfo.connect(lg); lg.connect(g.gain);
+        const n = noise(), g = gain(.6); chain(n, filt('lowpass', 650, .8), g, out);   // kayıtlı seslerle aynı seviyede
+        const lfo = osc('sine', 7), lg = gain(.24); lfo.connect(lg); lg.connect(g.gain);
         const n2 = noise(); m.bub = gain(.06); chain(n2, filt('bandpass', 1800, 4), m.bub, out);
         src.push(n, lfo, n2);
       }
@@ -437,13 +459,13 @@ canvas{display:block;width:100%;height:100%}
       cur = {out, src, m, step};
     }
     function tick(step, v){
-      if (!cur || cur.step!==step) return;
+      if (!cur || cur.step!==step || cur.rec) return;
       const t = ac.currentTime, m = cur.m;
       if (step===0){ m.crunch.gain.setTargetAtTime(.12 + Math.random()*.3, t, .015); m.motor.frequency.setTargetAtTime(88 + Math.random()*8, t, .05); }
       if (step===1 && Math.random() < .15) m.flow.gain.setTargetAtTime(.14 + Math.random()*.14, t, .03);
       if (step===2){ const k = Math.max(0, Math.min(1, (v-45)/30));
         m.whistle.gain.setTargetAtTime(.07*k, t, .1); m.w.frequency.setTargetAtTime(500 + 900*k, t, .1); m.hiss.gain.setTargetAtTime(.28 - .08*k, t, .1); }
-      if (step===3 && Math.random() < .2) m.bub.gain.setTargetAtTime(Math.random()*.12, t, .02);
+      if (step===3 && Math.random() < .2) m.bub.gain.setTargetAtTime(Math.random()*.24, t, .02);
     }
     function stop(fast){
       if (!cur) return; const c = cur; cur = null;
