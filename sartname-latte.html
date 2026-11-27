@@ -44,6 +44,9 @@ body{
 .top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--line-dim)}
 .top b{color:var(--koi);font-weight:700}
 .top > span{white-space:nowrap}
+.sndbtn{appearance:none;background:transparent;border:1px solid var(--koi);color:var(--koi);border-radius:5px;font:700 10px var(--mono);letter-spacing:.08em;padding:2px 7px;margin-right:10px;cursor:pointer;vertical-align:1px}
+.sndbtn[aria-pressed="false"]{border-color:var(--line-dim);color:var(--line-dim);text-decoration:line-through}
+.sndbtn:focus-visible{outline:2px solid var(--line);outline-offset:2px}
 @media (max-width:420px){.top .pk{display:none}}
 h1{font-family:var(--display);font-weight:900;font-size:clamp(36px,11vw,52px);line-height:.86;margin:0;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
 h1 span{color:var(--koi)}
@@ -155,7 +158,7 @@ canvas{display:block;width:100%;height:100%}
 </head>
 <body>
 <main class="sheet">
-  <div class="top"><span><b>ATELIER KOI</b><span class="pk"> · PROJE KONTROL</span></span><span id="roundNo">PAFTA 1/4</span></div>
+  <div class="top"><span><b>ATELIER KOI</b><span class="pk"> · PROJE KONTROL</span></span><span><button class="sndbtn" id="snd" type="button" aria-pressed="true" title="Sesi aç / kapat">SES</button><span id="roundNo">PAFTA 1/4</span></span></div>
   <h1>Şartnameye<br><span id="title" lang="en">uygun kahve</span></h1>
   <div class="modes" role="radiogroup" aria-label="Zorluk">
     <button class="mode" role="radio" data-m="stajyer">İLK MÜŞTERİ</button>
@@ -223,11 +226,12 @@ canvas{display:block;width:100%;height:100%}
 (() => {
   const num = (v, d) => (+v.toFixed(d)).toString().replace('.', ',');
 
-  // Gerçek specialty reçete: 18 g → 36 ml (1:2), süt 65 °C, köpük içeceğe göre
+  // Specialty reçete (1:2 oran): flat white çift shot 18 g → 36 ml, latte ve cappuccino tek shot 9 g → 18 ml.
+  // Süt 65 °C, köpük içeceğe göre.
   const DRINKS = {
-    fw:    {name:'Flat White', code:'FW', foam:5,  info:'İpeksi, çok ince mikroköpük'},
-    latte: {name:'Latte',      code:'LT', foam:10, info:'İnce mikroköpük katmanı'},
-    capp:  {name:'Cappuccino', code:'CP', foam:15, info:'Kalın, hacimli köpük'},
+    fw:    {name:'Flat White', code:'FW', dose:18, shot:36, foam:5,  info:'çift shot · ipeksi, çok ince köpük'},
+    latte: {name:'Latte',      code:'LT', dose:9,  shot:18, foam:10, info:'tek shot · ince mikroköpük'},
+    capp:  {name:'Cappuccino', code:'CP', dose:9,  shot:18, foam:15, info:'tek shot · kalın, hacimli köpük'},
   };
   const FOAM_NOTES = {
     fw:    ['Köpük çok ince', "Köpük kalın, latte'ye döndü"],
@@ -292,7 +296,7 @@ canvas{display:block;width:100%;height:100%}
     {key:'foam', name:'Köpük', unit:'MM · KÖPÜK KALINLIĞI', suf:' mm', fall:6, d:1,
      ready:t=>`Sütü dök. Köpük <em>${t}</em> olunca bırak. Bırakınca biraz kabarır, taşırma.`},
   ];
-  const targetOf = i => [18, 36, 65, DRINKS[drink].foam][i];
+  const targetOf = i => { const d = DRINKS[drink]; return [d.dose, d.shot, 65, d.foam][i]; };
   const rnd1 = (i, v) => STEPS[i].d ? Math.round(v*10)/10 : Math.round(v);
   const fmtV = (i, v) => STEPS[i].d ? v.toFixed(1).replace('.', ',') : String(Math.round(v));
   const fmtT = i => `${targetOf(i)}${STEPS[i].suf}`;
@@ -355,6 +359,7 @@ canvas{display:block;width:100%;height:100%}
     const M = MODES[mode], i = S.step;
     if (S.phase==='holding'){
       S.holdT += dt; const h = S.holdT, k = M.spd*S.rate[i]*wob(i,h);
+      sfx('tick', i, get(i));
       if (i===0) S.dose += dt*(4+1.5*h)*k;
       if (i===1) S.shot += dt*(9+.5*h)*k*S.tf;   // ön ıslatmadan sonra hafif hızlanma
       if (i===2) S.temp += dt*11*k;   // buharla sabit hızda ısınma
@@ -379,16 +384,110 @@ canvas{display:block;width:100%;height:100%}
   function milkH(){ const f = DRINKS[drink||'latte'].foam/10; return (S.foam/10)*(4.5-f)/f; }
   function liquidTop(){ return espH() + (S.foam>0 ? milkH() + S.foam/10 : 0); }
 
+  // ---------- ses: Web Audio ile üretilir, dosya yok ----------
+  const SND = (() => {
+    let ac = null, master = null, nb = null, cur = null;
+    let on = true; try { on = localStorage.getItem('koiSound') !== '0'; } catch(e) {}
+    const VOL = .55;
+    function unlock(){
+      if (!on) return false;
+      if (!ac){
+        const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+        ac = new AC();
+        master = ac.createGain(); master.gain.value = VOL; master.connect(ac.destination);
+        nb = ac.createBuffer(1, ac.sampleRate*2, ac.sampleRate);
+        const d = nb.getChannelData(0); for (let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+      }
+      if (ac.state === 'suspended') ac.resume().catch(()=>{});
+      return true;
+    }
+    const noise = () => { const s = ac.createBufferSource(); s.buffer = nb; s.loop = true; return s; };
+    const filt  = (type, f, q=1) => { const b = ac.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; return b; };
+    const gain  = v => { const g = ac.createGain(); g.gain.value = v; return g; };
+    const osc   = (type, f) => { const o = ac.createOscillator(); o.type = type; o.frequency.value = f; return o; };
+    const chain = (...n) => { for (let i=0;i<n.length-1;i++) n[i].connect(n[i+1]); return n[n.length-1]; };
+
+    function start(step){
+      if (!unlock()) return; stop(true);
+      const t = ac.currentTime, out = gain(0); out.connect(master);
+      out.gain.setValueAtTime(0, t); out.gain.linearRampToValueAtTime(1, t + .06);
+      const src = [], m = {};
+      if (step===0){            // değirmen: motor uğultusu + çekirdek kırılma çıtırtısı
+        m.motor = osc('sawtooth', 92); chain(m.motor, filt('lowpass', 700), gain(.18), out);
+        const m2 = osc('square', 184); chain(m2, filt('lowpass', 500), gain(.05), out);
+        const n = noise(); m.crunch = gain(.25); chain(n, filt('bandpass', 2600, .9), m.crunch, out);
+        src.push(m.motor, m2, n);
+      } else if (step===1){     // espresso: titreşimli pompa + akan ince sıvı
+        const pump = osc('square', 50); chain(pump, filt('lowpass', 260), gain(.16), out);
+        const n = noise(); m.flow = gain(0); chain(n, filt('bandpass', 1400, 2.5), m.flow, out);
+        m.flow.gain.setValueAtTime(0, t); m.flow.gain.linearRampToValueAtTime(.22, t + .7);   // ön ıslatmadan sonra akış
+        src.push(pump, n);
+      } else if (step===2){     // süt: buhar tıslaması + gurultu + ısındıkça yükselen ıslık
+        const n = noise(); m.hiss = gain(.28); chain(n, filt('highpass', 3000, .7), m.hiss, out);
+        const n2 = noise(); chain(n2, filt('bandpass', 700, 1.2), gain(.08), out);
+        m.w = osc('sine', 500); m.whistle = gain(0); chain(m.w, m.whistle, out);
+        src.push(n, n2, m.w);
+      } else {                  // köpük: dökülen süt, yumuşak lıkırtı
+        const n = noise(), g = gain(.3); chain(n, filt('lowpass', 650, .8), g, out);
+        const lfo = osc('sine', 7), lg = gain(.12); lfo.connect(lg); lg.connect(g.gain);
+        const n2 = noise(); m.bub = gain(.06); chain(n2, filt('bandpass', 1800, 4), m.bub, out);
+        src.push(n, lfo, n2);
+      }
+      src.forEach(x => x.start());
+      cur = {out, src, m, step};
+    }
+    function tick(step, v){
+      if (!cur || cur.step!==step) return;
+      const t = ac.currentTime, m = cur.m;
+      if (step===0){ m.crunch.gain.setTargetAtTime(.12 + Math.random()*.3, t, .015); m.motor.frequency.setTargetAtTime(88 + Math.random()*8, t, .05); }
+      if (step===1 && Math.random() < .15) m.flow.gain.setTargetAtTime(.14 + Math.random()*.14, t, .03);
+      if (step===2){ const k = Math.max(0, Math.min(1, (v-45)/30));
+        m.whistle.gain.setTargetAtTime(.07*k, t, .1); m.w.frequency.setTargetAtTime(500 + 900*k, t, .1); m.hiss.gain.setTargetAtTime(.28 - .08*k, t, .1); }
+      if (step===3 && Math.random() < .2) m.bub.gain.setTargetAtTime(Math.random()*.12, t, .02);
+    }
+    function stop(fast){
+      if (!cur) return; const c = cur; cur = null;
+      const t = ac.currentTime, f = fast ? .03 : .18;
+      c.out.gain.cancelScheduledValues(t); c.out.gain.setValueAtTime(c.out.gain.value, t); c.out.gain.linearRampToValueAtTime(0, t + f);
+      c.src.forEach(x => { try { x.stop(t + f + .02); } catch(e){} });
+      setTimeout(() => { try { c.out.disconnect(); } catch(e){} }, (f + .15)*1000);
+    }
+    function blip(f, t0, dur, type, v){
+      const o = osc(type, f), g = gain(0); chain(o, g, master);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(v, t0 + .01); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+      o.start(t0); o.stop(t0 + dur + .02); return o;
+    }
+    function result(verdict, won){         // mühür darbesi + kısa melodi
+      if (!unlock()) return; const t = ac.currentTime + .05;
+      const o = blip(140, t, .3, 'sine', .9); o.frequency.exponentialRampToValueAtTime(45, t + .2);
+      const n = noise(), g = gain(0); chain(n, filt('lowpass', 900), g, master);
+      g.gain.setValueAtTime(.7, t); g.gain.exponentialRampToValueAtTime(.001, t + .09); n.start(t); n.stop(t + .1);
+      const notes = won ? [523, 659, 784, 1047] : verdict===1 ? [440, 392] : [330, 262];
+      notes.forEach((f,i) => blip(f, t + .25 + i*(won ? .11 : .16), won ? .5 : .32, 'triangle', won ? .32 : .24));
+    }
+    function toggle(){
+      on = !on; try { localStorage.setItem('koiSound', on ? '1' : '0'); } catch(e) {}
+      if (!on){ stop(true); if (master) master.gain.setTargetAtTime(0, ac.currentTime, .02); }
+      else if (unlock()) master.gain.setTargetAtTime(VOL, ac.currentTime, .02);
+      return on;
+    }
+    return {unlock, start, tick, stop, result, toggle, get on(){ return on; }};
+  })();
+  // ses hiçbir zaman oyunu bozmasın
+  const sfx = (fn, ...a) => { try { return SND[fn](...a); } catch(e) {} };
+
   // ---------- akış ----------
   function press(){
     if (S.phase!=='ready') return;
     if (MODES[mode].gift && S.step===0) setG({status:'playing', attempt:S.attempt, drink});
     holdBtn.classList.add('down');
     holding = true; S.holdT = 0; S.phase='holding';
+    sfx('start', S.step);
   }
   function release(){
     holdBtn.classList.remove('down');
     if (!holding) return; holding=false;
+    sfx('stop');
     if (S.phase!=='holding') return;
     S.phase='settle'; S.post=0; S.atRelease = get(S.step);
     holdBtn.disabled = true;
@@ -403,7 +502,7 @@ canvas{display:block;width:100%;height:100%}
     $('rv').textContent = fmtV(i, v);
     let extra = '';
     if (i===0){
-      S.tf = Math.max(.6, Math.min(1.6, 1 + (18 - v)*.07));
+      const dz = targetOf(0); S.tf = Math.max(.6, Math.min(1.6, 1 + (dz - v)/dz*1.26));   // az doz → hızlı akış
       extra = S.tf>1.06 ? ' Az doz: shot <em>hızlı</em> akacak.' : S.tf<.94 ? ' Fazla doz: shot <em>yavaş</em> akacak.' : '';
     }
     const lost = WT[i]-p;
@@ -439,6 +538,7 @@ canvas{display:block;width:100%;height:100%}
     $('score').innerHTML = `<span class="cap">KALİTE PUANI</span>${total}<small>/100</small>`;
     const stp=$('stamp'); stp.style.display = won ? 'none' : '';
     stp.textContent=vtxt; stp.style.color=vcol; stp.classList.remove('pop'); void stp.offsetWidth; stp.classList.add('pop');
+    sfx('result', worst, won);
     $('lines').innerHTML =
       `<div class="legend"><span><i style="color:var(--ok)">●</i> ${M.gift ? 'Hediye' : 'Uygun'} ${WIN}+</span><span><i style="color:var(--warn)">●</i> Revize ${REV}–${WIN-1}</span><span><i style="color:var(--bad)">●</i> Uygunsuz ${REV}'in altı</span></div>` +
       STEPS.map((st,i)=>{ const lost = WT[i]-S.pts[i];
@@ -495,7 +595,7 @@ canvas{display:block;width:100%;height:100%}
     });
   }
   function renderScoring(){
-    $('scoring').innerHTML = `<span class="h">PUANLAMA · ${MODES[mode].label} · 18 g → 36 ml · 65 °C</span>` +
+    $('scoring').innerHTML = `<span class="h">PUANLAMA · ${MODES[mode].label} · süt hedefi 65 °C</span>` +
       STEPS.map((st,i)=>`<span class="c"><b>${st.name} ${WT[i]}</b><span class="pen">${penTxt(i)}</span></span>`).join('');
   }
   function renderModes(){
@@ -505,7 +605,7 @@ canvas{display:block;width:100%;height:100%}
   }
   function renderPick(){
     $('drinks').innerHTML = Object.entries(DRINKS).map(([k,d]) =>
-      `<button class="drink" data-d="${k}"><b lang="en">${d.name}</b><div class="mm">${d.foam} mm<small>KÖPÜK</small></div><span>${d.info}</span></button>`).join('');
+      `<button class="drink" data-d="${k}"><b lang="en">${d.name}</b><div class="mm">${d.foam} mm<small>KÖPÜK</small></div><span>${d.dose} g → ${d.shot} ml · ${d.info}</span></button>`).join('');
     document.querySelectorAll('.drink').forEach(b => b.addEventListener('click', () => { drink = b.dataset.d; restart(); }));
     renderScoring();
   }
@@ -518,6 +618,7 @@ canvas{display:block;width:100%;height:100%}
       if (g.status==='won' || g.status==='out') locked = g;
       else if (g.status==='revise'){ attempt = 2; drink = g.drink; }
     }
+    sfx('stop', true);
     S = fresh(); holding=false; S.code=null; S.attempt = M.gift ? attempt : 0;
     if (locked) S.phase = 'pick';
     $('result').classList.remove('show'); $('pick').classList.toggle('show', !locked && !drink);
@@ -546,6 +647,11 @@ canvas{display:block;width:100%;height:100%}
   }));
   $('again').addEventListener('click', restart);
   $('change').addEventListener('click', () => { drink = null; restart(); });
+  const sndBtn = $('snd');
+  sndBtn.setAttribute('aria-pressed', String(SND.on));
+  sndBtn.addEventListener('click', () => { const on = sfx('toggle'); sndBtn.setAttribute('aria-pressed', String(!!on)); });
+  // tarayıcılar sesi ancak bir dokunuştan sonra açar: ilk dokunuşta ses motorunu hazırla
+  document.addEventListener('pointerdown', () => sfx('unlock'), {capture:true});
   $('toBarista').addEventListener('click', () => { mode = 'muhendis'; try{localStorage.setItem('koiMode3', mode);}catch(e){} restart(); });
   $('pinReset').addEventListener('click', () => {
     $('pinReset').style.display = 'none'; $('pinForm').classList.add('show'); $('pinErr').textContent = '';
@@ -575,7 +681,7 @@ canvas{display:block;width:100%;height:100%}
     const M = MODES[mode];
     ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
     const cupH = 9, top = H*0.17, bot = H*0.9, pxcm = (bot-top)/cupH;
-    const cx = W*0.4, topW = Math.min(W*0.27, pxcm*3.6), botW = topW*0.68;
+    const cx = W*0.37, topW = Math.min(W*0.25, pxcm*3.6), botW = topW*0.68;   // bardak biraz sola: göstergelere yer
     const xAt = h => topW - (topW-botW)*(1-h/cupH);
     const yAt = h => bot - h*pxcm;
     function layer(h0,h1,fill,hatch){
@@ -597,19 +703,19 @@ canvas{display:block;width:100%;height:100%}
     ctx.strokeStyle=C['--line-dim']; ctx.lineWidth=1; for (let x=-H;x<W;x+=6){ ctx.beginPath(); ctx.moveTo(x,bot+8); ctx.lineTo(x+H,bot+8-H); ctx.stroke(); } ctx.restore();
     ctx.lineWidth=2.2; ctx.strokeStyle=C['--line']; ctx.beginPath(); ctx.ellipse(cx-topW-4-pxcm*.9, yAt(5.2), pxcm*1.0, pxcm*1.5, 0, Math.PI*.42, Math.PI*1.58); ctx.stroke();
     ctx.setLineDash([14,4,3,4]); ctx.lineWidth=1; ctx.strokeStyle=C['--line-dim']; ctx.beginPath(); ctx.moveTo(cx,top-14); ctx.lineTo(cx,bot+18); ctx.stroke(); ctx.setLineDash([]);
-    ctx.font = `500 10px ${MONO}`; ctx.fillStyle=C['--line-dim'];
+    ctx.font = `500 11px ${MONO}`; ctx.fillStyle=C['--line-dim'];
 
     if (drink && S.phase!=='pick'){
       const gx = cx + topW + 26, i = S.step, c = targetOf(i), half = band(i);
-      if (i===0) drawGauge(gx+(W-gx)/2-8, H*0.55, Math.max(26, Math.min((W-gx)/2-26, 56)), c, half, M.bands);
-      if (i===1) drawScale(gx + 14, top, bot, c, half, M.bands);
-      if (i===2) drawThermo(gx + 22, top, bot, c, half, M.bands);
+      if (i===0) drawScale(gx + 18, top, bot, c, half, M.bands, 0);
+      if (i===1) drawScale(gx + 18, top, bot, c, half, M.bands, 1);
+      if (i===2) drawThermo(gx + 26, top, bot, c, half, M.bands);
       if (i===3){
         // köpük yüzeyindeki B dairesi → sağdaki büyütülmüş detay
         const by = yAt((foamBot+foamTop)/2), bx = cx + xAt(foamTop) - 6;
         ctx.strokeStyle=C['--koi']; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(bx, by, 11, 0, 7); ctx.stroke();
         ctx.fillStyle=C['--koi']; ctx.font=`700 10px ${MONO}`; ctx.textAlign='center'; ctx.fillText('B', bx, by-15);
-        ctx.font=`500 10px ${MONO}`;
+        ctx.font=`500 11px ${MONO}`;
         drawDetail(cx+topW+18, W-8, top+14, bot, c, half, M.bands, bx+11, by);
       }
       if (S.phase==='holding'){
@@ -632,49 +738,43 @@ canvas{display:block;width:100%;height:100%}
     [top,bot].forEach(y=>{ctx.beginPath(); ctx.moveTo(dx-5,y); ctx.lineTo(dx+5,y); ctx.stroke();});
     ctx.save(); ctx.translate(dx-6,(top+bot)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillStyle=C['--line-dim']; ctx.fillText('h = 9,0 cm',0,0); ctx.restore();
   }
-  // terazi (0–30 g)
-  function drawGauge(x,y,r,c,half,bands){
-    const A = v => Math.PI + (Math.min(30,v)/30)*Math.PI;
-    ctx.strokeStyle=C['--line']; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,r,Math.PI,0); ctx.lineTo(x-r,y); ctx.stroke();
-    if (bands){ ctx.strokeStyle=C['--ok']; ctx.lineWidth=7; ctx.beginPath(); ctx.arc(x,y,r-6,A(c-half),A(c+half)); ctx.stroke(); }
-    ctx.strokeStyle=C['--line-dim']; ctx.fillStyle=C['--line-dim']; ctx.lineWidth=1; ctx.textAlign='center';
-    for (let v=0; v<=30; v+=1){ const a=A(v), l = v%5===0 ? 10 : 4;
-      ctx.beginPath(); ctx.moveTo(x+Math.cos(a)*(r-2),y+Math.sin(a)*(r-2)); ctx.lineTo(x+Math.cos(a)*(r-2-l),y+Math.sin(a)*(r-2-l)); ctx.stroke();
-      if (v%10===0) ctx.fillText(String(v), x+Math.cos(a)*(r+10), y+Math.sin(a)*(r+10)+3); }
-    const a=A(S.disp[0]); ctx.strokeStyle=C['--koi']; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+Math.cos(a)*(r-10),y+Math.sin(a)*(r-10)); ctx.stroke();
-    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fill();
-    ctx.fillStyle=C['--line-dim']; ctx.fillText('gram', x, y+16);
-  }
-  // dereceli mezür (0–50 ml)
-  function drawScale(x,top,bot,c,half,bands){
-    const max=50, y=v=>bot-6-(Math.min(max,v)/max)*(bot-top-26);
-    ctx.strokeStyle=C['--line']; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(x-11, top); ctx.lineTo(x-11, bot-6); ctx.lineTo(x+11, bot-6); ctx.lineTo(x+11, top); ctx.stroke();
-    if (bands){ ctx.fillStyle='rgba(60,207,125,.25)'; ctx.fillRect(x-24, y(c+half), 48, y(c-half)-y(c+half)); }
-    ctx.fillStyle=C['--espresso']; ctx.fillRect(x-9.5, y(S.disp[1]), 19, bot-6-y(S.disp[1]));
-    ctx.fillStyle=C['--koi']; ctx.fillRect(x-14, y(S.disp[1])-1, 28, 2);
-    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left';
-    for (let v=0; v<=max; v+=2){ ctx.fillRect(x+12, y(v), v%10===0?8:4, 1); if (v%10===0) ctx.fillText(String(v), x+23, y(v)+3); }
-    if (bands){ ctx.fillStyle=C['--ok']; ctx.fillText(`${num(c-half,1)}–${num(c+half,1)}`, x+23, y(c)+3); }
-    ctx.fillStyle=C['--line-dim']; ctx.textAlign='center'; ctx.fillText('ml', x, bot+8);
+  // dik ölçek: öğütme (terazi, gram) ve espresso (mezür, ml). Aralık hedefe göre:
+  // 9 g → 0–15 g, 18 g → 0–30 g · 18 ml → 0–25 ml, 36 ml → 0–50 ml
+  function drawScale(x,top,bot,c,half,bands,i){
+    const small = i===0 ? targetOf(0) <= 10 : targetOf(1) <= 20;
+    const max = i===0 ? (small ? 15 : 30) : (small ? 25 : 50);
+    const lab = small ? 5 : 10, tk = i===0 ? (small ? .5 : 1) : (small ? 1 : 2);
+    const y = v => bot-6-(Math.min(max,v)/max)*(bot-top-26), val = S.disp[i];
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2.4;
+    ctx.beginPath(); ctx.moveTo(x-14, top); ctx.lineTo(x-14, bot-6); ctx.lineTo(x+14, bot-6); ctx.lineTo(x+14, top); ctx.stroke();
+    if (bands){ ctx.fillStyle='rgba(60,207,125,.25)'; ctx.fillRect(x-28, y(c+half), 56, y(c-half)-y(c+half)); }
+    if (i===0){   // öğütülmüş kahve: noktalı doku
+      ctx.fillStyle='#6b3d22'; ctx.fillRect(x-12.5, y(val), 25, bot-6-y(val));
+      ctx.fillStyle='rgba(0,0,0,.25)'; for (let yy=bot-9; yy>y(val); yy-=4) for (let xx=x-11+((yy/4)%2)*2; xx<x+12; xx+=4) ctx.fillRect(xx, yy, 1.5, 1.5);
+    } else { ctx.fillStyle=C['--espresso']; ctx.fillRect(x-12.5, y(val), 25, bot-6-y(val)); }
+    ctx.fillStyle=C['--koi']; ctx.fillRect(x-18, y(val)-1.5, 36, 3);
+    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left'; ctx.font=`600 12px ${MONO}`;
+    for (let v=0; v<=max+1e-9; v+=tk){ const major = Math.abs(v%lab)<1e-9; ctx.fillRect(x+15, y(v), major?10:5, major?1.5:1); if (major) ctx.fillText(String(v), x+28, y(v)+4); }
+    if (bands){ ctx.fillStyle=C['--ok']; ctx.font=`700 11px ${MONO}`; ctx.fillText(`${num(c-half,1)}–${num(c+half,1)}`, x+28, y(c)+4); }
+    ctx.fillStyle=C['--line-dim']; ctx.textAlign='center'; ctx.font=`500 11px ${MONO}`; ctx.fillText(i===0 ? 'gram' : 'ml', x, bot+9);
   }
   function drawThermo(x,top,bot,c,half,bands){
     const y=v=>bot-(v/80)*(bot-top-20);
-    ctx.strokeStyle=C['--line']; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.roundRect(x-9, top, 18, bot-top-6, 9); ctx.stroke();
-    if (bands){ ctx.fillStyle='rgba(60,207,125,.25)'; ctx.fillRect(x-30, y(c+half), 60, y(c-half)-y(c+half)); }
-    ctx.fillStyle='rgba(255,90,79,.18)'; ctx.fillRect(x-30, y(80), 60, y(72)-y(80));
+    ctx.strokeStyle=C['--line']; ctx.lineWidth=2.4;
+    ctx.beginPath(); ctx.roundRect(x-11, top, 22, bot-top-6, 11); ctx.stroke();
+    if (bands){ ctx.fillStyle='rgba(60,207,125,.25)'; ctx.fillRect(x-32, y(c+half), 64, y(c-half)-y(c+half)); }
+    ctx.fillStyle='rgba(255,90,79,.18)'; ctx.fillRect(x-32, y(80), 64, y(72)-y(80));
     const v=Math.min(80,S.disp[2]); ctx.fillStyle = S.disp[2]>c+half ? C['--bad'] : C['--koi'];
-    ctx.beginPath(); ctx.roundRect(x-4.5, y(v), 9, bot-6-y(v)-2, 4); ctx.fill();
-    ctx.beginPath(); ctx.arc(x, bot-4, 12, 0, 7); ctx.fill();
-    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left';
-    for (let k=0;k<=80;k+=2){ ctx.fillRect(x+12, y(k), k%10===0?7:3, 1); if (k%10===0) ctx.fillText(String(k), x+21, y(k)+3); }
-    if (bands){ ctx.fillStyle=C['--ok']; ctx.fillText(`${num(c-half,1)}–${num(c+half,1)}`, x+21, y(c)+3); }
-    ctx.fillStyle=C['--bad']; ctx.fillText('YANIK', x-28, y(76)+3);
+    ctx.beginPath(); ctx.roundRect(x-5.5, y(v), 11, bot-6-y(v)-2, 5); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, bot-4, 14, 0, 7); ctx.fill();
+    ctx.fillStyle=C['--line-dim']; ctx.textAlign='left'; ctx.font=`600 12px ${MONO}`;
+    for (let k=0;k<=80;k+=2){ ctx.fillRect(x+14, y(k), k%10===0?9:4, k%10===0?1.5:1); if (k%10===0) ctx.fillText(String(k), x+26, y(k)+4); }
+    if (bands){ ctx.fillStyle=C['--ok']; ctx.font=`700 11px ${MONO}`; ctx.fillText(`${num(c-half,1)}–${num(c+half,1)}`, x+26, y(c)+4); }
+    ctx.fillStyle=C['--bad']; ctx.font=`700 11px ${MONO}`; ctx.fillText('YANIK', x-30, y(76)+4);
   }
   // DETAY B: köpük katmanının büyütülmüş kesiti, her mm okunur
   function drawDetail(x0, x1, top, bot, c, half, bands, px, py){
-    const max = Math.max(15, c + 10), win = Math.min(42, Math.max(26, (x1-x0)*.42));
+    const max = Math.max(15, c + 10), win = Math.min(50, Math.max(28, (x1-x0)*.42));
     const head = 16, yb = bot - 14, yt0 = top + head + 6, ppm = (yb - yt0)/max;
     const y = mm => yb - mm*ppm, xr = x0 + win;
     // pencere
@@ -691,20 +791,20 @@ canvas{display:block;width:100%;height:100%}
     ctx.strokeStyle=C['--koi']; ctx.lineWidth=1; ctx.setLineDash([3,3]);
     ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x0, yt0 + (yb-yt0)*.5); ctx.stroke(); ctx.setLineDash([]);
     // başlık
-    ctx.fillStyle=C['--koi']; ctx.font=`700 10px ${MONO}`; ctx.textAlign='left'; ctx.fillText('DETAY B · mm', x0, top+10);
+    ctx.fillStyle=C['--koi']; ctx.font=`700 11px ${MONO}`; ctx.textAlign='left'; ctx.fillText('DETAY B · mm', x0, top+10);
     // milimetre ölçeği
     const every = ppm >= 13 ? 1 : ppm >= 6 ? 2 : 5;
-    ctx.fillStyle=C['--line']; ctx.font=`600 ${ppm>=13?11:10}px ${MONO}`;
+    ctx.fillStyle=C['--line']; ctx.font=`600 ${ppm>=13?13:12}px ${MONO}`;
     for (let mm=0; mm<=max; mm++){
       const yy = y(mm), major = mm%5===0;
       ctx.fillStyle = major ? C['--line'] : C['--line-dim'];
-      ctx.fillRect(xr, yy, major ? 10 : 6, major ? 1.5 : 1);
-      if (mm%every===0) ctx.fillText(String(mm), xr+13, yy+4);
+      ctx.fillRect(xr, yy, major ? 12 : 7, major ? 1.5 : 1);
+      if (mm%every===0) ctx.fillText(String(mm), xr+15, yy+4);
     }
     if (bands){ ctx.fillStyle=C['--ok']; ctx.font=`700 10px ${MONO}`; ctx.fillText(`${c}`, x0-2-ctx.measureText(String(c)).width, y(c)+4); }
     // köpük göstergesi
     const yd = y(Math.max(0, Math.min(max, S.disp[3])));
-    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.moveTo(xr+1, yd); ctx.lineTo(xr+9, yd-5); ctx.lineTo(xr+9, yd+5); ctx.closePath(); ctx.fill();
+    ctx.fillStyle=C['--koi']; ctx.beginPath(); ctx.moveTo(xr+1, yd); ctx.lineTo(xr+11, yd-6); ctx.lineTo(xr+11, yd+6); ctx.closePath(); ctx.fill();
     ctx.strokeStyle=C['--koi']; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x0, yd); ctx.lineTo(xr, yd); ctx.stroke();
     ctx.font=`500 10px ${MONO}`;
   }
