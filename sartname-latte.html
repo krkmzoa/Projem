@@ -129,6 +129,8 @@ canvas{display:block;width:100%;height:100%}
 #result .score{font-size:60px;text-align:center}
 .score .cap{display:block;font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.12em;color:var(--line-dim);margin-bottom:4px}
 #result .stamp{font-size:32px;margin:6px 0 4px}
+.final{display:none;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.06em;color:#fff;background:var(--bad);border-radius:6px;padding:6px 12px;text-align:center}
+.final.show{display:block}
 #result .teaser{font-size:15px;line-height:1.4;max-width:400px;font-weight:600}
 #result .row,#result .gift{max-width:400px}
 .spec .ta{color:var(--koi)}
@@ -201,6 +203,7 @@ canvas{display:block;width:100%;height:100%}
       <div class="best" id="resHead">PROJE KONTROL RAPORU</div>
       <div class="score" id="score">0<small>/100</small></div>
       <div class="stamp" id="stamp">UYGUNDUR</div>
+      <div class="final" id="final"></div>
       <div class="gift" id="gift">
         <div class="g1" id="giftG1">HEDİYE KAZANDIN</div>
         <div class="g2" id="giftName">Latte bizden</div>
@@ -551,7 +554,7 @@ canvas{display:block;width:100%;height:100%}
     const M = MODES[mode];
     const total = Math.round(S.pts.reduce((a,b)=>a+b,0));
     const worst = verdictOf(total);
-    const [vtxt, vcol] = VERDICT[worst];
+    let [vtxt, vcol] = VERDICT[worst];
     const won = M.gift && worst===0;
     const canRevise = M.gift && worst===1 && S.attempt===1;
     if (M.gift) setG(won ? {status:'won', drink} : canRevise ? {status:'revise', attempt:2, drink} : {status:'out', reason:'sonuc'});
@@ -559,10 +562,15 @@ canvas{display:block;width:100%;height:100%}
     $('resHead').textContent = `PROJE KONTROL RAPORU · ${DRINKS[drink].name.toUpperCase()} · ${M.label}` + (M.gift ? ` · DENEME ${S.attempt}/2` : '');
     $('score').innerHTML = `<span class="cap">KALİTE PUANI</span>${total}<small>/100</small>`;
     const stp=$('stamp'); stp.style.display = won ? 'none' : '';
+    // hak bittiyse (UYGUNSUZ ya da 2. denemede yine REVİZE) son karar: REDDEDİLDİ
+    const finalOut = M.gift && !won && !canRevise;
+    if (finalOut){ vtxt = 'REDDEDİLDİ'; vcol = 'var(--bad)'; }
+    $('final').classList.toggle('show', finalOut);
+    $('final').textContent = finalOut ? (worst===1 && S.attempt===2 ? 'SON DENEME DE REVİZE · BUGÜNKÜ HAKKIN BİTTİ' : 'BUGÜNKÜ HAKKIN BİTTİ') : '';
     stp.textContent=vtxt; stp.style.color=vcol; stp.classList.remove('pop'); void stp.offsetWidth; stp.classList.add('pop');
     sfx('result', worst, won);
     $('lines').innerHTML =
-      `<div class="legend"><span><i style="color:var(--ok)">●</i> ${M.gift ? 'Hediye' : 'Uygun'} ${WIN}+</span><span><i style="color:var(--warn)">●</i> Revize ${REV}–${WIN-1}</span><span><i style="color:var(--bad)">●</i> Uygunsuz ${REV}'in altı</span></div>` +
+      (finalOut ? '' : `<div class="legend"><span><i style="color:var(--ok)">●</i> ${M.gift ? 'Hediye' : 'Uygun'} ${WIN}+</span><span><i style="color:var(--warn)">●</i> Revize ${REV}–${WIN-1}</span><span><i style="color:var(--bad)">●</i> Uygunsuz ${REV}'in altı</span></div>`) +
       STEPS.map((st,i)=>{ const lost = WT[i]-S.pts[i];
         return `<div class="ln" style="--c:${stepColor(i)}">
         <div class="lh"><b>${st.name}</b><span class="lv">${fmtV(i,S.val[i])}${st.suf} <small>/ hedef ${targetOf(i)}${st.suf}</small></span><span class="chip">${num(S.pts[i],1)}/${WT[i]}</span></div>
@@ -584,6 +592,7 @@ canvas{display:block;width:100%;height:100%}
       : canRevise ? `Son deneme hakkın var. Hediye için ${WIN} puan gerekli, sen ${total} aldın. ${bigTxt}`
       : worst===2 ? `Hakkın kalmadı: ${total} puan, en az ${REV} gerekliydi. ${bigTxt}`
       : `Hakkın kalmadı: ikinci denemede de ${WIN} puana ulaşılamadı (${total}). ${bigTxt}`;
+    $('teaser').style.color = finalOut ? 'var(--bad)' : '';
     const isBest = total>bests[mode]; if (isBest){ bests[mode]=total; try{localStorage.setItem('koiBest3_'+mode, String(total));}catch(e){} }
     $('best').textContent = isBest && total>0 ? `YENİ REKOR · ${total}/100` : `REKORUN · ${bests[mode]}/100`;
     $('ctrl').textContent = won ? 'HEDİYE' : vtxt; $('ctrl').style.color = won ? 'var(--ok)' : vcol;
@@ -592,7 +601,7 @@ canvas{display:block;width:100%;height:100%}
     $('result').classList.add('show'); $('result').scrollTop = 0;
     msg.innerHTML = won ? `Şartnameye uygun. <em>${DRINKS[drink].name} bizden!</em> Ekranı kasada göster.`
       : canRevise ? 'Revizyon gerekli. <em>Son deneme hakkın var.</em>'
-      : M.gift ? 'Şartname dışı. <em>Bugünkü hakkın bitti.</em>'
+      : M.gift ? 'Proje reddedildi. <em>Mühendis seviyesi yarın yeniden açılır.</em>'
       : worst===0 ? 'Proje onaylandı. <em>Afiyet olsun.</em>' : worst===1 ? 'Revizyon gerekli. <em>Bir daha dene.</em>' : 'Şartname dışı. <em>Yeniden hesapla.</em>';
     holdBtn.disabled = true;
     renderModes();
